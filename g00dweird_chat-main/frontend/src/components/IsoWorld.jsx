@@ -2188,12 +2188,6 @@ function QuoteBubble({ text, fullfunk, placeBelow = false }) {
     );
 }
 
-function thoughtTextHash(text) {
-    let hash = 0;
-    for (const ch of String(text || "")) hash = ((hash * 31) + ch.charCodeAt(0)) | 0;
-    return Math.abs(hash);
-}
-
 function pickThoughtBubbleVariant(text, fullfunk = false) {
     const source = String(text || "").trim();
     const len = source.length;
