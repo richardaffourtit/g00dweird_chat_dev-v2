@@ -3,20 +3,20 @@ import axios from "axios";
 const PREVIEW_MOCK = process.env.REACT_APP_PREVIEW_MOCK === "1";
 
 const PREVIEW_ROOMS = [
-    { id: "hello", name: "HELLO WORLD", tagline: "good weird starts here", theme: "hello", bg_url: "/worlds/hello.png" },
-    { id: "jello", name: "JELLO LOUNGE", tagline: "wiggly social gelatin", theme: "jello", bg_url: "/worlds/jello.png" },
-    { id: "heaven", name: "HEAVEN GATE", tagline: "clouds, halos, questionable snacks", theme: "heaven", bg_url: "/worlds/heaven.png" },
-    { id: "mars", name: "MARS YARD", tagline: "red dust transmission", theme: "mars", bg_url: "/worlds/mars.png" },
-    { id: "neoclassick-world", name: "NEOCLASSICK WORLD", tagline: "where we play golf at a high level", theme: "neoclassick-world", bg_url: "/worlds/neoclassick-world.png" },
-    { id: "wwworld", name: "WWWORLD", tagline: "let's get meta", theme: "wwworld", bg_url: "/worlds/wwworld.png" },
-    { id: "regular-cafe", name: "REGULAR CAFE", tagline: "almost normal", theme: "regular-cafe", bg_url: "/worlds/regular-cafe.png" },
-    { id: "toxic-void", name: "TOXIC VOID", tagline: "hazardous signal is alive", theme: "toxic-void", bg_url: "/worlds/toxic-void.png" },
-    { id: "basketball-court", name: "BASKETBALL COURT", tagline: "court of strange rebounds", theme: "basketball-court", bg_url: "/worlds/basketball-court.png" },
-    { id: "food-court", name: "FOOD COURT", tagline: "mall snacks, shared static", theme: "food-court", bg_url: "/worlds/food-court.png" },
-    { id: "jungle", name: "JUNGLE", tagline: "green signal overgrowth", theme: "jungle", bg_url: "/worlds/jungle.png" },
-    { id: "spiderweb", name: "SPIDERWEB", tagline: "sticky hallway of whispers", theme: "spiderweb", bg_url: "/worlds/spiderweb.png" },
-    { id: "liminal-backroom", name: "LIMINAL BACKROOM", tagline: "final form: the room remembers wrong", theme: "liminal-backroom", bg_url: "/worlds/liminal-backroom.png" },
-    { id: "inspiration-theatre", name: "INSPIRATION THEATRE", tagline: "groupwatch weird together", theme: "inspiration-theatre", bg_url: "/worlds/inspiration-theatre.png" },
+    { id: "hello", name: "HELLO WORLD", tagline: "good weird starts here", theme: "hello", bg_url: "/worlds/hello.png", icon_url: "/world_icons/hello.png" },
+    { id: "jello", name: "JELLO LOUNGE", tagline: "wiggly social gelatin", theme: "jello", bg_url: "/worlds/jello.png", icon_url: "/world_icons/jello.png" },
+    { id: "heaven", name: "HEAVEN GATE", tagline: "clouds, halos, questionable snacks", theme: "heaven", bg_url: "/worlds/heaven.png", icon_url: "/world_icons/heaven.png" },
+    { id: "mars", name: "MARS YARD", tagline: "red dust transmission", theme: "mars", bg_url: "/worlds/mars.png", icon_url: "/world_icons/mars.png" },
+    { id: "neoclassick-world", name: "NEOCLASSICK WORLD", tagline: "where we play golf at a high level", theme: "neoclassick-world", bg_url: "/worlds/neoclassick-world.png", icon_url: "/world_icons/neoclassick-world.png" },
+    { id: "wwworld", name: "WWWORLD", tagline: "let's get meta", theme: "wwworld", bg_url: "/worlds/wwworld.png", icon_url: "/world_icons/wwworld.png" },
+    { id: "regular-cafe", name: "REGULAR CAFE", tagline: "almost normal", theme: "regular-cafe", bg_url: "/worlds/regular-cafe.png", icon_url: "/world_icons/regular-cafe.png" },
+    { id: "toxic-void", name: "TOXIC VOID", tagline: "hazardous signal is alive", theme: "toxic-void", bg_url: "/worlds/toxic-void.png", icon_url: "/world_icons/toxic-void.png" },
+    { id: "basketball-court", name: "BASKETBALL COURT", tagline: "court of strange rebounds", theme: "basketball-court", bg_url: "/worlds/basketball-court.png", icon_url: "/world_icons/basketball-court.png" },
+    { id: "food-court", name: "FOOD COURT", tagline: "mall snacks, shared static", theme: "food-court", bg_url: "/worlds/food-court.png", icon_url: "/world_icons/food-court.png" },
+    { id: "jungle", name: "JUNGLE", tagline: "green signal overgrowth", theme: "jungle", bg_url: "/worlds/jungle.png", icon_url: "/world_icons/jungle.png" },
+    { id: "spiderweb", name: "SPIDERWEB", tagline: "sticky hallway of whispers", theme: "spiderweb", bg_url: "/worlds/spiderweb.png", icon_url: "/world_icons/spiderweb.png" },
+    { id: "liminal-backroom", name: "LIMINAL BACKROOM", tagline: "final form: the room remembers wrong", theme: "liminal-backroom", bg_url: "/worlds/liminal-backroom.png", icon_url: "/world_icons/liminal-backroom.png" },
+    { id: "inspiration-theatre", name: "INSPIRATION THEATRE", tagline: "groupwatch weird together", theme: "inspiration-theatre", bg_url: "/worlds/inspiration-theatre.png", icon_url: "/world_icons/inspiration-theatre.png" },
 ];
 
 function getBackendUrl() {
