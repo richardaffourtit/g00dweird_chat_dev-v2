@@ -1,0 +1,4 @@
+
+# Local Mongo runtime data
+backend/.mongo-data/
+backend/.mongo-logs/
