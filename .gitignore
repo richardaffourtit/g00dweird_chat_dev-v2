@@ -2,3 +2,7 @@
 # Local Mongo runtime data
 backend/.mongo-data/
 backend/.mongo-logs/
+
+# Local SSH key files
+rtassh
+rtassh.pub
