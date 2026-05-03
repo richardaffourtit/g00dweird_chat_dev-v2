@@ -1,0 +1,52 @@
+{
+  "summary": "Iteration 17 — backend refactor (ws.handlers extraction) + profile disambiguation + auto-raise focus + ChatWindow split. Backend: 19/19 pytest PASS — all WS message types dispatch correctly through the new ws.handlers.dispatch (chat/thought/typing/move/stance/avatar/sprite/anim/jukebox*/youtube*/tag_spray/tag_clear/attack/ping), profile ?user_id= disambiguation behaves exactly as spec (without -> most recent, with valid id -> that user, with wrong id -> 404), PvP cycle (hurt -> die -> respawn) works end-to-end, REST regression endpoints (join, rooms, bio, upload, files) all green. Frontend: ChatWindow refactor renders cleanly — all 9 required action-bar testids present, chat-input/chat-send work, user-list-link-<nick> anchors have correct href=/u/<nick>?u=<user_id>, profile-page-not-found ghost screen still rendered for missing handles. AUTO-RAISE FOCUS regression detected: re-clicking open-sprite while the sprite-picker is already open does NOT raise it above the worlds window (sprite z stayed 19; worlds z=24, so sprite remained underneath). React key-prop warning emitted from ChatMessageList post-refactor.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Desktop.jsx / Win95Window.jsx (requestFocus wiring)",
+        "issue": "Auto-raise focus management is NOT working. Repro: open-sprite button clicked -> SpritePicker visible (z=19). open-worlds clicked -> WorldPicker on top (z=23). Click open-sprite AGAIN -> SpritePicker z stays at 19; WorldPicker bumps to 24, so SpritePicker remains underneath WorldPicker. Expected: clicking the icon/button while window is already open should bump that window's z-index above all others (per requestFocus useEffect contract). Likely cause: the requestFocus prop's useEffect is not actually mutating z-index in Win95Window, OR Desktop.jsx is bumping focusNonces[key] but each window keeps its own static z and never compares against a global focus counter. Need to wire requestFocus -> setLocalZ(maxZ+1) using a shared topZ ref.",
+        "selector": "[data-testid='sprite-picker'], [data-testid='world-picker'], [data-testid='open-sprite']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "ChatMessageList.jsx",
+        "issue": "React console warning: 'Each child in a list should have a unique key prop. ... It was passed a child from ChatMessageList.' Add a stable key (msg.id or `${user_id}-${ts}`) to mapped <div>s.",
+        "selector": "[data-testid='chat-messages']",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration17.py",
+    "/app/test_reports/pytest/iter17.xml"
+  ],
+  "action_items": [
+    "[HIGH] Fix auto-raise focus: clicking an icon/action-bar button while the window is already open must raise its z-index above all peers. Verify Win95Window's requestFocus useEffect actually calls setZ(global++). Today, sprite z stayed at 19 while worlds was at 23/24, so re-clicking open-sprite did not pop SpritePicker on top.",
+    "[MED] Add unique key prop in ChatMessageList map — React warning emitted on every render after the refactor.",
+    "[INFO] /u/weirdbot?u=weirdbot-<room> returns 404 (correct — weirdbot is an in-memory bot, no DB doc). User-list-link is still emitted for it; consider hiding the bot from clickable user list links if you don't want users to land on a 404, OR seed a synthetic doc for weirdbot."
+  ],
+  "critical_code_review_comments": [
+    "ws/handlers.py L380 attack: rate-limit uses `getattr(conn, '_last_attack_ts', 0) < 0.6` — fine for ClientConn; works for WeirdBotConn too via getattr fallback. Good defensive choice.",
+    "ws/handlers.py L182 anim: empty-string anim_id is allowed via ALLOWED_ANIM membership (since '' is in the set), then converted to None via `aid or None`. Correct, but worth a comment — easy to misread.",
+    "ws/handlers.py L429 _respawn: x/y derived from hash(target_uid + str(time.time())) — non-deterministic, fine for gameplay, but if two attacks complete within the same epoch second the new positions could collide (low risk).",
+    "server.py L585 sort=[('created_at', -1)]: when ?user_id= is provided, the id filter already pinpoints one doc, so the sort is dead code in that branch — minor.",
+    "server.py L922 ws_endpoint: when an `old` connection is found and closed, the broadcast `user_left` is NOT emitted for the old uid. The new connection's user_joined is sent instead. Other clients will see the user position jump but no leave/rejoin — acceptable for reconnect flow.",
+    "ChatMessageList.jsx: missing `key` prop on mapped messages — React warning in console (see frontend_issues).",
+    "Desktop.jsx focusNonces approach: bumping a per-key nonce isn't sufficient unless Win95Window converts it into a globally-monotonic z-index. Today the nonce changes but z-index in DOM stays at 19, so siblings opened later end up on top permanently."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration17.py (new — 19 pytest tests)"
+  ],
+  "success_rate": {"backend": "100% (19/19 iter17)", "frontend": "85% — chat, user-list, profile-share, profile-not-found all good; AUTO-RAISE FOCUS feature failed verification."},
+  "test_credentials": "Nickname-only. Used TEST_i17_* on backend.",
+  "seed_data_creation": "Backend test created multiple TEST_i17_* user docs (each pytest case calls /api/join afresh), 1 TEST_i17_tag spray in mars room, 1 TEST_i17 bio update. All TEST_-prefixed; within MAX_TAGS_PER_ROOM=80 cap.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Run: pytest /app/backend/tests/test_iteration17.py -v. Auto-raise focus bug: in Win95Window the requestFocus prop must actually update a local z-index state (e.g. const [z, setZ] = useState(initial); useEffect(() => setZ(globalTopZ.current = globalTopZ.current+1), [requestFocus])). Verify with playwright: open sprite-picker, then world-picker, then click open-sprite again — assert getComputedStyle(spritePicker).zIndex > getComputedStyle(worldPicker).zIndex. ChatMessageList fix: add `key={m.id || `${m.user_id}-${m.ts}`}` to mapped messages. Backend ws handler dispatch is solid; no need to retest WS unless server.py is touched. Tests for /api/profile/{nick}?user_id= cover the 3 cases (none/match/wrong)."
+}

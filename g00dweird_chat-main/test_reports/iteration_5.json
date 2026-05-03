@@ -1,0 +1,49 @@
+{
+  "summary": "Iteration 5 testing of graffiti spray-tag + animated sprite WS features. CRITICAL bug found & hot-fixed: server.py ClientConn.__init__ was missing anim_id / anim_stance params while line 590 passed anim_id positionally AND line 275 read c.anim_id/c.anim_stance — every WebSocket join was crashing with `TypeError: ClientConn.__init__() takes 6 positional arguments but 7 were given`, breaking the entire app (chat, spray, anim). After fix all 8 new iter5 pytest tests pass + backend/frontend flows verified. Backend: 8/8 iter5 tests PASS (rest GET/DELETE tags, tag_spray WS broadcast+persist+no `_id`, snapshot includes tags, tag_clear broadcast+delete, stance broadcast+snapshot, anim broadcast+snapshot, MAX_TAGS_PER_ROOM cap <=80). Frontend (desktop 1920x1080): spray-window opens from start-menu, spray-toggle flips label '◉ SPRAYING' + bg rgb(179,255,0), floating-spray-can appears beside iso-avatar, tag-layer computed mixBlendMode='screen', placed-tag wrapper bg rgba(0,0,0,0) (NO BLACK RECT — key user req MET), preset & custom tags placed, spray-clear removes all tags. Full regression: 40/43 pytest PASS (2 stale tests hardcode 5 rooms but backend now serves 11 — not a bug; 1 flaky stance test times out on full run but passes in isolation).",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "WS /api/ws/{room_id}", "issue": "[FIXED by testing agent] ClientConn.__init__ missing anim_id/anim_stance params — every WS connection crashed with TypeError. Added `anim_id=None, anim_stance='idle'` to ClientConn constructor in server.py. Main agent should review this fix.", "priority": "CRITICAL"}
+    ],
+    "minor": [
+      {"endpoint": "/api/rooms (regression)", "issue": "test_list_rooms (iter1) and test_five_rooms_with_bg (iter3) hardcode 5 rooms but ROOMS now has 11 entries. Old tests are stale, not a backend bug. Recommend main agent update or delete the outdated assertions."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Anim sprite picker UI", "issue": "Could not locate `data-testid=\"icon-sprites\"` nor `data-testid^=anim-` buttons — the anim creature picker UI testids were not discoverable in my session. Backend WS anim + stance confirmed working via pytest. Main agent should verify SpritePicker.jsx exposes a testid pattern like `anim-<creature>` / `stance-<state>` for automated tests.", "affected_selectors": ["[data-testid=\"icon-sprites\"]", "[data-testid^=\"anim-\"]"]}
+    ],
+    "design_issues": [
+      {"screen": "SprayTool window", "issues": ["SprayWindow is centered over iso-world so clicking the iso-world beneath it requires aiming at the uncovered strip. Not blocking (drag to move works), but on smaller desktops a user could miss that the iso-world is still clickable around the window. Minor."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration5.py",
+    "/app/test_reports/pytest/iter5.xml",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "[ALREADY FIXED by T1] Re-verify the ClientConn constructor fix in /app/backend/server.py lines 227-238 — added anim_id/anim_stance kwargs so all WS joins succeed.",
+    "Expose data-testid attributes on the anim creature picker (SpritePicker.jsx) and stance picker so animated-sprite flow is automatable — e.g. `anim-<creature>` and `stance-<state>`.",
+    "Update stale iter1/iter3 room-count tests (or delete) — they expect 5 rooms but backend now serves 11.",
+    "[LOW] Spray size slider scale difference on placed tags was visible but subtle (61px → 70px in my run). Confirm that the rendered tag <img> wrapper multiplies by spraySize correctly (IsoWorld.jsx placed-tag transform)."
+  ],
+  "critical_code_review_comments": [
+    "server.py L228: ClientConn needs explicit defaults for new fields (anim_id, anim_stance) — the bug shipped because the constructor signature was not updated when anim support was added. Consider adding a dataclass or ensuring any new state field is initialised in __init__ to prevent future AttributeError on c.<field>.",
+    "server.py L841: anim_id validation uses an allow-list `('fairy','ape','ghost','robot','frog','cat','')`. Good — but the empty string means 'clear' and is conflated with None (line 843 `conn.anim_id = aid or None`). OK functionally but document intent.",
+    "server.py tag_spray handler: MAX_TAGS_PER_ROOM enforcement does `count_documents` + `find+delete` on every spray. For a hot room that becomes 3 round-trips per tag. Consider a bulk capped-list or sorted-set pattern later.",
+    "IsoWorld.jsx placed-tag: verify the transform/scale on the wrapper multiplies by tag.scale so clients see the size chosen at spray time. In my test two placed tags at scale 1.0 vs 2.5 rendered 61px vs 70px which is narrower than expected.",
+    "SprayWindow is rendered as a floating window that obscures the iso-world — spray mode keeps it focused. A11y: indicator 'SPRAY MODE — CLICK TO TAG' banner is good."
+  ],
+  "updated_files": [
+    "/app/backend/server.py (CRITICAL hot-fix: ClientConn __init__ signature)",
+    "/app/backend/tests/test_iteration5.py (new)"
+  ],
+  "success_rate": {"backend": "100% on iter5 (8/8), 93% overall (40/43 — 2 stale + 1 flaky)", "frontend": "100% of testable spray flow (toggle, mixBlendMode, floating can, preset+custom tag placed, clear). Anim sprite picker UI not reachable — backend WS validated instead."},
+  "test_credentials": "Nickname-only. Used T1_iter5_a / T1_iter5_b / T1_iter5c and TEST_i5* on backend.",
+  "seed_data_creation": "Small spray tags on rooms jungle/heaven/mars may persist briefly; cleared at end where possible. test_ws_tag_spray_respects_max_cap cleans up toxic-void.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend has 43 pytest tests across backend_test.py, test_iteration2-5.py. Run: `pytest /app/backend/tests/ -v --junitxml=/app/test_reports/pytest/pytest_results.xml`. iter5 asserts: (a) REST GET/DELETE /api/rooms/{id}/tags (no `_id` leak, 404 unknown room), (b) WS tag_spray broadcasts to other clients + persists to db.tags, (c) WS snapshot includes tags array on join, (d) WS tag_clear broadcasts + wipes tags, (e) WS stance broadcasts + new-joiner snapshot has anim_stance, (f) WS anim broadcasts + snapshot anim_id (invalid creature ids ignored), (g) MAX_TAGS_PER_ROOM=80 cap enforced. Frontend testids: spray-window, spray-toggle, spray-clear, spray-size, spray-custom-input, spray-custom-set, spray-preset-<WORD>, spray-selection, spray-presets, spray-custom-form. IsoWorld: iso-world, tag-layer (mixBlendMode:screen — CRITICAL), placed-tag, iso-avatar, floating-spray-can, spray-mode-indicator, thought-bubble, quote-bubble, iso-room-tag. Desktop: icon-spray (double-click to open), start-button, start-spray. ANIM PICKER: no discoverable testid — ask main agent to add (e.g. anim-<creature>, stance-<state>).",
+  "rca of the issue": "Root cause of the blocking WS crash: when the feature batch added anim_id + anim_stance to the realtime-state model, the ws_endpoint was updated to accept/pass `anim_id` (server.py L584, L590) and room_user_list / snapshot payloads were updated to read `c.anim_id` / `c.anim_stance` (L275, L633), but ClientConn.__init__ was NOT updated to accept or initialise those fields. Every WebSocket `/api/ws/{room_id}` handshake therefore failed with `TypeError: ClientConn.__init__() takes 6 positional arguments but 7 were given`, taking down chat / spray / anim entirely. Mitigation applied by testing agent: extended ClientConn.__init__ signature to `(self, ws, user_id, nickname, avatar_url, sprite_id, anim_id=None, anim_stance='idle')` and initialised both fields. Reproduction before fix: `wscat -c \"wss://strange-worlds-chat.preview.emergentagent.com/api/ws/hello?user_id=X&nickname=Y\"` → server logs traceback and closes connection. After fix: handshake succeeds, snapshot + broadcasts work, iter5 tests all pass."
+}

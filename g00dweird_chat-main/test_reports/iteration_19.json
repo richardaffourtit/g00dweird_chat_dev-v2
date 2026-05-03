@@ -1,0 +1,38 @@
+{
+  "summary": "Iteration 19 — Bot frequency tuning + ghost dash anim + quote-bubble TTL. Backend: 6/6 new tests PASS (bot tick/talk frequency reduced, react probability reduced, full WS regression for chat/move/anim/stance/ping, snapshot.kill_mode, /api/profile/{nickname}). Iter18 regression: 7/7 PASS. Frontend: quote-bubble TTL extended from 8s to 12s — VERIFIED via playwright (bubble visible 9s after send). Ghost DASH animation — INCONCLUSIVE: avatar visibly moves >260px after clicking far when ghost is picked, but img-frame sampling never captured dash_0/1/2 frames during the move (only idle_0/1/2 frames seen across 3.5s sampling window). Main agent claims self-test confirmed dash plays; this may be a playwright-timing/ordering artifact OR a real regression. Worth verifying via main-agent self-test or manual user check.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "IsoWorld ghost dash animation", "issue": "Playwright could not observe dash_0/1/2 frames cycling on the local user's avatar during a far-click move. Avatar position updates correctly (>260px stage distance), but only idle_0/1/2 frames render in <img src> across a 3.5s sample window (50ms granularity). useChatSocket case 'move' resets anim_stance to 'idle' (lib/useChatSocket.js L113); ChatWindow.handleMove sends move FIRST then stance:dash (ChatWindow.jsx L157-158), so the order should net to dash, but client never observes it. Either WS broadcast ordering is being violated, or stance:dash is not being sent/processed. Main agent reports self-test confirmed dash works — needs human/manual verification.", "selector": "[data-testid='iso-avatar'] img", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration19.py",
+    "/app/test_reports/pytest/iter19.xml",
+    "/app/backend/tests/test_iteration18.py"
+  ],
+  "action_items": [
+    "Verify ghost dash anim manually: pick ghost via Sprites picker, click far in iso-world, and visually confirm dash_0/1/2 frames cycle on YOUR avatar (not via screenshot — by eye over ~1.3s). If you see only idle, that's a real regression; if you see dash, my playwright sampler is racing somewhere.",
+    "[OPTIONAL HARDENING] In ChatWindow.handleMove L157-158 — consider sending 'stance' BEFORE 'move' so that the move's anim_stance:'idle' reset in useChatSocket happens BEFORE the stance update arrives, eliminating any chance of stance being clobbered by a late-arriving move broadcast. Current order works in theory but is fragile.",
+    "[OPTIONAL HARDENING] Add data-stance attribute to [data-testid='iso-avatar'] div so playwright tests can sample stance state directly without parsing img src."
+  ],
+  "critical_code_review_comments": [
+    "server.py L411-417: weights tuple [3,2,1,1,6] sums to 13. Talk prob = 2/13 ≈ 15%. With tick interval 12-22s avg 17s, expect ~3.5 talks per hour — feels right for 'quieter bot'. PASS.",
+    "server.py L490: random > 0.12 means react probability = 12% (12 in 100). Roughly 1-in-8. Spec says 'closer to 1 in 8' — matches.",
+    "IsoWorld.jsx L35: QUOTE_TTL_MS=12000 — VERIFIED at runtime (bubble still visible at 9s).",
+    "IsoWorld.jsx L626-639: fpsForStance — float=8 (new), dash=10. Reasonable progression.",
+    "ChatWindow.jsx L156-168: handleMove now takes travelMs and uses Math.max(900, travelMs+400) — clean. NOTE: send order is move-then-stance; given useChatSocket case 'move' resets anim_stance to idle, this relies on broadcast ordering (move broadcast arrives BEFORE stance broadcast). In well-ordered single-server WS this is fine, but flipping the order (stance then move) would be more defensive."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration19.py (new — 6 pytest tests covering bot frequency, react rate, WS regression, profile)"
+  ],
+  "success_rate": {"backend": "100% (6/6 iter19 + 7/7 iter18 regression = 13/13)", "frontend": "67% — 2/3 verified (quote-bubble TTL pass, ghost dash inconclusive, sprite picker + login + room nav working)"},
+  "test_credentials": "Nickname-only via POST /api/join. Used TEST_i19_* for both backend and frontend tests.",
+  "seed_data_creation": "TEST_i19_* user docs from /api/join calls in pytest and 3 UI sessions. No tags/uploads created.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Run: pytest /app/backend/tests/test_iteration19.py -v (takes ~50s due to 35s bot-frequency window). Frontend: ghost dash animation observation via playwright is brittle — img.src polling at 50ms didn't catch dash_*.png frames despite avatar visibly traversing >260px in stage coords. To re-test dash properly: (a) manually as a user, OR (b) instrument frontend to expose anim_stance via data-stance attribute on [data-testid='iso-avatar'], OR (c) open a 2ND ws client (observer) and subscribe to stance broadcasts to confirm 'dash' was actually sent — backend test_chat_move_stance_anim_ping_dispatch in iter19 already confirms the stance dispatch path works end-to-end. Quote-bubble TTL=12s is verified working. Bot frequency reduction verified working at the WS level.",
+  "rca of the issue": "Ghost dash inconclusive: ChatWindow.handleMove at L157 sends 'move' before 'stance:dash' at L158. useChatSocket case 'move' (L113 of lib/useChatSocket.js) resets anim_stance to 'idle' on every move broadcast for ANY user including self. So if both messages broadcast in order, client should land on 'dash'. If they're out of order (rare but possible), client lands on 'idle'. Playwright observation showed only idle frames over 3.5s. Either the stance broadcast isn't reaching the client, OR a setTimeout-based stance:idle is firing too early. Recommend swapping send order in handleMove (stance first, move second) for robustness."
+}

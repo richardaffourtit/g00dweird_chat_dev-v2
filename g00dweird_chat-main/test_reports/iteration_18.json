@@ -1,0 +1,34 @@
+{
+  "summary": "Iteration 18 — Kill-Mode toggle feature. Backend: 7/7 new tests PASS (kill_mode WS handler broadcasts on/off, bool-coerces truthy 'yes'->True, snapshot users[] includes kill_mode field with True after toggle and False default, attack handler is NOT gated by attacker.kill_mode, ping/chat regression after kill_mode added). Iter17 regression: 19/19 still PASS. Frontend: ALL kill-mode UI verified end-to-end via Playwright — kill-mode-pill toggles '⚔ PEACE'<->'⚔ KILL', kill-mode-banner '⚔ KILL MODE — click to strike' shown only when ON, toggle-kill-mode sidebar button text '⚔ Kill Mode'<->'⚔ Kill Mode (ON)', m-kill-mode visible at mobile width, user-hostile-<nick> rendered in user list when kill_mode=true, localStorage 'g00d_kill_mode'='1' set on enable and persists across reload (banner and pill restore correctly), default mode = OFF on first visit, click weirdbot in OFF mode opens '/u/weirdbot?u=weirdbot-hello' in new tab via window.open, click in ON mode does NOT call window.open (attack flow via WS instead). Pill stopPropagation works (clicks don't bleed through to iso-world stage).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration18.py",
+    "/app/test_reports/pytest/iter18.xml",
+    "/app/backend/tests/test_iteration17.py"
+  ],
+  "action_items": [
+    "[INFO] Pre-existing iter17 issues (auto-raise focus + ChatMessageList key warning) NOT re-tested in this run — still open per iteration_17.json. Out of scope for iter18 review."
+  ],
+  "critical_code_review_comments": [
+    "ws/handlers.py L453 handle_kill_mode: clean & minimal — bool coerces payload, mutates conn.kill_mode, broadcasts to ALL (including sender) which is exactly what client useChatSocket case 'kill_mode' expects (case 113-116). Good.",
+    "server.py L356 room_user_list: uses getattr(c, 'kill_mode', False) — defends against WeirdBotConn that doesn't have the field. Correct defensive pattern.",
+    "server.py WeirdBotConn class L290: does NOT define self.kill_mode — relying on the getattr default in room_user_list. Works today but if any future code does `bot.kill_mode = ...` it will crash on .kill_mode access. Consider adding `self.kill_mode = False` in WeirdBotConn.__init__ for symmetry with ClientConn (line 259).",
+    "Server does not gate attack on attacker.kill_mode — confirmed correct per spec (gating is client-side UX). This means a malicious client could attack with kill_mode=False; that's the documented design.",
+    "Frontend ChatWindow localStorage key 'g00d_kill_mode' uses '1'/'0' string flag — pill text and banner correctly hydrate from this on reload. Good.",
+    "Frontend stopPropagation on the pill click confirmed — clicking the pill toggles state without triggering the iso-world background click (which would have spawned a move/attack)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration18.py (new — 7 pytest tests)"
+  ],
+  "success_rate": {"backend": "100% (7/7 iter18, 19/19 iter17 regression)", "frontend": "100% — all 11 UI flows in spec verified"},
+  "test_credentials": "Nickname-only. Used TEST_i18_* on backend and TEST_i18_ui / TEST_i18_clk on frontend.",
+  "seed_data_creation": "TEST_i18_* user docs from /api/join calls in pytest. No tags/uploads created.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Run: pytest /app/backend/tests/test_iteration18.py -v. Frontend kill-mode happy-path is fully covered. To stub window.open in playwright: page.evaluate(\"() => { window.__opened = []; window.open = (u,t)=>{window.__opened.push({u,t}); return null;}; }\") then click iso-avatar and read window.__opened. weirdbot iso-avatar is identifiable via data-nick='weirdbot' and data-uid='weirdbot-<roomid>'. Default mode (OFF) opens new tab; ON mode triggers attack WS without window.open. Pre-existing iter17 issues (Win95Window auto-raise z-index focus, ChatMessageList missing key prop) remain unresolved — those are pre-iter18 backlog, not introduced by kill-mode feature."
+}

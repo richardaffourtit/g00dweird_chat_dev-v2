@@ -1,0 +1,43 @@
+{
+  "summary": "Iteration 2 testing of g00dweird.com (chat history replay, jukebox queue+volume, upload mime+rate-limit, emoticon picker + typing indicator, guestbook, shareable invite, 9 SVG sprite avatars). Backend: 25/25 pytest tests PASSED (14 from iter1 regression + 11 new iter2). Frontend Playwright: all targeted iter-2 flows passed including auto-route /r/haunted-lan, sprite picker (9 sprites), emote picker (31 emotes), copy-invite toast, guestbook post, jukebox controls, chat history replay across reload.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Jukebox volume slider", "issue": "Setting jukebox-volume to 0.3 via input/change events resulted in document.querySelector('audio').volume reporting 0.6 (state may be propagating to a different/secondary <audio> element on the page). Slider, mute, next, clear all render and accept input. Likely either (a) querySelector hit the video-wall audio not jukebox audio, or (b) onChange handler not wiring slider value to <audio ref>. Not blocking but worth verifying that the JukeboxWindow's <audio> element's .volume tracks the slider.", "affected_selectors": ["jukebox-volume"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/test_iteration2.py",
+    "/app/backend/tests/pytest.ini",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Verify JukeboxWindow.jsx audio ref .volume is bound to slider state (jukebox-volume) — UI test observed audio.volume=0.6 after slider set to 0.3 (could be unrelated audio el; quick to confirm).",
+    "Doc note: review_request mentions sprite IDs as 'tiny_ghost/cute_ghost/giant_ghost' but actual implementation uses 'ghost_tiny/ghost_cute/ghost_giant' (consistent with WS event sample {sprite_id:ghost_tiny}). All 9 sprite-pick-{id} testids exist with the ghost_* prefix variant. No code change needed; just align doc."
+  ],
+  "critical_code_review_comments": [
+    "Upload rate limit is in-process per-user dict (_upload_times) — won't share across replicas; OK for single-instance preview but will silently fail-open in scaled deployments.",
+    "Streaming download (StreamingResponse) currently buffers the entire file in memory (data, _ = get_object) before chunking. True streaming would require requests.get(..., stream=True) and iter_content. Memory cost equals file size (50MB cap).",
+    "/api/guestbook has no rate limit; spammable. Consider a per-user/IP throttle similar to upload.",
+    "WS handlers trust client-supplied sprite_id with no validation against SPRITE_IDS allowlist. Worth adding server-side check to prevent garbage in user list.",
+    "Typing event has no cooldown — a malicious client could spam typing=true to all peers. Throttle on server side or add a min interval.",
+    "MAX_HISTORY_PER_ROOM=50 is fine, but db.messages still has no TTL/cap; flagged in iter1 and still applicable.",
+    "Frontend chat-history replay relies entirely on server snapshot.history; no local cache, so offline reconnect shows blank momentarily — acceptable for retro UX."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration2.py (new — 11 tests: guestbook, upload mime/rate-limit, history endpoint+snapshot, sprite snapshot+broadcast, typing exclude-sender, jukebox enqueue/next/clear)"
+  ],
+  "success_rate": {"backend": "100% (25/25)", "frontend": "100% of targeted iter-2 flows"},
+  "test_credentials": "Nickname-only. Created TEST_iter2, TEST_rl, TEST_hist, TEST_spA, TEST_spB, TEST_tyA, TEST_tyB, TEST_jq, TEST_fe2, TEST_fe3 during testing.",
+  "seed_data_creation": "Inserted ~5 guestbook entries (TEST_*), ~12 file uploads (PNG), and a few chat messages in pixel-beach/cyber-cafe/haunted-lan rooms during tests. Non-destructive.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Run `pytest /app/backend/tests -v` (asyncio_mode=auto). New iter-2 tests live in test_iteration2.py and reuse PNG_BYTES + WS pattern from backend_test.py. WS events: typing (broadcast excludes sender), sprite (echoes to all incl. sender), jukebox_enqueue auto-promotes when no current track. Frontend public URL works. Sprite IDs are ghost_tiny/ghost_cute/ghost_giant (NOT tiny_ghost). All required data-testids exist. /r/:roomId auto-route works post-login. Guestbook entries persist via /api/guestbook.",
+  "rca of the issue": "No blocking bugs. Minor jukebox-volume slider→audio.volume mismatch should be verified by querying the audio inside [data-testid='jukebox-window'] specifically; could be observer effect from another <audio> in DOM."
+}

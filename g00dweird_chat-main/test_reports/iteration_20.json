@@ -1,0 +1,34 @@
+{
+  "summary": "Iteration 20 — Critical fix to ghost dash/float animation (Desktop.jsx useEffect dep on `socket` reference was clobbering travel stance with idle ~120ms after each click). Backend regression iter19 suite: 6/6 PASS. Frontend dash/float bug fix: VERIFIED via the new data-stance attribute on [data-testid='iso-avatar']. Far-click → data-stance='dash' for 5 samples (~700ms within 1.6s window). Short-click → data-stance='float' for 6 samples (~720ms within 1.4s window). After 3.5s idle, stance correctly reverts to 'idle' (no spurious overwrite). QuoteBubble TTL extended to 12s — bubble still visible at ~9.8s post-send. New data-* attributes (data-user-id/nickname/stance/anim-id) on iso-avatar make playwright assertions deterministic.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "console_warnings": [
+      {"observation": "Multiple HTTP 403 'Failed to load resource' console errors during the test, primarily after the bot stance broadcast / bubble appears. Likely bot/sprite asset 403s from /api/files? path with no auth pin or expired URL. Pre-existing, not introduced by iter20. Worth investigating if it produces broken images for users who never picked an avatar.", "priority": "LOW"}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration19.py",
+    "/app/test_reports/pytest/iter20.xml"
+  ],
+  "action_items": [
+    "[OPTIONAL] Investigate the 403 console flood when bot speaks — appears to be sprite/avatar asset request. Doesn't break UX (sprite still renders) but pollutes console.",
+    "[OPTIONAL] Long-tail: same socket-dependency-in-useEffect anti-pattern could exist elsewhere — search for `useEffect(.*\\[.*socket.*\\])` across codebase to ensure no other effect is firing on every render."
+  ],
+  "critical_code_review_comments": [
+    "Desktop.jsx L162-169: lastSentStanceRef guard correctly prevents the effect from re-sending stance:'idle' on every render. Verified at runtime — dash holds for full travel duration. The bug RCA (socket reference recreated each render → effect re-fires → sends idle within 120ms) is fully resolved.",
+    "IsoWorld.jsx L350-354: data-testid='iso-avatar' now carries data-user-id, data-nickname, data-stance, data-anim-id — excellent for deterministic playwright sampling. dash/float observable at 100ms granularity.",
+    "ChatWindow.jsx handleMove: travelMs+400ms hold timer plays well with the new guard — local stance survives until the explicit idle timer fires.",
+    "server.py bot tuning (tick 12-22s, weights [3,2,1,1,6], react 0.12) verified at WS layer in test_iteration19.py — all pass."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (6/6 iter19 regression)", "frontend": "100% (4/4: dash held, float held, idle revert, bubble TTL)"},
+  "test_credentials": "Nickname-only via POST /api/join. Used TEST_i20_* prefix.",
+  "seed_data_creation": "TEST_i20_71855 user via /api/join + a 'hello bubble TTL test' chat in /r/hello.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter20 fix VERIFIED. The critical fix is in Desktop.jsx L162-169 (lastSentStanceRef + useEffect deps changed from [animStance, socket] to [animStance, socket.connected]). The new data-stance attribute on [data-testid='iso-avatar'] is the canonical way to verify travel stances. Sample at 100-150ms over 1.5-1.7s after a far click and expect >=5 'dash' samples. Backend test_iteration19.py covers the WS regression and bot frequency — runs in ~50s.",
+  "rca of the issue": "The iter19 'dash inconclusive' issue was caused by Desktop.jsx having a useEffect with [animStance, socket] dependencies. `socket` is the return of useChatSocket() which constructs a new object literal every render. Any state change anywhere in Desktop (users[], messages[], typing[]) would re-render → new socket reference → effect re-fires → socket.send({type:'stance', stance:'idle'}) within ~120ms of any click, clobbering ChatWindow.handleMove's transient stance:'dash'/'float'. Fix: introduced lastSentStanceRef and changed deps to [animStance, socket.connected] (a primitive). Effect now only fires when animStance state actually changes. Verified: dash held for 700+ms, float held for 720+ms, idle revert clean."
+}

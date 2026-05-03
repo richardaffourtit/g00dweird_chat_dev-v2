@@ -1,0 +1,44 @@
+{
+  "summary": "Iteration 3 testing of g00dweird.com (5 new rooms with bg_url, quote-bubble, persistent thought-bubble via *think prefix, mobile-responsive layout). Backend: 32/32 pytest tests PASSED (14 iter1 regression + 11 iter2 + 7 new iter3). Frontend Playwright desktop + mobile flows all functional: room bg renders from customer-assets URL, quote-bubble appears on chat send, toggle-think prefixes input, thought-bubble appears on *think and clears with bare *think, mobile-actions bar with all 6 m-* buttons works, drawer toggles, sprite-picker / jukebox-window open via mobile buttons, chat-window spans full 390px viewport, chat-input fits without overflow, desktop icon column hidden on mobile.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "m-share copy invite", "issue": "m-share button click did not surface an element with [data-testid='copy-invite-toast'] in mobile run. Either toast uses a different testid or the toast was dismissed faster than 800ms. Desktop copy-invite already validated in iter2. Minor.", "affected_selectors": ["m-share", "copy-invite-toast"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/test_iteration2.py",
+    "/app/backend/tests/test_iteration3.py",
+    "/app/test_reports/pytest/iter3.xml"
+  ],
+  "action_items": [
+    "Optional: add [data-testid='copy-invite-toast'] (or document the existing testid) to the toast that briefly shows after m-share / copy-invite is clicked, so it can be asserted in tests.",
+    "Optional polish: when a room is switched on mobile via m-worlds + WorldPicker, ensure the chat window title bar refreshes to the new room name (observed it occasionally still showed [ HELLO ] briefly after picking JELLO; chat does refocus, but title-bar text update was not always immediate). Likely a re-render race; non-blocking."
+  ],
+  "critical_code_review_comments": [
+    "server.py is approaching ~720 lines; consider splitting WS handler (chat/typing/move/avatar/sprite/jukebox) into dedicated module for readability and testability. Same recommendation as iter2 still applies.",
+    "ClientConn.last_message has no TTL on the server side — it persists for the lifetime of the WS connection. The 8s expiry is purely client-side. New joiners receive last_message in the snapshot regardless of age; if a user has been idle for >8s their bubble may flash on a new joiner's screen until 8s passes since last_message.ts. Consider stripping last_message older than 8s in room_user_list() to keep client+server semantics consistent.",
+    "*think parsing does not handle 'think' inside legitimate chat (rare but possible: '*think* I was right'). Current code only strips when prefix is exactly '*think ' or equal to '*think', which is correct, but document this for users.",
+    "Direct type:'thought' WS event has no length cap separate from the 200-char clamp in chat path; both paths clamp to 200, which is consistent.",
+    "Mobile chat window uses 100vw x calc(100dvh - 34px). 100dvh is well-supported now but degrades on older mobile Safari (<15.4). Acceptable for retro-themed app.",
+    "WorldPicker on mobile is not auto-opened, but the active room indicator inside it relies on currentRoomId prop; verify it's passed when opened via m-worlds (it is — Desktop.jsx passes it; OK)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/backend_test.py (room ids updated to hello/jello/heaven/mars/regular-cafe)",
+    "/app/backend/tests/test_iteration2.py (room ids updated)",
+    "/app/backend/tests/test_iteration3.py (new — 7 tests: 5 rooms + bg_url, regular-cafe state, snapshot users include thought+last_message, *think prefix broadcasts thought (no chat) to sender+others, *think alone clears, direct type:'thought' event, regular chat updates last_message in subsequent snapshot, user_joined includes sprite_id+x+y)"
+  ],
+  "success_rate": {"backend": "100% (32/32)", "frontend": "100% of targeted iter-3 flows (desktop + mobile)"},
+  "test_credentials": "Nickname-only. Created TEST_iter2/TEST_rl/TEST_hist/TEST_spA/TEST_spB/TEST_tyA/TEST_tyB/TEST_jq plus iter3 TEST_i3snap/TEST_thA/TEST_thB/TEST_th_direct/TEST_lm/TEST_lm_obs/TEST_ujA/TEST_ujB and frontend nicks DESK_T1/MOB_T1/MOB_T2/MOB_T3 during testing.",
+  "seed_data_creation": "A few chat messages and one persistent thought ('hello there'/'new content'/cleared) were left on hello/jello/heaven/mars/regular-cafe rooms during testing; non-destructive.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Run `pytest /app/backend/tests/ -v` (asyncio_mode=auto). 32 tests across backend_test.py, test_iteration2.py, test_iteration3.py. Iter3 covers 5-rooms+bg_url, *think intercept, last_message snapshot field, type:'thought' event, user_joined sprite/x/y. Frontend: REACT_APP_BACKEND_URL is the public preview URL. Mobile breakpoint is <640px (useIsMobile hook). m-toggle-users opens [data-testid='mobile-sidebar'] drawer (initial showUsers=false on mobile). On mobile, desktop icons column display:none. Chat window goes 100vw x 100dvh-34px on mobile; drag disabled. Quote-bubble TTL is purely client-side (8s after last_message.ts). Thought-bubble persists until cleared via bare '*think' (or new *think replaces it). Sprite IDs use ghost_tiny/ghost_cute/ghost_giant prefix variant.",
+  "rca of the issue": "No blocking bugs. Two minor observations: (1) copy-invite-toast testid not found after m-share click on mobile — likely missing/different testid; (2) chat title-bar may briefly lag when switching rooms via WorldPicker on mobile, harmless render race. Server-side last_message has no age cap (purely client-side 8s) — see code review #2."
+}

@@ -1,0 +1,29 @@
+{
+  "id": "spider",
+  "image": "/scenery/spiderweb_phase2/spider_spritesheet.png",
+  "renderImage": "/scenery/spiderweb_phase2/spider_spritesheet_keyed.png",
+  "keyColor": "#ff0000",
+  "frameWidth": 221.75,
+  "frameHeight": 221.75,
+  "rows": 4,
+  "frameCount": 8,
+  "fps": 8,
+  "loop": true,
+  "scale": 0.25,
+  "anchor": {
+    "x": 0.5,
+    "y": 0.72
+  },
+  "hitbox": {
+    "x": 0.14,
+    "y": 0.18,
+    "w": 0.72,
+    "h": 0.64
+  },
+  "directions": {
+    "north": { "row": 0 },
+    "east": { "row": 1 },
+    "south": { "row": 2 },
+    "west": { "row": 3 }
+  }
+}

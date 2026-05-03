@@ -1,0 +1,342 @@
+{
+  "scene_id": "hello_iso_phase2_living_scene",
+  "canvas": {
+    "width": 1254,
+    "height": 1254
+  },
+  "background": "assets/background/hello_iso_world_bg.png",
+  "rendering": {
+    "pixel_art": true,
+    "image_smoothing": false
+  },
+  "key_color": "#ff0000",
+  "layers": [
+    {
+      "id": "bg",
+      "z": 0
+    },
+    {
+      "id": "background_fx",
+      "z": 10
+    },
+    {
+      "id": "world_fx_behind_avatars",
+      "z": 20
+    },
+    {
+      "id": "avatar_walkable",
+      "z": 50
+    },
+    {
+      "id": "world_fx_front",
+      "z": 70
+    },
+    {
+      "id": "sky_foreground",
+      "z": 90
+    }
+  ],
+  "walkable_area": {
+    "type": "ellipse",
+    "center": [
+      640,
+      690
+    ],
+    "radius": [
+      430,
+      185
+    ],
+    "notes": "Approximate plaza walk zone. Adjust to match avatar feet."
+  },
+  "spawn_points": [
+    [
+      640,
+      700
+    ],
+    [
+      530,
+      700
+    ],
+    [
+      750,
+      700
+    ],
+    [
+      640,
+      610
+    ],
+    [
+      470,
+      785
+    ],
+    [
+      820,
+      785
+    ]
+  ],
+  "animated_objects": [
+    {
+      "id": "waterfall_left",
+      "sprite": "assets/sprites/hello_waterfall_loop_64x128.png",
+      "frameWidth": 64,
+      "frameHeight": 128,
+      "frames": 8,
+      "frameMs": 75,
+      "x": 56,
+      "y": 382,
+      "z": 18,
+      "loop": true,
+      "blend": "normal"
+    },
+    {
+      "id": "rainbow_shimmer",
+      "sprite": "assets/sprites/hello_rainbow_shimmer_256x96.png",
+      "frameWidth": 256,
+      "frameHeight": 96,
+      "frames": 12,
+      "frameMs": 95,
+      "x": 435,
+      "y": 135,
+      "z": 12,
+      "loop": true,
+      "blend": "screen",
+      "opacity": 0.55
+    },
+    {
+      "id": "center_heart_pulse",
+      "sprite": "assets/sprites/hello_heart_pulse_64.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 8,
+      "frameMs": 110,
+      "x": 610,
+      "y": 700,
+      "z": 21,
+      "loop": true,
+      "blend": "screen",
+      "opacity": 0.6
+    },
+    {
+      "id": "right_door_glow",
+      "sprite": "assets/sprites/hello_soft_glow_64.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 10,
+      "frameMs": 90,
+      "x": 1125,
+      "y": 590,
+      "z": 22,
+      "loop": true,
+      "blend": "screen",
+      "opacity": 0.75
+    },
+    {
+      "id": "smile_balloon_sway",
+      "sprite": "assets/sprites/hello_smile_balloon_sway_64.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 12,
+      "frameMs": 110,
+      "x": 470,
+      "y": 112,
+      "z": 15,
+      "loop": true,
+      "motion": {
+        "type": "bob",
+        "amplitudeY": 8,
+        "durationSec": 3.5
+      }
+    },
+    {
+      "id": "heart_balloon_sway",
+      "sprite": "assets/sprites/hello_heart_balloon_sway_64.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 12,
+      "frameMs": 110,
+      "x": 330,
+      "y": 95,
+      "z": 15,
+      "loop": true,
+      "motion": {
+        "type": "bob",
+        "amplitudeY": 10,
+        "durationSec": 4.1
+      }
+    },
+    {
+      "id": "bunting_front_wave",
+      "sprite": "assets/sprites/hello_flag_bunting_wave_128x32.png",
+      "frameWidth": 128,
+      "frameHeight": 32,
+      "frames": 8,
+      "frameMs": 130,
+      "x": 872,
+      "y": 948,
+      "z": 72,
+      "loop": true
+    },
+    {
+      "id": "bunting_left_wave",
+      "sprite": "assets/sprites/hello_flag_bunting_wave_128x32.png",
+      "frameWidth": 128,
+      "frameHeight": 32,
+      "frames": 8,
+      "frameMs": 130,
+      "x": 72,
+      "y": 930,
+      "z": 72,
+      "loop": true
+    },
+    {
+      "id": "foreground_cloud_01",
+      "sprite": "assets/sprites/hello_foreground_cloud_drift_192x64.png",
+      "frameWidth": 192,
+      "frameHeight": 64,
+      "frames": 8,
+      "frameMs": 130,
+      "x": -220,
+      "y": 1040,
+      "z": 91,
+      "loop": true,
+      "motion": {
+        "type": "drift",
+        "fromX": -220,
+        "toX": 1400,
+        "durationSec": 55
+      }
+    },
+    {
+      "id": "foreground_cloud_02",
+      "sprite": "assets/sprites/hello_foreground_cloud_drift_192x64.png",
+      "frameWidth": 192,
+      "frameHeight": 64,
+      "frames": 8,
+      "frameMs": 130,
+      "x": 1300,
+      "y": 420,
+      "z": 9,
+      "loop": true,
+      "motion": {
+        "type": "drift",
+        "fromX": 1300,
+        "toX": -260,
+        "durationSec": 80
+      }
+    }
+  ],
+  "starfield": {
+    "sprite": "assets/sprites/hello_star_twinkle_32.png",
+    "frameWidth": 32,
+    "frameHeight": 32,
+    "frames": 8,
+    "frameMs": 90,
+    "instances": [
+      {
+        "x": 48,
+        "y": 54,
+        "z": 11,
+        "delayMs": 0
+      },
+      {
+        "x": 145,
+        "y": 72,
+        "z": 11,
+        "delayMs": 160
+      },
+      {
+        "x": 195,
+        "y": 186,
+        "z": 11,
+        "delayMs": 300
+      },
+      {
+        "x": 539,
+        "y": 96,
+        "z": 11,
+        "delayMs": 440
+      },
+      {
+        "x": 904,
+        "y": 50,
+        "z": 11,
+        "delayMs": 210
+      },
+      {
+        "x": 1035,
+        "y": 50,
+        "z": 11,
+        "delayMs": 510
+      },
+      {
+        "x": 1160,
+        "y": 88,
+        "z": 11,
+        "delayMs": 630
+      },
+      {
+        "x": 864,
+        "y": 228,
+        "z": 11,
+        "delayMs": 350
+      },
+      {
+        "x": 754,
+        "y": 266,
+        "z": 11,
+        "delayMs": 700
+      },
+      {
+        "x": 1196,
+        "y": 151,
+        "z": 11,
+        "delayMs": 850
+      },
+      {
+        "x": 30,
+        "y": 200,
+        "z": 11,
+        "delayMs": 570
+      },
+      {
+        "x": 1008,
+        "y": 1050,
+        "z": 73,
+        "delayMs": 920
+      }
+    ]
+  },
+  "interactions": [
+    {
+      "id": "door_click",
+      "hitbox": [
+        1085,
+        535,
+        1220,
+        760
+      ],
+      "onClick": "playDoorGlowPulse"
+    },
+    {
+      "id": "heart_center",
+      "hitbox": [
+        500,
+        610,
+        780,
+        790
+      ],
+      "onEnter": "increaseHeartPulse",
+      "onLeave": "normalHeartPulse"
+    },
+    {
+      "id": "waterfall",
+      "hitbox": [
+        30,
+        330,
+        130,
+        520
+      ],
+      "onClick": "spawnSparkles"
+    }
+  ]
+}

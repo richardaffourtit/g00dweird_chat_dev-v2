@@ -1,0 +1,28 @@
+{
+  "scene_id": "neoclassick_world",
+  "canvas": {"width": 1536, "height": 1536, "aspect": "1:1 square"},
+  "background": "assets/background/neoclassick_world_1x1_bg.png",
+  "key_color": "#ff0000",
+  "rendering": {"pixel_art": true, "image_smoothing": false},
+  "bot_avatar": {
+    "id": "neo",
+    "file": "assets/avatars/g00dwierd_avatar_neo_64.png",
+    "frameWidth": 64,
+    "frameHeight": 64,
+    "rowOrder": ["idle", "walk", "run", "jump", "attack_light", "hurt", "die", "emote_bless"],
+    "defaultPosition": [765, 615]
+  },
+  "animated_objects": [
+    {"id":"main_equalizer_pulse","sprite":"assets/sprites/neo_equalizer_pulse_128.png","frameWidth":128,"frameHeight":96,"frames":12,"frameMs":70,"x":690,"y":85,"z":22,"loop":true},
+    {"id":"center_record_spin","sprite":"assets/sprites/neo_record_spin_64.png","frameWidth":64,"frameHeight":64,"frames":12,"frameMs":80,"x":733,"y":690,"z":25,"loop":true},
+    {"id":"neon_sign_flicker","sprite":"assets/sprites/neo_neon_flicker_64.png","frameWidth":64,"frameHeight":64,"frames":8,"frameMs":85,"x":705,"y":245,"z":32,"loop":true},
+    {"id":"left_waterfall_flow","sprite":"assets/sprites/neo_waterfall_flow_64x160.png","frameWidth":64,"frameHeight":160,"frames":10,"frameMs":75,"x":126,"y":790,"z":28,"loop":true}
+  ],
+  "interactions": [
+    {"id":"dj_booth","hitbox":[1030,420,1245,610],"onClick":"pulseCenterRecord"},
+    {"id":"record_shop","hitbox":[390,705,620,865],"onClick":"openRecordShop"},
+    {"id":"main_temple","hitbox":[560,170,965,450],"onEnter":"boostEqualizerGlow"},
+    {"id":"portal_firepit","hitbox":[1110,800,1285,955],"onClick":"openPortalMenu"},
+    {"id":"center_stage","hitbox":[600,575,935,790],"onAvatarEmote":"triggerMusicReactivePulse"}
+  ]
+}

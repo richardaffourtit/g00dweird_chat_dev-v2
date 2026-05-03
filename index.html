@@ -1,0 +1,1518 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>G00DWIERD Sprite Lab</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101014;
+      --panel: #181920;
+      --panel-2: #20222c;
+      --line: #353846;
+      --text: #f2f4f8;
+      --muted: #9ba3b4;
+      --green: #97f15f;
+      --cyan: #4ed7ff;
+      --pink: #ff5fa8;
+      --yellow: #ffd45a;
+      --danger: #ff645d;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button,
+    select,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button,
+    select,
+    input[type="number"],
+    input[type="text"],
+    textarea {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 6px;
+    }
+
+    button {
+      min-height: 34px;
+      padding: 0 12px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--cyan);
+    }
+
+    button.active {
+      border-color: var(--green);
+      background: #203316;
+      color: var(--green);
+    }
+
+    button.tool-active {
+      border-color: var(--yellow);
+      background: #3b3115;
+      color: var(--yellow);
+    }
+
+    button.primary {
+      border-color: #4f8e32;
+      background: #244316;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    button.warn {
+      border-color: #8f453f;
+      background: #3a1f20;
+      color: #ffb5b0;
+    }
+
+    input[type="file"] {
+      max-width: 100%;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(260px, 320px) minmax(0, 1fr) minmax(280px, 360px);
+      min-height: 100vh;
+    }
+
+    .sidebar,
+    .inspector {
+      background: var(--panel);
+      border-color: var(--line);
+      overflow: auto;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--line);
+    }
+
+    .inspector {
+      border-left: 1px solid var(--line);
+    }
+
+    .section {
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section h1,
+    .section h2 {
+      margin: 0 0 10px;
+      letter-spacing: 0;
+      line-height: 1.15;
+    }
+
+    .section h1 {
+      font-size: 18px;
+    }
+
+    .section h2 {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .field label,
+    .tiny-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    select,
+    input[type="number"],
+    input[type="text"] {
+      min-height: 34px;
+      width: 100%;
+      padding: 0 9px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 10px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .action-grid,
+    .button-row,
+    .nudge-grid,
+    .number-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .action-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .button-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .number-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .nudge-grid {
+      grid-template-columns: repeat(3, 42px);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .nudge-grid button {
+      width: 42px;
+      padding: 0;
+    }
+
+    .main {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      min-width: 0;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #12131a;
+    }
+
+    .toolbar .spacer {
+      flex: 1;
+    }
+
+    .stage-wrap {
+      min-height: 0;
+      overflow: auto;
+      background:
+        linear-gradient(45deg, #191a22 25%, transparent 25%),
+        linear-gradient(-45deg, #191a22 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #191a22 75%),
+        linear-gradient(-45deg, transparent 75%, #191a22 75%);
+      background-size: 28px 28px;
+      background-position: 0 0, 0 14px, 14px -14px, -14px 0;
+    }
+
+    .canvas-shell {
+      position: relative;
+      width: max-content;
+      margin: 24px;
+      border: 1px solid var(--line);
+      background: #000;
+    }
+
+    canvas {
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    #sourceCanvas {
+      width: min(92vw, 1448px);
+      max-width: none;
+      height: auto;
+    }
+
+    .statusbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+      min-height: 38px;
+      padding: 8px 14px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      background: #12131a;
+    }
+
+    .preview-box {
+      display: grid;
+      place-items: center;
+      min-height: 210px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #0b0c10;
+      overflow: hidden;
+    }
+
+    #previewCanvas {
+      width: 192px;
+      height: 192px;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+      gap: 8px;
+    }
+
+    .thumb {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 56px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #11131a;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .thumb.active {
+      border-color: var(--cyan);
+      box-shadow: inset 0 0 0 1px var(--cyan);
+    }
+
+    .thumb canvas {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .thumb span {
+      position: absolute;
+      left: 4px;
+      top: 3px;
+      color: var(--yellow);
+      font-size: 10px;
+      font-weight: 800;
+      text-shadow: 0 1px 1px #000;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .pill.ok {
+      color: var(--green);
+      border-color: #426b2f;
+    }
+
+    .pill.hot {
+      color: var(--pink);
+      border-color: #743150;
+    }
+
+    @media (max-width: 1080px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar,
+      .inspector {
+        border: 0;
+      }
+
+      .sidebar {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .inspector {
+        border-top: 1px solid var(--line);
+      }
+
+      .action-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .action-grid,
+      .button-row,
+      .number-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .toolbar {
+        align-items: stretch;
+      }
+
+      .toolbar > * {
+        flex: 1 1 160px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <section class="section">
+        <h1>G00DWIERD Sprite Lab</h1>
+        <div class="field">
+          <label for="avatarSelect">Avatar</label>
+          <select id="avatarSelect"></select>
+        </div>
+        <div class="pill-row" id="avatarStats"></div>
+      </section>
+
+      <section class="section">
+        <h2>Action</h2>
+        <div class="action-grid" id="actionGrid"></div>
+        <div class="field">
+          <label for="customAction">Custom</label>
+          <input id="customAction" type="text" placeholder="emote_confused">
+        </div>
+        <button id="useCustomAction">Use Custom</button>
+      </section>
+
+      <section class="section">
+        <h2>Frames</h2>
+        <div class="button-row">
+          <button class="primary" id="addFrame">Add Selected</button>
+          <button id="replaceFrame">Replace</button>
+          <button id="duplicateFrame">Duplicate</button>
+          <button class="warn" id="deleteFrame">Delete</button>
+        </div>
+        <div class="field">
+          <label for="frameDuration">Frame ms</label>
+          <input id="frameDuration" type="number" min="20" step="10" value="120">
+        </div>
+        <div class="field">
+          <label>
+            <input id="loopToggle" type="checkbox" checked>
+            Loop
+          </label>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Manifest</h2>
+        <div class="button-row">
+          <button id="exportManifest">Export JSON</button>
+          <button id="copyManifest">Copy JSON</button>
+          <button id="resetManifest" class="warn">Reset</button>
+          <button id="saveManifest">Save</button>
+        </div>
+        <div class="field">
+          <label for="importManifest">Import JSON</label>
+          <input id="importManifest" type="file" accept="application/json,.json">
+        </div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <div class="toolbar">
+        <button id="detectFrames">Detect Boxes</button>
+        <button id="manualBox">Manual Box</button>
+        <button id="toggleDetected" class="active">Detected</button>
+        <button id="toggleAssigned" class="active">Assigned</button>
+        <label class="tiny-label" for="zoomRange">Zoom</label>
+        <input id="zoomRange" type="range" min="35" max="180" value="100">
+        <div class="spacer"></div>
+        <span class="tiny-label" id="hoverReadout">x 0 y 0</span>
+      </div>
+
+      <div class="stage-wrap" id="stageWrap">
+        <div class="canvas-shell">
+          <canvas id="sourceCanvas" width="1448" height="1086"></canvas>
+        </div>
+      </div>
+
+      <div class="statusbar">
+        <span id="selectedReadout">No box selected</span>
+        <span id="actionReadout"></span>
+        <span id="saveReadout"></span>
+      </div>
+    </main>
+
+    <aside class="inspector">
+      <section class="section">
+        <h2>Preview</h2>
+        <div class="preview-box">
+          <canvas id="previewCanvas" width="192" height="192"></canvas>
+        </div>
+        <div class="pill-row">
+          <span class="pill ok" id="frameCount">0 frames</span>
+          <span class="pill" id="playState">playing</span>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Selected Box</h2>
+        <div class="number-grid">
+          <div class="field">
+            <label for="boxX">X</label>
+            <input id="boxX" type="number" step="1">
+          </div>
+          <div class="field">
+            <label for="boxY">Y</label>
+            <input id="boxY" type="number" step="1">
+          </div>
+          <div class="field">
+            <label for="boxW">W</label>
+            <input id="boxW" type="number" min="1" step="1">
+          </div>
+          <div class="field">
+            <label for="boxH">H</label>
+            <input id="boxH" type="number" min="1" step="1">
+          </div>
+        </div>
+        <div class="field">
+          <label for="roleSelect">Role</label>
+          <select id="roleSelect">
+            <option value="actor">Actor Avatar</option>
+            <option value="label">Text Label</option>
+            <option value="floating_object">Floating Object</option>
+            <option value="projectile">Projectile / Beam</option>
+            <option value="particle">Particle</option>
+            <option value="effect">Effect</option>
+            <option value="prop">Prop</option>
+          </select>
+        </div>
+        <div class="nudge-grid">
+          <span></span>
+          <button data-nudge="0,-1">Up</button>
+          <span></span>
+          <button data-nudge="-1,0">Left</button>
+          <button data-nudge="0,1">Down</button>
+          <button data-nudge="1,0">Right</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Timeline</h2>
+        <div class="timeline" id="timeline"></div>
+      </section>
+
+      <section class="section">
+        <h2>JSON</h2>
+        <textarea id="jsonOut" spellcheck="false"></textarea>
+      </section>
+    </aside>
+  </div>
+
+  <script>
+    const avatars = [
+      "alien",
+      "ape",
+      "cat",
+      "fairy",
+      "frog",
+      "ghost",
+      "robot",
+      "skeleton",
+      "slime",
+      "tv_head"
+    ].map((name) => ({
+      name,
+      image: `assets/g00dwierd_avatar_${name}.png`
+    }));
+
+    const quickActions = [
+      "idle",
+      "walk",
+      "run",
+      "jump",
+      "hop",
+      "float",
+      "dash",
+      "attack",
+      "attack_scare",
+      "attack_laser",
+      "attack_tongue",
+      "attack_chestbeat",
+      "hurt",
+      "die",
+      "emote_confused",
+      "emote_love",
+      "emote_alert",
+      "emote_sleep"
+    ];
+
+    const defaultTiming = {
+      idle: { ms: 120, loop: true },
+      walk: { ms: 90, loop: true },
+      run: { ms: 70, loop: true },
+      hop: { ms: 90, loop: true },
+      float: { ms: 110, loop: true },
+      dash: { ms: 70, loop: true },
+      jump: { ms: 90, loop: false },
+      hurt: { ms: 100, loop: false },
+      die: { ms: 90, loop: false }
+    };
+
+    const roleNames = {
+      actor: "actor",
+      label: "label",
+      floating_object: "float",
+      projectile: "proj",
+      particle: "part",
+      effect: "fx",
+      prop: "prop"
+    };
+
+    const actionZones = {
+      skeleton: [
+        zone("idle", 0, 170, 440, 380),
+        zone("walk", 520, 170, 950, 380),
+        zone("run", 980, 170, 1448, 380),
+        zone("jump", 0, 380, 520, 610),
+        zone("attack", 520, 380, 1448, 610),
+        zone("hurt", 0, 610, 690, 820),
+        zone("die", 690, 610, 1448, 820),
+        zone("emote_confused", 0, 820, 520, 1086),
+        zone("emote_love", 520, 820, 780, 1086),
+        zone("emote_alert", 780, 820, 1080, 1086),
+        zone("emote_sleep", 1080, 820, 1448, 1086)
+      ],
+      alien: [
+        zone("idle", 0, 130, 420, 330),
+        zone("walk", 420, 130, 900, 330),
+        zone("run", 900, 130, 1448, 330),
+        zone("jump", 0, 330, 510, 560),
+        zone("attack", 510, 330, 1448, 560),
+        zone("hurt", 0, 560, 620, 790),
+        zone("die", 620, 560, 1448, 790),
+        zone("emote_confused", 0, 790, 520, 1086),
+        zone("emote_love", 520, 790, 720, 1086),
+        zone("emote_alert", 720, 790, 930, 1086),
+        zone("emote_sleep", 930, 790, 1448, 1086)
+      ],
+      ape: [
+        zone("idle", 0, 90, 430, 330),
+        zone("walk", 430, 90, 1010, 330),
+        zone("jump", 1010, 90, 1448, 330),
+        zone("attack_chestbeat", 0, 330, 1448, 560),
+        zone("emote_confused", 0, 560, 330, 800),
+        zone("emote_love", 330, 560, 540, 800),
+        zone("emote_alert", 540, 560, 760, 800),
+        zone("emote_sleep", 760, 560, 1448, 800),
+        zone("hurt", 0, 800, 700, 1086),
+        zone("die", 700, 800, 1448, 1086)
+      ],
+      cat: [
+        zone("idle", 0, 70, 760, 210),
+        zone("walk", 0, 210, 900, 370),
+        zone("jump", 0, 370, 900, 500),
+        zone("attack", 0, 500, 980, 640),
+        zone("emote_confused", 0, 640, 370, 780),
+        zone("emote_love", 370, 640, 570, 780),
+        zone("emote_sleep", 570, 640, 760, 780),
+        zone("emote_alert", 760, 640, 1448, 780),
+        zone("hurt", 0, 780, 1448, 940),
+        zone("die", 0, 940, 1448, 1086)
+      ],
+      fairy: [
+        zone("idle", 0, 110, 430, 330),
+        zone("walk", 430, 110, 960, 330),
+        zone("jump", 960, 110, 1448, 330),
+        zone("attack", 0, 330, 760, 560),
+        zone("emote_love", 0, 560, 230, 780),
+        zone("emote_confused", 230, 560, 420, 780),
+        zone("emote_alert", 420, 560, 700, 780),
+        zone("emote_sleep", 700, 560, 820, 780),
+        zone("hurt", 820, 560, 1448, 780),
+        zone("die", 0, 780, 1448, 1086)
+      ],
+      frog: [
+        zone("idle", 0, 95, 780, 235),
+        zone("hop", 0, 235, 920, 375),
+        zone("jump", 0, 375, 780, 505),
+        zone("attack_tongue", 0, 505, 1448, 650),
+        zone("emote_confused", 0, 650, 360, 790),
+        zone("emote_sleep", 360, 650, 560, 790),
+        zone("emote_alert", 560, 650, 760, 790),
+        zone("emote_love", 760, 650, 1448, 790),
+        zone("hurt", 0, 790, 1448, 930),
+        zone("die", 0, 930, 1448, 1086)
+      ],
+      ghost: [
+        zone("idle", 0, 85, 650, 225),
+        zone("float", 0, 225, 800, 370),
+        zone("dash", 0, 370, 850, 505),
+        zone("attack_scare", 0, 505, 1448, 650),
+        zone("emote_confused", 0, 650, 390, 790),
+        zone("emote_love", 390, 650, 600, 790),
+        zone("emote_alert", 600, 650, 800, 790),
+        zone("emote_sleep", 800, 650, 1448, 790),
+        zone("hurt", 0, 790, 1448, 930),
+        zone("die", 0, 930, 1448, 1086)
+      ],
+      robot: [
+        zone("idle", 0, 95, 430, 330),
+        zone("walk", 430, 95, 960, 330),
+        zone("jump", 960, 95, 1448, 330),
+        zone("attack_laser", 0, 330, 1448, 560),
+        zone("emote_alert", 0, 560, 260, 800),
+        zone("emote_confused", 260, 560, 520, 800),
+        zone("emote_love", 520, 560, 790, 800),
+        zone("emote_sleep", 790, 560, 1448, 800),
+        zone("hurt", 0, 800, 700, 1086),
+        zone("die", 700, 800, 1448, 1086)
+      ],
+      slime: [
+        zone("idle", 0, 150, 440, 330),
+        zone("walk", 440, 150, 940, 330),
+        zone("hop", 940, 150, 1448, 330),
+        zone("jump", 940, 150, 1448, 330),
+        zone("attack", 0, 330, 710, 555),
+        zone("attack_laser", 710, 330, 1448, 555),
+        zone("hurt", 0, 555, 700, 790),
+        zone("die", 700, 555, 1448, 790),
+        zone("emote_confused", 0, 790, 520, 1086),
+        zone("emote_love", 520, 790, 720, 1086),
+        zone("emote_alert", 720, 790, 930, 1086),
+        zone("emote_sleep", 930, 790, 1448, 1086)
+      ],
+      tv_head: [
+        zone("idle", 0, 145, 420, 340),
+        zone("walk", 420, 145, 930, 340),
+        zone("run", 930, 145, 1448, 340),
+        zone("jump", 0, 340, 430, 585),
+        zone("attack_laser", 430, 340, 1060, 585),
+        zone("hurt", 1060, 340, 1448, 585),
+        zone("die", 0, 585, 520, 835),
+        zone("emote_confused", 520, 585, 760, 1086),
+        zone("emote_love", 760, 585, 940, 1086),
+        zone("emote_alert", 940, 585, 1120, 1086),
+        zone("emote_sleep", 1120, 585, 1448, 1086)
+      ]
+    };
+
+    function zone(action, x1, y1, x2, y2) {
+      return { action, x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+    }
+
+    const storageKey = "g00dwierd-sprite-lab-manifest-v1";
+    const state = {
+      avatar: avatars[0].name,
+      action: "idle",
+      image: new Image(),
+      detected: [],
+      selectedBox: null,
+      selectedFrameIndex: -1,
+      selectedFrameAction: null,
+      showDetected: true,
+      showAssigned: true,
+      manualMode: false,
+      zoom: 1,
+      manifest: createManifest(),
+      previewTime: 0,
+      lastTick: performance.now(),
+      drag: null
+    };
+
+    const sourceCanvas = document.querySelector("#sourceCanvas");
+    const sourceCtx = sourceCanvas.getContext("2d", { willReadFrequently: true });
+    const previewCanvas = document.querySelector("#previewCanvas");
+    const previewCtx = previewCanvas.getContext("2d");
+    const avatarSelect = document.querySelector("#avatarSelect");
+    const actionGrid = document.querySelector("#actionGrid");
+    const customAction = document.querySelector("#customAction");
+    const frameDuration = document.querySelector("#frameDuration");
+    const loopToggle = document.querySelector("#loopToggle");
+    const jsonOut = document.querySelector("#jsonOut");
+    const timeline = document.querySelector("#timeline");
+    const roleSelect = document.querySelector("#roleSelect");
+
+    function createManifest() {
+      return {
+        version: 1,
+        sourceType: "presentation-board-crops",
+        generatedBy: "G00DWIERD Sprite Lab",
+        avatars: {}
+      };
+    }
+
+    function getAvatarData(name = state.avatar) {
+      const avatar = avatars.find((item) => item.name === name);
+      if (!state.manifest.avatars[name]) {
+        state.manifest.avatars[name] = {
+          image: avatar.image,
+          sourceSize: { w: 1448, h: 1086 },
+          animations: {}
+        };
+      }
+      return state.manifest.avatars[name];
+    }
+
+    function getActionData(action = state.action) {
+      const avatarData = getAvatarData();
+      if (!avatarData.animations[action]) {
+        const timing = defaultTiming[action] || { ms: 100, loop: true };
+        avatarData.animations[action] = {
+          ms: timing.ms,
+          loop: timing.loop,
+          frames: []
+        };
+      }
+      return avatarData.animations[action];
+    }
+
+    function loadStoredManifest() {
+      const saved = localStorage.getItem(storageKey);
+      if (!saved) return;
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.version) state.manifest = parsed;
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+
+    function persist() {
+      localStorage.setItem(storageKey, JSON.stringify(state.manifest));
+      document.querySelector("#saveReadout").textContent = `saved ${new Date().toLocaleTimeString()}`;
+      updateJson();
+    }
+
+    function setupUI() {
+      avatars.forEach((avatar) => {
+        const option = document.createElement("option");
+        option.value = avatar.name;
+        option.textContent = avatar.name.replace("_", " ");
+        avatarSelect.append(option);
+      });
+
+      quickActions.forEach((action) => {
+        const button = document.createElement("button");
+        button.textContent = action.replaceAll("_", " ");
+        button.dataset.action = action;
+        actionGrid.append(button);
+      });
+
+      avatarSelect.addEventListener("change", () => {
+        state.avatar = avatarSelect.value;
+        state.selectedBox = null;
+        state.selectedFrameIndex = -1;
+        state.selectedFrameAction = null;
+        loadAvatar();
+      });
+
+      actionGrid.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-action]");
+        if (!button) return;
+        setAction(button.dataset.action);
+      });
+
+      document.querySelector("#useCustomAction").addEventListener("click", () => {
+        const value = customAction.value.trim();
+        if (value) setAction(value);
+      });
+
+      document.querySelector("#detectFrames").addEventListener("click", detectBoxes);
+      document.querySelector("#manualBox").addEventListener("click", () => {
+        state.manualMode = !state.manualMode;
+        document.querySelector("#manualBox").classList.toggle("tool-active", state.manualMode);
+      });
+      document.querySelector("#toggleDetected").addEventListener("click", () => {
+        state.showDetected = !state.showDetected;
+        document.querySelector("#toggleDetected").classList.toggle("active", state.showDetected);
+        drawSource();
+      });
+      document.querySelector("#toggleAssigned").addEventListener("click", () => {
+        state.showAssigned = !state.showAssigned;
+        document.querySelector("#toggleAssigned").classList.toggle("active", state.showAssigned);
+        drawSource();
+      });
+      document.querySelector("#zoomRange").addEventListener("input", (event) => {
+        state.zoom = Number(event.target.value) / 100;
+        sourceCanvas.style.width = `${Math.round(sourceCanvas.width * state.zoom)}px`;
+      });
+
+      document.querySelector("#addFrame").addEventListener("click", addSelectedFrame);
+      document.querySelector("#replaceFrame").addEventListener("click", replaceSelectedFrame);
+      document.querySelector("#duplicateFrame").addEventListener("click", duplicateSelectedFrame);
+      document.querySelector("#deleteFrame").addEventListener("click", deleteSelectedFrame);
+      document.querySelector("#exportManifest").addEventListener("click", downloadManifest);
+      document.querySelector("#copyManifest").addEventListener("click", copyManifest);
+      document.querySelector("#saveManifest").addEventListener("click", persist);
+      document.querySelector("#resetManifest").addEventListener("click", resetManifest);
+      document.querySelector("#importManifest").addEventListener("change", importManifest);
+      roleSelect.addEventListener("change", () => {
+        if (!state.selectedBox) return;
+        state.selectedBox.role = roleSelect.value;
+        updateStoredSelectedFrame();
+        drawSource();
+        renderTimeline();
+        updateReadouts();
+        persist();
+      });
+
+      ["boxX", "boxY", "boxW", "boxH"].forEach((id) => {
+        document.querySelector(`#${id}`).addEventListener("change", updateSelectedBoxFromInputs);
+      });
+
+      document.querySelectorAll("[data-nudge]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const [dx, dy] = button.dataset.nudge.split(",").map(Number);
+          nudgeSelected(dx, dy);
+        });
+      });
+
+      frameDuration.addEventListener("change", () => {
+        const data = getActionData();
+        data.ms = Number(frameDuration.value) || 100;
+        persist();
+        updateActionUI();
+      });
+
+      loopToggle.addEventListener("change", () => {
+        getActionData().loop = loopToggle.checked;
+        persist();
+        updateActionUI();
+      });
+
+      sourceCanvas.addEventListener("mousemove", handleCanvasMove);
+      sourceCanvas.addEventListener("mousedown", handleCanvasDown);
+      window.addEventListener("mouseup", () => {
+        if (state.drag?.kind === "move") {
+          applySuggestedMetadata(state.selectedBox);
+          updateStoredSelectedFrame();
+          persist();
+          renderTimeline();
+        }
+        if (state.drag?.kind === "draw" && state.selectedBox) {
+          const box = cleanBox(state.selectedBox);
+          state.selectedBox = box.w >= 4 && box.h >= 4 ? box : null;
+          applySuggestedMetadata(state.selectedBox);
+          syncBoxInputs();
+          drawSource();
+          updateReadouts();
+        }
+        state.drag = null;
+      });
+    }
+
+    function setAction(action, options = {}) {
+      state.action = action;
+      if (!options.keepSelection) {
+        state.selectedFrameIndex = -1;
+        state.selectedFrameAction = null;
+      }
+      getActionData(action);
+      updateActionUI();
+      drawSource();
+      renderTimeline();
+      updateJson();
+    }
+
+    function loadAvatar() {
+      const avatar = avatars.find((item) => item.name === state.avatar);
+      avatarSelect.value = state.avatar;
+      state.image = new Image();
+      state.image.onload = () => {
+        sourceCanvas.width = state.image.naturalWidth;
+        sourceCanvas.height = state.image.naturalHeight;
+        getAvatarData().sourceSize = { w: sourceCanvas.width, h: sourceCanvas.height };
+        sourceCanvas.style.width = `${Math.round(sourceCanvas.width * state.zoom)}px`;
+        detectBoxes();
+        updateActionUI();
+      };
+      state.image.src = avatar.image;
+    }
+
+    function setSelectedBox(box, frameIndex = -1, options = {}) {
+      const suggestedAction = options.skipSuggest ? null : inferActionForBox(box);
+      if (suggestedAction && suggestedAction !== state.action && frameIndex < 0) {
+        setAction(suggestedAction, { keepSelection: true });
+      }
+      state.selectedBox = box ? withMetadata({ ...box, action: suggestedAction || box.action || state.action }) : null;
+      state.selectedFrameIndex = frameIndex;
+      state.selectedFrameAction = frameIndex >= 0 ? state.action : null;
+      syncBoxInputs();
+      drawSource();
+      renderTimeline();
+      updateReadouts();
+    }
+
+    function handleCanvasMove(event) {
+      const point = canvasPoint(event);
+      document.querySelector("#hoverReadout").textContent = `x ${point.x} y ${point.y}`;
+      if (!state.drag || !state.selectedBox) return;
+      if (state.drag.kind === "draw") {
+        state.selectedBox = rectFromPoints(state.drag.start, point);
+      } else {
+        const dx = point.x - state.drag.x;
+        const dy = point.y - state.drag.y;
+        state.selectedBox.x = clamp(state.drag.box.x + dx, 0, sourceCanvas.width - state.selectedBox.w);
+        state.selectedBox.y = clamp(state.drag.box.y + dy, 0, sourceCanvas.height - state.selectedBox.h);
+      }
+      syncBoxInputs();
+      drawSource();
+    }
+
+    function handleCanvasDown(event) {
+      const point = canvasPoint(event);
+      const assigned = getActionData().frames.map((frame, index) => ({ ...frame, frameIndex: index }));
+      const hit = [...assigned, ...state.detected]
+        .reverse()
+        .find((box) => point.x >= box.x && point.x <= box.x + box.w && point.y >= box.y && point.y <= box.y + box.h);
+      if (state.manualMode || !hit) {
+        state.selectedFrameIndex = -1;
+        state.selectedBox = { x: point.x, y: point.y, w: 1, h: 1 };
+        state.drag = { kind: "draw", start: point };
+        syncBoxInputs();
+        drawSource();
+        updateReadouts();
+        return;
+      }
+      setSelectedBox(hit, Number.isInteger(hit.frameIndex) ? hit.frameIndex : -1);
+      state.drag = { kind: "move", x: point.x, y: point.y, box: { ...state.selectedBox } };
+    }
+
+    function canvasPoint(event) {
+      const rect = sourceCanvas.getBoundingClientRect();
+      return {
+        x: Math.round((event.clientX - rect.left) * (sourceCanvas.width / rect.width)),
+        y: Math.round((event.clientY - rect.top) * (sourceCanvas.height / rect.height))
+      };
+    }
+
+    function detectBoxes() {
+      if (!state.image.complete) return;
+      sourceCtx.clearRect(0, 0, sourceCanvas.width, sourceCanvas.height);
+      sourceCtx.drawImage(state.image, 0, 0);
+      const { width, height } = sourceCanvas;
+      const imageData = sourceCtx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+      const visited = new Uint8Array(width * height);
+      const boxes = [];
+
+      const isForeground = (index) => {
+        const offset = index * 4;
+        const r = data[offset];
+        const g = data[offset + 1];
+        const b = data[offset + 2];
+        const a = data[offset + 3];
+        if (a < 40) return false;
+        const redBackground = r > 185 && g < 70 && b < 70;
+        return !redBackground;
+      };
+
+      for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+          const start = y * width + x;
+          if (visited[start] || !isForeground(start)) continue;
+          const queue = [start];
+          visited[start] = 1;
+          let qi = 0;
+          let minX = x;
+          let maxX = x;
+          let minY = y;
+          let maxY = y;
+          let count = 0;
+
+          while (qi < queue.length) {
+            const idx = queue[qi++];
+            const px = idx % width;
+            const py = Math.floor(idx / width);
+            count += 1;
+            if (px < minX) minX = px;
+            if (px > maxX) maxX = px;
+            if (py < minY) minY = py;
+            if (py > maxY) maxY = py;
+
+            const neighbors = [idx - 1, idx + 1, idx - width, idx + width];
+            for (const next of neighbors) {
+              if (next < 0 || next >= visited.length || visited[next]) continue;
+              const nx = next % width;
+              if ((next === idx - 1 && nx > px) || (next === idx + 1 && nx < px)) continue;
+              if (!isForeground(next)) continue;
+              visited[next] = 1;
+              queue.push(next);
+            }
+          }
+
+          const w = maxX - minX + 1;
+          const h = maxY - minY + 1;
+          const area = w * h;
+          const density = count / area;
+          const likelyText = h < 36 && w > 22 && density < 0.58;
+          const smallEffect = count > 24 && w >= 5 && h >= 5 && w <= 120 && h <= 80;
+          const spriteChunk = count > 80 && w >= 14 && h >= 14 && w <= 220 && h <= 180;
+          const oversizedGroup = w > 180 || h > 170;
+          if ((spriteChunk || smallEffect || likelyText) && !oversizedGroup) {
+            boxes.push(expandBox({
+              x: minX,
+              y: minY,
+              w,
+              h,
+              density,
+              pixelCount: count,
+              roleHint: likelyText ? "label" : ""
+            }, 3));
+          }
+        }
+      }
+
+      state.detected = mergeNearbyBoxes(boxes)
+        .sort((a, b) => a.y - b.y || a.x - b.x)
+        .map((box, id) => withMetadata({ ...box, id }));
+      drawSource();
+      updateReadouts();
+    }
+
+    function mergeNearbyBoxes(boxes) {
+      const sorted = boxes.sort((a, b) => a.y - b.y || a.x - b.x);
+      const merged = [];
+      for (const box of sorted) {
+        const target = merged.find((item) => boxesClose(item, box));
+        if (target) {
+          const x1 = Math.min(target.x, box.x);
+          const y1 = Math.min(target.y, box.y);
+          const x2 = Math.max(target.x + target.w, box.x + box.w);
+          const y2 = Math.max(target.y + target.h, box.y + box.h);
+          target.x = x1;
+          target.y = y1;
+          target.w = x2 - x1;
+          target.h = y2 - y1;
+        } else {
+          merged.push({ ...box });
+        }
+      }
+      return merged;
+    }
+
+    function boxesClose(a, b) {
+      const ax2 = a.x + a.w;
+      const ay2 = a.y + a.h;
+      const bx2 = b.x + b.w;
+      const by2 = b.y + b.h;
+      const horizontalGap = Math.max(0, Math.max(a.x, b.x) - Math.min(ax2, bx2));
+      const verticalGap = Math.max(0, Math.max(a.y, b.y) - Math.min(ay2, by2));
+      const overlapX = Math.min(ax2, bx2) - Math.max(a.x, b.x);
+      const overlapY = Math.min(ay2, by2) - Math.max(a.y, b.y);
+      return horizontalGap <= 12 && verticalGap <= 12 && (overlapX > -8 || overlapY > -8);
+    }
+
+    function expandBox(box, amount) {
+      const x = clamp(box.x - amount, 0, sourceCanvas.width);
+      const y = clamp(box.y - amount, 0, sourceCanvas.height);
+      const x2 = clamp(box.x + box.w + amount, 0, sourceCanvas.width);
+      const y2 = clamp(box.y + box.h + amount, 0, sourceCanvas.height);
+      return { ...box, x, y, w: x2 - x, h: y2 - y };
+    }
+
+    function rectFromPoints(a, b) {
+      const x1 = clamp(Math.min(a.x, b.x), 0, sourceCanvas.width);
+      const y1 = clamp(Math.min(a.y, b.y), 0, sourceCanvas.height);
+      const x2 = clamp(Math.max(a.x, b.x), 0, sourceCanvas.width);
+      const y2 = clamp(Math.max(a.y, b.y), 0, sourceCanvas.height);
+      return { x: x1, y: y1, w: Math.max(1, x2 - x1), h: Math.max(1, y2 - y1) };
+    }
+
+    function inferActionForBox(box) {
+      if (!box) return "";
+      const zones = actionZones[state.avatar] || [];
+      const cx = box.x + box.w / 2;
+      const cy = box.y + box.h / 2;
+      const hit = zones.find((item) => {
+        return cx >= item.x && cx <= item.x + item.w && cy >= item.y && cy <= item.y + item.h;
+      });
+      return hit?.action || box.action || "";
+    }
+
+    function inferRoleForBox(box) {
+      if (!box) return "actor";
+      if (box.roleHint === "label") return "label";
+      if (box.role) return box.role;
+      const action = box.action || inferActionForBox(box);
+      const aspect = box.w / Math.max(1, box.h);
+      const area = box.w * box.h;
+      if (box.h < 38 && box.w > 22 && (box.density ?? 0.4) < 0.62) return "label";
+      if (aspect > 2.4 && box.w > 58) return "projectile";
+      if (box.w <= 28 && box.h <= 28) return "particle";
+      if (action.startsWith("emote_") && (box.w < 54 || box.h < 54)) return "floating_object";
+      if (action.startsWith("attack") && area < 2600) return "effect";
+      if ((action === "hurt" || action === "die") && area < 1800) return "effect";
+      return "actor";
+    }
+
+    function withMetadata(box) {
+      if (!box) return null;
+      const action = inferActionForBox(box) || box.action || state.action;
+      const role = inferRoleForBox({ ...box, action });
+      return { ...box, action, role };
+    }
+
+    function applySuggestedMetadata(box) {
+      const suggestedAction = inferActionForBox(box);
+      if (suggestedAction && suggestedAction !== state.action) {
+        setAction(suggestedAction, { keepSelection: true });
+      }
+      if (state.selectedBox) {
+        state.selectedBox = withMetadata({ ...state.selectedBox, action: suggestedAction || state.selectedBox.action });
+      }
+    }
+
+    function drawSource() {
+      sourceCtx.clearRect(0, 0, sourceCanvas.width, sourceCanvas.height);
+      sourceCtx.drawImage(state.image, 0, 0);
+
+      if (state.showDetected) {
+        state.detected.forEach((box) => drawBox(sourceCtx, box, "rgba(78, 215, 255, 0.92)", 1, cropLabel(box)));
+      }
+
+      if (state.showAssigned) {
+        getActionData().frames.forEach((box, index) => {
+          drawBox(sourceCtx, box, "rgba(151, 241, 95, 0.95)", 2, `${index + 1} ${roleNames[box.role] || ""}`);
+        });
+      }
+
+      if (state.selectedBox) {
+        drawBox(sourceCtx, state.selectedBox, "rgba(255, 212, 90, 1)", 3, cropLabel(state.selectedBox));
+      }
+    }
+
+    function drawBox(ctx, box, color, lineWidth, label = "") {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
+      ctx.setLineDash(lineWidth === 1 ? [6, 4] : []);
+      ctx.strokeRect(box.x + 0.5, box.y + 0.5, box.w, box.h);
+      if (label) {
+        const labelWidth = Math.max(24, Math.min(140, label.length * 7 + 10));
+        ctx.fillStyle = "rgba(0, 0, 0, 0.74)";
+        ctx.fillRect(box.x, Math.max(0, box.y - 18), labelWidth, 18);
+        ctx.fillStyle = color;
+        ctx.font = "bold 13px ui-monospace, monospace";
+        ctx.fillText(label, box.x + 5, Math.max(13, box.y - 5));
+      }
+      ctx.restore();
+    }
+
+    function addSelectedFrame() {
+      if (!state.selectedBox) return;
+      applySuggestedMetadata(state.selectedBox);
+      const data = getActionData();
+      data.frames.push(cleanBox(state.selectedBox, state.action, state.selectedBox.role));
+      state.selectedFrameIndex = data.frames.length - 1;
+      state.selectedFrameAction = state.action;
+      persist();
+      drawSource();
+      renderTimeline();
+      updateReadouts();
+    }
+
+    function replaceSelectedFrame() {
+      if (!state.selectedBox || state.selectedFrameIndex < 0) return;
+      applySuggestedMetadata(state.selectedBox);
+      updateStoredSelectedFrame();
+      persist();
+      drawSource();
+      renderTimeline();
+    }
+
+    function duplicateSelectedFrame() {
+      const data = getActionData();
+      if (state.selectedFrameIndex < 0 || !data.frames[state.selectedFrameIndex]) return;
+      data.frames.splice(state.selectedFrameIndex + 1, 0, { ...data.frames[state.selectedFrameIndex] });
+      state.selectedFrameIndex += 1;
+      state.selectedFrameAction = state.action;
+      state.selectedBox = { ...data.frames[state.selectedFrameIndex] };
+      persist();
+      drawSource();
+      renderTimeline();
+    }
+
+    function deleteSelectedFrame() {
+      const data = getActionData(state.selectedFrameAction || state.action);
+      if (state.selectedFrameIndex < 0) return;
+      data.frames.splice(state.selectedFrameIndex, 1);
+      state.selectedFrameIndex = -1;
+      state.selectedFrameAction = null;
+      persist();
+      drawSource();
+      renderTimeline();
+      updateReadouts();
+    }
+
+    function cleanBox(box, action = box.action || state.action, role = box.role || inferRoleForBox(box)) {
+      return {
+        x: Math.round(box.x),
+        y: Math.round(box.y),
+        w: Math.round(box.w),
+        h: Math.round(box.h),
+        action,
+        role
+      };
+    }
+
+    function syncBoxInputs() {
+      const box = state.selectedBox || { x: "", y: "", w: "", h: "" };
+      document.querySelector("#boxX").value = box.x;
+      document.querySelector("#boxY").value = box.y;
+      document.querySelector("#boxW").value = box.w;
+      document.querySelector("#boxH").value = box.h;
+      roleSelect.value = box.role || "actor";
+    }
+
+    function updateSelectedBoxFromInputs() {
+      if (!state.selectedBox) state.selectedBox = { x: 0, y: 0, w: 32, h: 32 };
+      state.selectedBox = cleanBox({
+        x: Number(document.querySelector("#boxX").value) || 0,
+        y: Number(document.querySelector("#boxY").value) || 0,
+        w: Number(document.querySelector("#boxW").value) || 1,
+        h: Number(document.querySelector("#boxH").value) || 1,
+        action: state.selectedBox.action || state.action,
+        role: state.selectedBox.role || roleSelect.value
+      }, state.selectedBox.action || state.action, state.selectedBox.role || roleSelect.value);
+      applySuggestedMetadata(state.selectedBox);
+      if (updateStoredSelectedFrame()) {
+        persist();
+        renderTimeline();
+      }
+      drawSource();
+      updateReadouts();
+    }
+
+    function nudgeSelected(dx, dy) {
+      if (!state.selectedBox) return;
+      state.selectedBox.x = clamp(state.selectedBox.x + dx, 0, sourceCanvas.width - state.selectedBox.w);
+      state.selectedBox.y = clamp(state.selectedBox.y + dy, 0, sourceCanvas.height - state.selectedBox.h);
+      applySuggestedMetadata(state.selectedBox);
+      if (updateStoredSelectedFrame()) {
+        persist();
+        renderTimeline();
+      }
+      syncBoxInputs();
+      drawSource();
+      updateReadouts();
+    }
+
+    function renderTimeline() {
+      timeline.innerHTML = "";
+      const frames = getActionData().frames;
+      frames.forEach((frame, index) => {
+        const item = document.createElement("button");
+        item.className = `thumb ${index === state.selectedFrameIndex && state.selectedFrameAction === state.action ? "active" : ""}`;
+        item.type = "button";
+        const label = document.createElement("span");
+        label.textContent = index + 1;
+        const canvas = document.createElement("canvas");
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext("2d");
+        drawFrameToCanvas(ctx, canvas, frame);
+        item.append(canvas, label);
+        item.addEventListener("click", () => setSelectedBox(frame, index));
+        timeline.append(item);
+      });
+      document.querySelector("#frameCount").textContent = `${frames.length} frame${frames.length === 1 ? "" : "s"}`;
+    }
+
+    function drawFrameToCanvas(ctx, canvas, frame) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.imageSmoothingEnabled = false;
+      const scale = Math.min(canvas.width / frame.w, canvas.height / frame.h) * 0.86;
+      const dw = frame.w * scale;
+      const dh = frame.h * scale;
+      const dx = (canvas.width - dw) / 2;
+      const dy = (canvas.height - dh) / 2;
+      ctx.drawImage(state.image, frame.x, frame.y, frame.w, frame.h, dx, dy, dw, dh);
+    }
+
+    function tick(now) {
+      const delta = now - state.lastTick;
+      state.lastTick = now;
+      state.previewTime += delta;
+      drawPreview();
+      requestAnimationFrame(tick);
+    }
+
+    function drawPreview() {
+      const data = getActionData();
+      previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+      previewCtx.imageSmoothingEnabled = false;
+      previewCtx.fillStyle = "#090a0e";
+      previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+      previewCtx.strokeStyle = "#272a36";
+      previewCtx.strokeRect(48.5, 24.5, 96, 144);
+      if (!data.frames.length) return;
+      const ms = Math.max(20, data.ms || 100);
+      let index = Math.floor(state.previewTime / ms);
+      if (data.loop) {
+        index %= data.frames.length;
+      } else {
+        index = Math.min(index, data.frames.length - 1);
+      }
+      drawFrameToCanvas(previewCtx, previewCanvas, data.frames[index]);
+    }
+
+    function updateActionUI() {
+      document.querySelectorAll("#actionGrid button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.action === state.action);
+      });
+      const data = getActionData();
+      frameDuration.value = data.ms;
+      loopToggle.checked = data.loop;
+      document.querySelector("#actionReadout").textContent = `${state.avatar} / ${state.action}`;
+      renderTimeline();
+      updateAvatarStats();
+    }
+
+    function updateAvatarStats() {
+      const animations = getAvatarData().animations;
+      const stats = document.querySelector("#avatarStats");
+      stats.innerHTML = "";
+      Object.keys(animations).sort().forEach((name) => {
+        const pill = document.createElement("span");
+        const count = animations[name].frames.length;
+        pill.className = `pill ${count ? "ok" : ""}`;
+        pill.textContent = `${name}: ${count}`;
+        stats.append(pill);
+      });
+    }
+
+    function updateReadouts() {
+      const selected = state.selectedBox;
+      document.querySelector("#selectedReadout").textContent = selected
+        ? `selected ${selected.action || state.action} / ${selected.role || "actor"} x ${selected.x} y ${selected.y} w ${selected.w} h ${selected.h}`
+        : "No box selected";
+      updateAvatarStats();
+    }
+
+    function updateStoredSelectedFrame() {
+      if (state.selectedFrameIndex < 0 || !state.selectedBox) return false;
+      const avatarData = getAvatarData();
+      const fromAction = state.selectedFrameAction || state.action;
+      const fromData = avatarData.animations[fromAction];
+      if (!fromData?.frames[state.selectedFrameIndex]) return false;
+
+      const frame = cleanBox(state.selectedBox, state.selectedBox.action || state.action, state.selectedBox.role);
+      const toAction = frame.action || state.action;
+      if (toAction !== fromAction) {
+        fromData.frames.splice(state.selectedFrameIndex, 1);
+        const toData = getActionData(toAction);
+        toData.frames.push(frame);
+        state.selectedFrameIndex = toData.frames.length - 1;
+        state.selectedFrameAction = toAction;
+      } else {
+        fromData.frames[state.selectedFrameIndex] = frame;
+        state.selectedFrameAction = fromAction;
+      }
+      return true;
+    }
+
+    function cropLabel(box) {
+      const action = shortActionLabel(box.action);
+      const role = roleNames[box.role] || "";
+      return [action, role].filter(Boolean).join(":");
+    }
+
+    function shortActionLabel(action) {
+      const labels = {
+        idle: "idle",
+        walk: "walk",
+        run: "run",
+        jump: "jump",
+        hop: "hop",
+        float: "float",
+        dash: "dash",
+        attack: "atk",
+        attack_scare: "scare",
+        attack_laser: "laser",
+        attack_tongue: "tongue",
+        attack_chestbeat: "beat",
+        hurt: "hurt",
+        die: "die",
+        emote_confused: "?",
+        emote_love: "love",
+        emote_alert: "!",
+        emote_sleep: "zzz"
+      };
+      return labels[action] || "";
+    }
+
+    function updateJson() {
+      jsonOut.value = JSON.stringify(state.manifest, null, 2);
+    }
+
+    function downloadManifest() {
+      const blob = new Blob([JSON.stringify(state.manifest, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "g00dwierd_sprite_manifest.json";
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function copyManifest() {
+      await navigator.clipboard.writeText(JSON.stringify(state.manifest, null, 2));
+      document.querySelector("#saveReadout").textContent = "json copied";
+    }
+
+    function resetManifest() {
+      if (!confirm("Reset every saved frame rectangle?")) return;
+      state.manifest = createManifest();
+      localStorage.removeItem(storageKey);
+      getAvatarData();
+      updateActionUI();
+      updateJson();
+      drawSource();
+    }
+
+    function importManifest(event) {
+      const [file] = event.target.files;
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          state.manifest = JSON.parse(reader.result);
+          persist();
+          loadAvatar();
+        } catch (error) {
+          alert("Invalid JSON");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    loadStoredManifest();
+    setupUI();
+    setAction("idle");
+    loadAvatar();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

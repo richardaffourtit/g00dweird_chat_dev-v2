@@ -1,0 +1,612 @@
+{
+  "schema": "g00dweird.thoughtBubbles.v1",
+  "generatedBy": "frontend/scripts/generate_thought_bubble_manifest.py",
+  "sourceImage": "/scenery/thoughtbubbles.png",
+  "sourceSize": {
+    "w": 1536,
+    "h": 1024
+  },
+  "padding": 24,
+  "variants": [
+    {
+      "id": "s1",
+      "tier": "short",
+      "rank": 1,
+      "source": {
+        "x": 30,
+        "y": 160,
+        "w": 89,
+        "h": 100
+      },
+      "render": {
+        "scale": 0.92
+      },
+      "tail": {
+        "x": 34,
+        "y": 88
+      },
+      "text": {
+        "x": 33,
+        "y": 35,
+        "w": 24,
+        "h": 25
+      },
+      "fontSize": 13
+    },
+    {
+      "id": "s2",
+      "tier": "short",
+      "rank": 2,
+      "source": {
+        "x": 148,
+        "y": 140,
+        "w": 104,
+        "h": 119
+      },
+      "render": {
+        "scale": 0.92
+      },
+      "tail": {
+        "x": 37,
+        "y": 105
+      },
+      "text": {
+        "x": 37,
+        "y": 39,
+        "w": 34,
+        "h": 27
+      },
+      "fontSize": 13
+    },
+    {
+      "id": "s3",
+      "tier": "short",
+      "rank": 3,
+      "source": {
+        "x": 279,
+        "y": 132,
+        "w": 112,
+        "h": 124
+      },
+      "render": {
+        "scale": 0.92
+      },
+      "tail": {
+        "x": 41,
+        "y": 109
+      },
+      "text": {
+        "x": 38,
+        "y": 37,
+        "w": 39,
+        "h": 30
+      },
+      "fontSize": 13
+    },
+    {
+      "id": "s4a",
+      "tier": "short",
+      "rank": 4,
+      "source": {
+        "x": 408,
+        "y": 121,
+        "w": 123,
+        "h": 135
+      },
+      "render": {
+        "scale": 0.92
+      },
+      "tail": {
+        "x": 47,
+        "y": 119
+      },
+      "text": {
+        "x": 39,
+        "y": 40,
+        "w": 47,
+        "h": 30
+      },
+      "fontSize": 13
+    },
+    {
+      "id": "s4b",
+      "tier": "short",
+      "rank": 5,
+      "source": {
+        "x": 546,
+        "y": 110,
+        "w": 141,
+        "h": 149
+      },
+      "render": {
+        "scale": 0.92
+      },
+      "tail": {
+        "x": 55,
+        "y": 131
+      },
+      "text": {
+        "x": 41,
+        "y": 44,
+        "w": 60,
+        "h": 34
+      },
+      "fontSize": 13
+    },
+    {
+      "id": "s5",
+      "tier": "short",
+      "rank": 6,
+      "source": {
+        "x": 696,
+        "y": 99,
+        "w": 155,
+        "h": 164
+      },
+      "render": {
+        "scale": 0.92
+      },
+      "tail": {
+        "x": 59,
+        "y": 144
+      },
+      "text": {
+        "x": 43,
+        "y": 45,
+        "w": 68,
+        "h": 38
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "s6",
+      "tier": "short",
+      "rank": 7,
+      "source": {
+        "x": 854,
+        "y": 86,
+        "w": 175,
+        "h": 173
+      },
+      "render": {
+        "scale": 0.92
+      },
+      "tail": {
+        "x": 72,
+        "y": 152
+      },
+      "text": {
+        "x": 48,
+        "y": 48,
+        "w": 80,
+        "h": 44
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "s7",
+      "tier": "short",
+      "rank": 8,
+      "source": {
+        "x": 1038,
+        "y": 76,
+        "w": 191,
+        "h": 183
+      },
+      "render": {
+        "scale": 0.92
+      },
+      "tail": {
+        "x": 81,
+        "y": 161
+      },
+      "text": {
+        "x": 50,
+        "y": 50,
+        "w": 92,
+        "h": 50
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "s8",
+      "tier": "short",
+      "rank": 9,
+      "source": {
+        "x": 1239,
+        "y": 61,
+        "w": 254,
+        "h": 193
+      },
+      "render": {
+        "scale": 0.92
+      },
+      "tail": {
+        "x": 116,
+        "y": 170
+      },
+      "text": {
+        "x": 63,
+        "y": 53,
+        "w": 131,
+        "h": 58
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "m1",
+      "tier": "medium",
+      "rank": 1,
+      "source": {
+        "x": 128,
+        "y": 359,
+        "w": 174,
+        "h": 140
+      },
+      "render": {
+        "scale": 0.82
+      },
+      "tail": {
+        "x": 59,
+        "y": 123
+      },
+      "text": {
+        "x": 44,
+        "y": 38,
+        "w": 110,
+        "h": 31
+      },
+      "fontSize": 13
+    },
+    {
+      "id": "m2",
+      "tier": "medium",
+      "rank": 2,
+      "source": {
+        "x": 274,
+        "y": 341,
+        "w": 189,
+        "h": 151
+      },
+      "render": {
+        "scale": 0.82
+      },
+      "tail": {
+        "x": 67,
+        "y": 133
+      },
+      "text": {
+        "x": 25,
+        "y": 40,
+        "w": 140,
+        "h": 36
+      },
+      "fontSize": 13
+    },
+    {
+      "id": "m3",
+      "tier": "medium",
+      "rank": 3,
+      "source": {
+        "x": 433,
+        "y": 327,
+        "w": 200,
+        "h": 165
+      },
+      "render": {
+        "scale": 0.82
+      },
+      "tail": {
+        "x": 74,
+        "y": 145
+      },
+      "text": {
+        "x": 26,
+        "y": 41,
+        "w": 148,
+        "h": 41
+      },
+      "fontSize": 13
+    },
+    {
+      "id": "m4",
+      "tier": "medium",
+      "rank": 4,
+      "source": {
+        "x": 604,
+        "y": 313,
+        "w": 245,
+        "h": 187
+      },
+      "render": {
+        "scale": 0.82
+      },
+      "tail": {
+        "x": 116,
+        "y": 165
+      },
+      "text": {
+        "x": 32,
+        "y": 45,
+        "w": 181,
+        "h": 46
+      },
+      "fontSize": 13
+    },
+    {
+      "id": "m5",
+      "tier": "medium",
+      "rank": 5,
+      "source": {
+        "x": 798,
+        "y": 303,
+        "w": 268,
+        "h": 191
+      },
+      "render": {
+        "scale": 0.82
+      },
+      "tail": {
+        "x": 122,
+        "y": 168
+      },
+      "text": {
+        "x": 35,
+        "y": 48,
+        "w": 198,
+        "h": 52
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "m7",
+      "tier": "medium",
+      "rank": 6,
+      "source": {
+        "x": 1016,
+        "y": 293,
+        "w": 316,
+        "h": 196
+      },
+      "render": {
+        "scale": 0.82
+      },
+      "tail": {
+        "x": 148,
+        "y": 172
+      },
+      "text": {
+        "x": 41,
+        "y": 50,
+        "w": 234,
+        "h": 57
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "m8",
+      "tier": "medium",
+      "rank": 7,
+      "source": {
+        "x": 1256,
+        "y": 282,
+        "w": 280,
+        "h": 204
+      },
+      "render": {
+        "scale": 0.82
+      },
+      "tail": {
+        "x": 128,
+        "y": 180
+      },
+      "text": {
+        "x": 34,
+        "y": 54,
+        "w": 192,
+        "h": 61
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "l1",
+      "tier": "long",
+      "rank": 1,
+      "source": {
+        "x": 163,
+        "y": 530,
+        "w": 303,
+        "h": 156
+      },
+      "render": {
+        "scale": 0.76
+      },
+      "tail": {
+        "x": 138,
+        "y": 137
+      },
+      "text": {
+        "x": 33,
+        "y": 58,
+        "w": 240,
+        "h": 40
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "l2",
+      "tier": "long",
+      "rank": 2,
+      "source": {
+        "x": 439,
+        "y": 541,
+        "w": 381,
+        "h": 153
+      },
+      "render": {
+        "scale": 0.76
+      },
+      "tail": {
+        "x": 185,
+        "y": 135
+      },
+      "text": {
+        "x": 38,
+        "y": 44,
+        "w": 305,
+        "h": 45
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "l3",
+      "tier": "long",
+      "rank": 3,
+      "source": {
+        "x": 768,
+        "y": 535,
+        "w": 382,
+        "h": 161
+      },
+      "render": {
+        "scale": 0.76
+      },
+      "tail": {
+        "x": 179,
+        "y": 142
+      },
+      "text": {
+        "x": 38,
+        "y": 44,
+        "w": 306,
+        "h": 49
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "l4",
+      "tier": "long",
+      "rank": 4,
+      "source": {
+        "x": 1100,
+        "y": 528,
+        "w": 436,
+        "h": 171
+      },
+      "render": {
+        "scale": 0.76
+      },
+      "tail": {
+        "x": 204,
+        "y": 150
+      },
+      "text": {
+        "x": 42,
+        "y": 45,
+        "w": 334,
+        "h": 53
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "l5",
+      "tier": "long",
+      "rank": 5,
+      "source": {
+        "x": 0,
+        "y": 698,
+        "w": 428,
+        "h": 168
+      },
+      "render": {
+        "scale": 0.76
+      },
+      "tail": {
+        "x": 202,
+        "y": 148
+      },
+      "text": {
+        "x": 58,
+        "y": 46,
+        "w": 329,
+        "h": 50
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "l6",
+      "tier": "long",
+      "rank": 6,
+      "source": {
+        "x": 372,
+        "y": 700,
+        "w": 418,
+        "h": 172
+      },
+      "render": {
+        "scale": 0.76
+      },
+      "tail": {
+        "x": 204,
+        "y": 151
+      },
+      "text": {
+        "x": 42,
+        "y": 45,
+        "w": 334,
+        "h": 49
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "l7",
+      "tier": "long",
+      "rank": 7,
+      "source": {
+        "x": 737,
+        "y": 706,
+        "w": 381,
+        "h": 162
+      },
+      "render": {
+        "scale": 0.76
+      },
+      "tail": {
+        "x": 180,
+        "y": 143
+      },
+      "text": {
+        "x": 38,
+        "y": 43,
+        "w": 305,
+        "h": 48
+      },
+      "fontSize": 12
+    },
+    {
+      "id": "l8",
+      "tier": "long",
+      "rank": 8,
+      "source": {
+        "x": 1046,
+        "y": 703,
+        "w": 490,
+        "h": 163
+      },
+      "render": {
+        "scale": 0.76
+      },
+      "tail": {
+        "x": 229,
+        "y": 143
+      },
+      "text": {
+        "x": 48,
+        "y": 43,
+        "w": 380,
+        "h": 50
+      },
+      "fontSize": 12
+    }
+  ]
+}

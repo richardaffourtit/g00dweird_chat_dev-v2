@@ -1,0 +1,91 @@
+{
+  "theme_and_archetype": {
+    "theme": "LIGHT",
+    "archetype": "7 (Electric & Neon / Retro-Futurism)",
+    "description": "A cursed, nostalgic Windows 95 desktop environment mixed with weird vaporwave, glitchy, and early internet aesthetics. Think GeoCities meets Habbo Hotel."
+  },
+  "colors": {
+    "desktop_bg": "#008080",
+    "surface": "#c0c0c0",
+    "surface_recessed": "#ffffff",
+    "header_active": "#000080",
+    "header_inactive": "#7b7b7b",
+    "text_primary": "#000000",
+    "text_header": "#ffffff",
+    "border_light": "#ffffff",
+    "border_gray": "#808080",
+    "border_dark": "#000000",
+    "accent_glitch_magenta": "#ff00ff",
+    "accent_glitch_cyan": "#00ffff"
+  },
+  "typography": {
+    "font_families": {
+      "heading": "'Silkscreen', 'Press Start 2P', 'VT323', monospace",
+      "body": "'VT323', 'MS Sans Serif', monospace"
+    },
+    "hierarchy": {
+      "h1": "text-2xl tracking-tighter",
+      "h2": "text-xl tracking-tight",
+      "body": "text-lg leading-tight",
+      "small": "text-sm"
+    },
+    "notes": "VT323 renders quite small, so use text-lg or text-xl for normal reading. Never use anti-aliasing (use antialiased false or pixelated rendering if possible)."
+  },
+  "spacing_and_layout": {
+    "desktop": "fixed inset-0 w-screen h-screen overflow-hidden bg-[#008080]",
+    "window": "absolute flex flex-col min-w-[300px] bg-[#c0c0c0] p-[2px]",
+    "window_header": "flex justify-between items-center bg-[#000080] px-1 py-0.5 select-none",
+    "window_body": "p-2 flex flex-col gap-2",
+    "recessed_panel": "p-2 bg-white",
+    "taskbar": "absolute bottom-0 left-0 w-full h-[35px] bg-[#c0c0c0] flex items-center px-1 z-50",
+    "desktop_icons": "absolute top-0 left-0 flex flex-col flex-wrap gap-6 p-4 h-[calc(100vh-40px)]"
+  },
+  "components": {
+    "window_border": "border-t-2 border-l-2 border-white border-r-2 border-b-2 border-black shadow-[inset_-1px_-1px_#808080,inset_1px_1px_#dfdfdf]",
+    "recessed_border": "border-t-2 border-l-2 border-[#808080] border-r-2 border-b-2 border-white shadow-[inset_1px_1px_#000000]",
+    "button": "bg-[#c0c0c0] px-4 py-1 border-t-2 border-l-2 border-white border-r-2 border-b-2 border-black shadow-[inset_-1px_-1px_#808080,inset_1px_1px_#dfdfdf] active:border-t-black active:border-l-black active:border-r-white active:border-b-white active:shadow-[inset_1px_1px_#000000] focus:outline-dotted focus:outline-1 focus:outline-black focus:outline-offset-[-4px]",
+    "icon": "w-8 h-8 pixelated image-rendering-pixelated",
+    "desktop_icon_container": "flex flex-col items-center justify-center gap-1 w-20 cursor-pointer text-white text-center drop-shadow-[1px_1px_0_#000]",
+    "scanlines": "pointer-events-none fixed inset-0 z-[9999] opacity-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]"
+  },
+  "image_urls": {
+    "worlds": [
+      {
+        "url": "https://images.unsplash.com/photo-1749834553226-b0f0651a2a96?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHwxfHx2YXBvcndhdmUlMjBhZXN0aGV0aWN8ZW58MHx8fHwxNzc3MzM5NjIxfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Cyber Cafe Iso Room Background",
+        "category": "isometric_world"
+      },
+      {
+        "url": "https://images.pexels.com/photos/9122255/pexels-photo-9122255.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Haunted LAN Party Room Background",
+        "category": "isometric_world"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1576495169018-bd2414046c6b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwyfHxwaXhlbCUyMGFydHxlbnwwfHx8fDE3NzczMzk2MzF8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Pixel Beach Island Background",
+        "category": "isometric_world"
+      }
+    ],
+    "textures": [
+      {
+        "url": "https://images.pexels.com/photos/7026467/pexels-photo-7026467.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Weird Vaporwave Win95 Desktop Wallpaper (Optional override for solid teal)",
+        "category": "desktop_wallpaper"
+      }
+    ]
+  },
+  "motion_and_interactions": {
+    "hover_states": "No smooth transitions! Use instant state changes to simulate old software. Buttons depress instantly.",
+    "animations": "Add a faint flickering CSS animation to text inputs. Use a blink animation for the custom text cursor.",
+    "dragging": "Windows must be draggable via the navy title bar. When dragged, the z-index should increase to bring it to front."
+  },
+  "instructions_to_main_agent": [
+    "Load fonts from Google Fonts: @import url('https://fonts.googleapis.com/css2?family=Silkscreen&family=VT323&display=swap');",
+    "DO NOT use Shadcn UI or rounded corners for Windows. Every window must be perfectly square and use the chunky 90s bevels defined in components.window_border.",
+    "Implement the desktop container with relative or fixed positioning, and use absolute positioning for all windows (chat, jukebox, upload, worlds) so they can overlap and be dragged.",
+    "The Isometric Worlds should be implemented as a recessed panel containing the world background image, with user avatars rendered as absolute elements inside it.",
+    "Add 'data-testid' to everything. e.g. data-testid='start-button', data-testid='chat-window', data-testid='upload-dialog'.",
+    "For the Start button: Use the Win95 standard style, containing a Windows logo icon and 'Start' text.",
+    "To achieve the 'g00dweird' vibe, inject random marquee tags in the chat, use a custom crosshair or pixel pointer cursor via CSS (cursor: crosshair), and overlay the scanlines div on top of everything with pointer-events: none."
+  ]
+}

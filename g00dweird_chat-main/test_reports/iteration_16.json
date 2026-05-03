@@ -1,0 +1,39 @@
+{
+  "summary": "Iteration 16: validated (a) new GET /api/profile/{nickname} public profile endpoint, (b) upload flow alive after EMERGENT_LLM_KEY refresh (no more 401), (c) WS persistence of sprite_id/anim_id/avatar_path/last_room_id/last_seen_at to user doc on join+disconnect, (d) live presence (live_room_id/live_room_name) populated while user is on a WS, (e) profile reflects sprayed tags + uploads, (f) frontend /u/<nickname> page (success + 404 ghost), user-list links, ProfileWindow Share button, and sprite single-instance regression. Backend: 11/11 iter16 pytest PASS. Frontend: profile-page renders all required testids (handle, bio, marquee, enter cta, share cta, tags, uploads, live-cta when connected, 404 with home-cta). Sprite single-instance regression CONFIRMED (in-room screenshot shows one ghost + one weirdbot, no left+right duplication; iso-avatar nodes count == users count).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Open SpritePicker from desktop", "issue": "icon-sprites double-click and open-sprite click did not always open [data-testid='sprite-picker'] in my session — likely because the WORLDS.exe window remained focused on top and ate the click. The picker testid does exist (verified in source); not a code bug, just an interaction nuance. Other windows (My Profile, Worlds.exe) auto-open on entering a room and obscure the desktop icons. Consider focusing/raising the picker on open.", "affected_selectors": ["[data-testid='sprite-picker']", "[data-testid='icon-sprites']"]}
+    ],
+    "design_issues": [
+      {"screen": "/u/<nickname> profile page", "issues": ["AVATAR fallback shows 'NO BODY' placeholder when user has no sprite/anim/avatar_path — looks intentional and on-brand for the 'alive web' aesthetic. Looks good with neon pixel handle and STATUS=AFK chip."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration16.py",
+    "/app/test_reports/pytest/iter16.xml"
+  ],
+  "action_items": [
+    "[low] On entering a room, WORLDS.exe + MY PROFILE windows auto-open and cover desktop icons — clicking the SPRITES desktop icon doesn't always raise the picker over them. Consider auto-closing Worlds after pick, or always raising any newly-opened window to top.",
+    "[none required] All requested features verified working."
+  ],
+  "critical_code_review_comments": [
+    "server.py L909: avatar_path derivation `(avatar_url or '').split('/api/files/', 1)[-1] if avatar_url else None` will produce a non-None bogus path equal to the full URL when avatar_url does not contain '/api/files/'. Consider an explicit `if '/api/files/' in avatar_url` check.",
+    "server.py L598-603: live presence loop iterates ROOM_STATES sequentially and breaks at first match — correct as a user can only be in one room, but if a stale ClientConn is left in another room (e.g. on a crash), profile will report the wrong live room. The disconnect finally-block does pop the connection so this is mostly defensive.",
+    "server.py L572-578: GET /api/profile/{nickname} returns the most-recently-created user when nicknames collide. As noted in the docstring, future disambiguation by user_id is needed. Acceptable for MVP.",
+    "ProfilePage.jsx is 540 lines — borderline. If it grows further consider extracting StatChip / AvatarFrame / TagsSection / UploadsSection into their own files."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration16.py (new — 11 pytest tests)"
+  ],
+  "success_rate": {"backend": "100% (11/11 iter16)", "frontend": "100% on requested testids — profile-page, profile-page-not-found, profile-page-live-cta, user-list-link-<nick> (target=_blank, href=/u/<nick>), profile-share, sprite single-instance verified visually."},
+  "test_credentials": "Nickname-only. Used TEST_i16_* on backend. Test users from this session: TEST_i16_fe, TEST_i16_live, TEST_i16_sp.",
+  "seed_data_creation": "Backend: created several TEST_i16_* user docs and one TEST_i16 spray tag in the first room (used by test_profile_reflects_sprayed_tags). Tags persist but are scoped under TEST_ prefix and within MAX_TAGS_PER_ROOM=80 cap. No production data touched.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Profile endpoint shape: {user_id, nickname, bio, created_at, last_room_id, last_seen_at, sprite_id, anim_id, avatar_path, live_room_id, live_room_name, tags[], uploads[]}. 404 on unknown nickname. WS persists to db.users on connect (sprite_id/anim_id/avatar_path/last_room_id/last_seen_at), on `avatar` msg (avatar_path), on `sprite` msg (sprite_id, anim_id=None), on `anim` msg (anim_id), on disconnect (last_seen_at, last_room_id). Frontend route /u/:nickname is OUTSIDE the Win95 desktop (purple gradient, intentional). Testids: profile-page, profile-page-not-found, profile-page-handle, profile-page-bio, profile-page-marquee, profile-page-tags, profile-page-uploads, profile-page-enter-cta, profile-page-share-cta, profile-page-live-cta (only when connected), profile-page-home-cta (404 only), profile-page-last-room (offline only). ChatWindow exposes data-testid='user-list-link-<nickname>' (anchor target=_blank, href=/u/<nick>). ProfileWindow has data-testid='profile-share'. SpritePicker testids: sprite-picker, anim-pick-<creature>, sprite-pick-<id>, stance-<state>, sprite-close. Run pytest with: pytest /app/backend/tests/test_iteration16.py -v. Note: when entering a room, WORLDS.exe and MY PROFILE windows auto-open — close them before clicking desktop icons in playwright."
+}

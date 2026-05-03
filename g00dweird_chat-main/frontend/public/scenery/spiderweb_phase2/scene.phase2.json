@@ -1,0 +1,38 @@
+{
+  "background": "assets/background/spiderweb_bg.png",
+  "keyColor": "#ff0000",
+  "objects": [
+    {
+      "id": "web_shimmer",
+      "sprite": "assets/sprites/web_shimmer_128.png",
+      "x": 0,
+      "y": 0,
+      "z": 10,
+      "frameMs": 120
+    },
+    {
+      "id": "lanterns",
+      "sprite": "assets/sprites/lantern_flicker_64.png",
+      "x": 900,
+      "y": 200,
+      "z": 20,
+      "frameMs": 90
+    },
+    {
+      "id": "particles",
+      "sprite": "assets/sprites/particle_fall_128.png",
+      "x": 0,
+      "y": 0,
+      "z": 5,
+      "frameMs": 140
+    },
+    {
+      "id": "center_rune",
+      "sprite": "assets/sprites/rune_pulse_64.png",
+      "x": 900,
+      "y": 600,
+      "z": 25,
+      "frameMs": 100
+    }
+  ]
+}

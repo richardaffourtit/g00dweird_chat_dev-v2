@@ -1,0 +1,23 @@
+{
+  "mode": "final_form",
+  "systems": {
+    "identity_drift": {
+      "username_glitch": true,
+      "avatar_desync": true,
+      "chat_delay_variance_ms": 500
+    },
+    "phantom_activity": {
+      "typing_indicator_fake": true,
+      "ghost_messages": true,
+      "frequency": "low"
+    },
+    "memory_instability": {
+      "message_reorder_chance": 0.1,
+      "message_fade": true
+    },
+    "presence_blur": {
+      "nearby_users_opacity_shift": true,
+      "distance_uncertainty": true
+    }
+  }
+}

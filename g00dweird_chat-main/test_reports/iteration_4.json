@@ -1,0 +1,35 @@
+{
+  "summary": "Iteration 4 testing of g00dweird.com fullfunk + chat-overlay + thought-cloud features. Backend: 35/35 pytest PASSED (32 regression iter1+2+3 + 3 new iter4 covering chat fullfunk flag broadcast/persist, *think+fullfunk thought broadcast & snapshot thought_fullfunk, regular chat last_message.fullfunk=false in snapshot). Frontend Playwright desktop (1920x1080) + mobile (390x844): /fullfunk/{A,5,excl,dollar}.png all 200; toggle-fullfunk button label 𝔽𝕟𝕜 toggles active class + yellow bg (rgb(255,238,85)) + placeholder 'FULLFUNK MODE — msg renders as pixel glyphs'; sending 'HELLO 1!' under fullfunk produces [data-testid='fullfunk-chat'] containing exactly 7 <img> glyphs (HELLO=5 + '1' + '!'); '*think DREAM' adds NO chat-message but creates [data-testid='thought-bubble'] with inner <svg> cloud + 5 glyph imgs; chat-resize drag changes [data-testid='chat-messages'] height by 140px desktop / 108px mobile; chat-messages computed bg = rgba(255,255,255,0.55); regression: sprite-picker, jukebox, copy-invite, mobile-actions bar, mobile drawer all still functional. Glyph imgs load with naturalWidth>0 (e.g. excl.png 38x110).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Chat overlay", "issues": ["Chat-message rows on the semi-transparent (rgba 0.55) bg use textShadow:'0 0 3px #fff' for legibility — works fine over the bright pastel HELLO room bg, but in lower-contrast scenes (e.g. mars red mesas) light-coloured timestamp text (#333) on the rgba white overlay still has acceptable contrast (~7:1). No action needed; just noting design choice."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/test_iteration2.py",
+    "/app/backend/tests/test_iteration3.py",
+    "/app/backend/tests/test_iteration4.py",
+    "/app/test_reports/pytest/iter4.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "ChatWindow.jsx is now ~480 lines with iso world + chat overlay + resize + sidebar mixed in one component. Consider extracting (a) ResizeHandle + chatH state into a useResizableChat hook, (b) MessageRow into its own component, (c) sidebarContent into a Sidebar component. Same readability concern as previous iters but worse now.",
+    "FullfunkText loads a <img> per character with no caching hint. For long messages this means many parallel HTTP requests; consider an HTTP cache header on /fullfunk/*.png served by the frontend (CRA serves them static, so default browser caching applies — should be OK, but worth confirming).",
+    "ChatWindow inline-style on resize handle uses bottom={chatH}; combined with the overlay using bottom:0, height:chatH — when chatH grows, the iso world above shrinks visually but the IsoWorld component itself doesn't know (it fills its parent and is just covered). That's intentional/acceptable but means the iso scene cannot be interacted with in the area covered by the chat overlay. Consider lowering overlay alpha further or adding pointer-events:none to a top portion of the overlay if you want users to still click avatars under it.",
+    "Server-side: ClientConn.last_message still has no age cap (8s expiry purely client-side). However room_user_list() now strips last_message older than 8s based on lm['ts'] — verified fix from iter3 review item #2 is implemented (server.py L243-250). Good.",
+    "*think with fullfunk:true sets conn.thought_fullfunk = fullfunk only when conn.thought is non-empty; bare '*think' (clear) correctly resets thought_fullfunk to False. Logic correct.",
+    "Frontend FullfunkText falls back to a font-pixel span with magenta color for unmapped characters (e.g. emoji). Reasonable graceful degradation."
+  ],
+  "updated_files": ["/app/backend/tests/test_iteration4.py (new)"],
+  "success_rate": {"backend": "100% (35/35)", "frontend": "100% of targeted iter-4 flows (desktop + mobile)"},
+  "test_credentials": "Nickname-only. Created TEST_i4ff_a / TEST_i4ff_b / TEST_i4_thff / TEST_i4_thff_obs / TEST_i4_lmff / TEST_i4_lmff_obs (backend) and T1_iter4 / T1_m4 (frontend).",
+  "seed_data_creation": "One persistent fullfunk thought 'cloud dream' on jello room and a TEST_HI_FF chat in hello room may persist briefly. Non-destructive.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Run `pytest /app/backend/tests/ -v` (asyncio_mode=auto in pytest.ini) — 35 tests across backend_test.py / test_iteration2.py / test_iteration3.py / test_iteration4.py. Iter4 tests assert: chat with {fullfunk:true} broadcasts fullfunk=true and persists in /api/rooms/{rid}/history; *think+fullfunk broadcasts thought with fullfunk=true AND new joiner snapshot user has thought + thought_fullfunk fields populated; regular chat with fullfunk:false reflects last_message.fullfunk=false in subsequent snapshot. Frontend: glyph assets at /fullfunk/{char}.png (uppercase A-Z & 0-9 use char filename, punct uses slug map in /app/frontend/src/components/FullfunkText.jsx). toggle-fullfunk testid: 'toggle-fullfunk' label '𝔽𝕟𝕜'. fullfunk message wrapper testid: 'fullfunk-chat'. Resize handle: 'chat-resize'; drags vertically, range [60, 400] px on chatH state. Chat overlay testid: 'chat-messages' with rgba(255,255,255,0.55) bg + backdrop-filter blur. ThoughtCloud testid: 'thought-bubble' (inside IsoWorld).",
+  "rca of the issue": "No bugs. All requested behaviour observed end-to-end."
+}
