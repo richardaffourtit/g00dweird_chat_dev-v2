@@ -31,7 +31,10 @@ function getBackendUrl() {
 const BACKEND_URL = getBackendUrl();
 export const API = `${BACKEND_URL}/api`;
 
-export const api = axios.create({ baseURL: API });
+export const api = axios.create({
+    baseURL: API,
+    timeout: 8000,
+});
 
 const warnedPreviewFallbacks = new Set();
 

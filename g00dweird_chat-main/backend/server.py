@@ -17,7 +17,9 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
 import boto3
+import certifi
 from botocore.exceptions import BotoCoreError, ClientError
+from pymongo.errors import PyMongoError
 from fastapi import (
     FastAPI, APIRouter, WebSocket, WebSocketDisconnect, UploadFile,
     File, Form, HTTPException, Query
@@ -27,6 +29,8 @@ from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field
+from worlds.registry import load_worlds, RoomInfo
+from worlds.behaviors import behavior_for
 
 from ws.handlers import WSContext, dispatch as ws_dispatch
 
@@ -37,7 +41,13 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(level
 logger = logging.getLogger("g00dweird")
 
 mongo_url = os.environ["MONGO_URL"]
-client = AsyncIOMotorClient(mongo_url)
+client = AsyncIOMotorClient(
+    mongo_url,
+    serverSelectionTimeoutMS=3000,
+    connectTimeoutMS=3000,
+    socketTimeoutMS=5000,
+    tlsCAFile=certifi.where(),
+)
 db = client[os.environ["DB_NAME"]]
 
 # ---------- Object Storage ----------
@@ -123,14 +133,6 @@ class JoinResponse(BaseModel):
     nickname: str
 
 
-class RoomInfo(BaseModel):
-    id: str
-    name: str
-    theme: str
-    tagline: str
-    bg_url: str
-
-
 class FileRecord(BaseModel):
     id: str
     user_id: str
@@ -158,79 +160,7 @@ class GuestbookEntry(BaseModel):
 
 
 # ---------- Static Rooms ----------
-_WORLD_ASSETS = "/worlds"
-ROOMS: List[RoomInfo] = [
-    RoomInfo(
-        id="hello", name="Hello", theme="hello",
-        tagline="pastel welcome plaza in the clouds",
-        bg_url=f"{_WORLD_ASSETS}/hello.png",
-    ),
-    RoomInfo(
-        id="jello", name="Jello", theme="jello",
-        tagline="rainbow gelatin kingdom, bring a spoon",
-        bg_url=f"{_WORLD_ASSETS}/jello.png",
-    ),
-    RoomInfo(
-        id="heaven", name="Heaven", theme="heaven",
-        tagline="pearly gates, floating colonnades, rainbows",
-        bg_url=f"{_WORLD_ASSETS}/heaven.png",
-    ),
-    RoomInfo(
-        id="mars", name="Mars", theme="mars",
-        tagline="red mesas, outpost lights, two moons",
-        bg_url=f"{_WORLD_ASSETS}/mars.png",
-    ),
-    RoomInfo(
-        id="neoclassick-world", name="Neoclassick World", theme="neoclassick-world",
-        tagline="where we play golf at a high level",
-        bg_url=f"{_WORLD_ASSETS}/neoclassick-world.png",
-    ),
-    RoomInfo(
-        id="wwworld", name="WWWorld", theme="wwworld",
-        tagline="let's get meta",
-        bg_url=f"{_WORLD_ASSETS}/wwworld.png",
-    ),
-    RoomInfo(
-        id="regular-cafe", name="Regular Cafe", theme="regular-cafe",
-        tagline="green stools, ivy, espresso machine hum",
-        bg_url=f"{_WORLD_ASSETS}/regular-cafe.png",
-    ),
-    RoomInfo(
-        id="toxic-void", name="GW Toxic Void", theme="toxic-void",
-        tagline="good weird hazardous signal is alive",
-        bg_url=f"{_WORLD_ASSETS}/toxic-void.png",
-    ),
-    RoomInfo(
-        id="basketball-court", name="Busted Court", theme="basketball-court",
-        tagline="hoop dreams die here — play 4 fun",
-        bg_url=f"{_WORLD_ASSETS}/basketball-court.png",
-    ),
-    RoomInfo(
-        id="food-court", name="Food Court", theme="food-court",
-        tagline="cosmic bites, taco asteroid, zero-g fries",
-        bg_url=f"{_WORLD_ASSETS}/food-court.png",
-    ),
-    RoomInfo(
-        id="jungle", name="Jungle", theme="jungle",
-        tagline="welcome to the jungle, explore chill connect",
-        bg_url=f"{_WORLD_ASSETS}/jungle.png",
-    ),
-    RoomInfo(
-        id="spiderweb", name="Spider Web", theme="spiderweb",
-        tagline="web weave chill, stick together",
-        bg_url=f"{_WORLD_ASSETS}/spiderweb.png",
-    ),
-    RoomInfo(
-        id="liminal-backroom", name="Liminal Room", theme="liminal-backroom",
-        tagline="final form: the room remembers wrong",
-        bg_url=f"{_WORLD_ASSETS}/liminal-backroom.png",
-    ),
-    RoomInfo(
-        id="inspiration-theatre", name="Inspiration Theatre", theme="inspiration-theatre",
-        tagline="g00dweird theatre — communal youtube groupwatch",
-        bg_url=f"{_WORLD_ASSETS}/inspiration-theatre.png",
-    ),
-]
+ROOMS = load_worlds(ROOT_DIR / "worlds" / "manifests.json")
 ROOM_BY_ID = {r.id: r for r in ROOMS}
 
 MAX_HISTORY_PER_ROOM = 50
@@ -402,6 +332,46 @@ ROOM_STATES: Dict[str, RoomState] = {r.id: RoomState(r.id) for r in ROOMS}
 STATE_LOCK = asyncio.Lock()
 
 
+async def persist_room_media_state(room: RoomState):
+    try:
+        await db.room_media_state.update_one(
+            {"room_id": room.room_id},
+            {"$set": {
+                "room_id": room.room_id,
+                "current_audio": room.current_audio,
+                "current_video": room.current_video,
+                "audio_queue": room.audio_queue,
+                "video_queue": room.video_queue,
+                "current_youtube": room.current_youtube,
+                "youtube_queue": room.youtube_queue,
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+            }},
+            upsert=True,
+        )
+    except Exception:
+        logger.exception("persist_room_media_state_failed", extra={"room_id": room.room_id})
+
+
+async def restore_room_media_state(room: RoomState):
+    try:
+        rec = await db.room_media_state.find_one({"room_id": room.room_id}, {"_id": 0})
+        if not rec:
+            return
+        room.current_audio = rec.get("current_audio")
+        room.current_video = rec.get("current_video")
+        room.audio_queue = rec.get("audio_queue") or []
+        room.video_queue = rec.get("video_queue") or []
+        room.current_youtube = rec.get("current_youtube")
+        room.youtube_queue = rec.get("youtube_queue") or []
+    except Exception:
+        logger.exception("restore_room_media_state_failed", extra={"room_id": room.room_id})
+
+
+
+
+def record_metric(event: str, fields: Optional[dict] = None):
+    logger.info("metric", extra={"event": event, **(fields or {})})
+
 async def broadcast(room: RoomState, message: dict, exclude: Optional[str] = None):
     dead: List[str] = []
     payload = json.dumps(message)
@@ -459,6 +429,9 @@ async def on_startup():
         await db.guestbook.create_index("created_at")
     except Exception:
         pass
+    await db.room_media_state.create_index("room_id", unique=True)
+    for room in ROOM_STATES.values():
+        await restore_room_media_state(room)
     # spawn the WeirdBot tick task
     asyncio.create_task(_weirdbot_loop())
     logger.info("g00dweird backend ready")
@@ -636,7 +609,11 @@ async def join(req: JoinRequest):
         "bio": "",
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
-    await db.users.insert_one(doc)
+    try:
+        await db.users.insert_one(doc)
+    except PyMongoError:
+        logger.exception("join_failed_db_unavailable")
+        raise HTTPException(503, "database unavailable; try again soon")
     return JoinResponse(user_id=user_id, nickname=nick)
 
 
@@ -1018,6 +995,9 @@ WS_CTX = WSContext(
     avatar_url_to_path=_avatar_url_to_path,
     max_tags_per_room=MAX_TAGS_PER_ROOM,
     room_state_cls=RoomState,
+    persist_room_media_state=persist_room_media_state,
+    record_metric=record_metric,
+    behavior_for_room=behavior_for,
 )
 
 
@@ -1041,6 +1021,10 @@ async def ws_endpoint(websocket: WebSocket, room_id: str,
             except Exception:
                 pass
         room.connections[user_id] = conn
+
+    behavior = behavior_for(room_id)
+    if behavior.on_join:
+        await behavior.on_join(WS_CTX, conn, room)
 
     # Persist presence to user doc for shareable profile pages.
     try:

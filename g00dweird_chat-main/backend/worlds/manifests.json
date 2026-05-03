@@ -1,0 +1,16 @@
+[
+  {"id":"hello","name":"Hello","theme":"hello","tagline":"pastel welcome plaza in the clouds","bg_url":"/worlds/hello.png"},
+  {"id":"jello","name":"Jello","theme":"jello","tagline":"rainbow gelatin kingdom, bring a spoon","bg_url":"/worlds/jello.png"},
+  {"id":"heaven","name":"Heaven","theme":"heaven","tagline":"pearly gates, floating colonnades, rainbows","bg_url":"/worlds/heaven.png"},
+  {"id":"mars","name":"Mars","theme":"mars","tagline":"red mesas, outpost lights, two moons","bg_url":"/worlds/mars.png"},
+  {"id":"neoclassick-world","name":"Neoclassick World","theme":"neoclassick-world","tagline":"where we play golf at a high level","bg_url":"/worlds/neoclassick-world.png"},
+  {"id":"wwworld","name":"WWWorld","theme":"wwworld","tagline":"let's get meta","bg_url":"/worlds/wwworld.png"},
+  {"id":"regular-cafe","name":"Regular Cafe","theme":"regular-cafe","tagline":"green stools, ivy, espresso machine hum","bg_url":"/worlds/regular-cafe.png"},
+  {"id":"toxic-void","name":"GW Toxic Void","theme":"toxic-void","tagline":"good weird hazardous signal is alive","bg_url":"/worlds/toxic-void.png"},
+  {"id":"basketball-court","name":"Busted Court","theme":"basketball-court","tagline":"hoop dreams die here — play 4 fun","bg_url":"/worlds/basketball-court.png"},
+  {"id":"food-court","name":"Food Court","theme":"food-court","tagline":"cosmic bites, taco asteroid, zero-g fries","bg_url":"/worlds/food-court.png"},
+  {"id":"jungle","name":"Jungle","theme":"jungle","tagline":"welcome to the jungle, explore chill connect","bg_url":"/worlds/jungle.png"},
+  {"id":"spiderweb","name":"Spider Web","theme":"spiderweb","tagline":"web weave chill, stick together","bg_url":"/worlds/spiderweb.png"},
+  {"id":"liminal-backroom","name":"Liminal Room","theme":"liminal-backroom","tagline":"final form: the room remembers wrong","bg_url":"/worlds/liminal-backroom.png"},
+  {"id":"inspiration-theatre","name":"Inspiration Theatre","theme":"inspiration-theatre","tagline":"g00dweird theatre — communal youtube groupwatch","bg_url":"/worlds/inspiration-theatre.png"}
+]

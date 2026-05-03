@@ -40,6 +40,9 @@ class WSContext:
     avatar_url_to_path: Callable[[Optional[str]], Optional[str]]
     max_tags_per_room: int
     room_state_cls: Any  # for type checks only
+    persist_room_media_state: Callable[[Any], Awaitable[None]]
+    record_metric: Callable[[str, dict], None]
+    behavior_for_room: Callable[[str], Any]
 
 
 ALLOWED_ANIM = {
@@ -85,6 +88,7 @@ async def handle_chat(ctx: WSContext, conn, room, msg: dict) -> None:
     }
     conn.last_message = {"text": text, "ts": ts, "fullfunk": fullfunk}
     await ctx.broadcast(room, out)
+    ctx.record_metric("chat_message", {"room_id": room.room_id})
     await ctx.db.messages.insert_one({**out, "room_id": room.room_id})
     # WeirdBot reacts (~30%) — pass recent context for a contextual reply
     try:
@@ -229,6 +233,7 @@ async def handle_jukebox_play(ctx: WSContext, conn, room, msg: dict) -> None:
     else:
         room.current_video = track
     await ctx.broadcast(room, {"type": "jukebox_play", "track": track, "kind": kind})
+    await ctx.persist_room_media_state(room)
 
 
 async def handle_jukebox_stop(ctx: WSContext, conn, room, msg: dict) -> None:
@@ -238,6 +243,7 @@ async def handle_jukebox_stop(ctx: WSContext, conn, room, msg: dict) -> None:
     elif kind == "video":
         room.current_video = None
     await ctx.broadcast(room, {"type": "jukebox_stop", "kind": kind})
+    await ctx.persist_room_media_state(room)
 
 
 async def handle_jukebox_enqueue(ctx: WSContext, conn, room, msg: dict) -> None:
@@ -261,6 +267,7 @@ async def handle_jukebox_enqueue(ctx: WSContext, conn, room, msg: dict) -> None:
             await ctx.broadcast(room, {
                 "type": "jukebox_queue", "kind": "video", "queue": room.video_queue,
             })
+    await ctx.persist_room_media_state(room)
 
 
 async def handle_jukebox_next(ctx: WSContext, conn, room, msg: dict) -> None:
@@ -294,6 +301,7 @@ async def handle_youtube_play(ctx: WSContext, conn, room, msg: dict) -> None:
     }
     room.current_youtube = track
     await ctx.broadcast(room, {"type": "youtube_play", "track": track})
+    await ctx.persist_room_media_state(room)
 
 
 async def handle_youtube_enqueue(ctx: WSContext, conn, room, msg: dict) -> None:
@@ -309,6 +317,7 @@ async def handle_youtube_enqueue(ctx: WSContext, conn, room, msg: dict) -> None:
         if len(room.youtube_queue) < 30:
             room.youtube_queue.append(item)
         await ctx.broadcast(room, {"type": "youtube_queue", "queue": room.youtube_queue})
+    await ctx.persist_room_media_state(room)
 
 
 async def handle_youtube_next(ctx: WSContext, conn, room, msg: dict) -> None:
@@ -320,11 +329,13 @@ async def handle_youtube_next(ctx: WSContext, conn, room, msg: dict) -> None:
     else:
         room.current_youtube = None
         await ctx.broadcast(room, {"type": "youtube_stop"})
+    await ctx.persist_room_media_state(room)
 
 
 async def handle_youtube_stop(ctx: WSContext, conn, room, msg: dict) -> None:
     room.current_youtube = None
     await ctx.broadcast(room, {"type": "youtube_stop"})
+    await ctx.persist_room_media_state(room)
 
 
 async def handle_youtube_clear(ctx: WSContext, conn, room, msg: dict) -> None:
@@ -496,7 +507,8 @@ async def handle_basketball_shot(ctx: WSContext, conn, room, msg: dict) -> None:
     Physics stays client-side so this remains lightweight; the server only
     validates the initial vector and fans it out to everyone in the room.
     """
-    if room.room_id != "basketball-court":
+    behavior = ctx.behavior_for_room(room.room_id)
+    if not ((behavior.interaction_rules or {}).get("shots_enabled") and room.room_id == "basketball-court"):
         return
     now = time.time()
     if now - getattr(conn, "_last_basketball_shot_ts", 0.0) < 0.35:
