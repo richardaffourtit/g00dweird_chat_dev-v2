@@ -40,15 +40,40 @@ load_dotenv(ROOT_DIR / ".env")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("g00dweird")
 
-mongo_url = os.environ["MONGO_URL"]
-client = AsyncIOMotorClient(
-    mongo_url,
-    serverSelectionTimeoutMS=3000,
-    connectTimeoutMS=3000,
-    socketTimeoutMS=5000,
-    tlsCAFile=certifi.where(),
-)
-db = client[os.environ["DB_NAME"]]
+
+def _required_env(name: str) -> str:
+    value = (os.environ.get(name) or "").strip()
+    if not value:
+        raise RuntimeError(f"missing required env var: {name}")
+    return value
+
+
+mongo_url = _required_env("MONGO_URL")
+db_name = (os.environ.get("DB_NAME") or os.environ.get("MONGO_DB_NAME") or "").strip()
+if not db_name:
+    raise RuntimeError("missing required env var: DB_NAME (or MONGO_DB_NAME)")
+
+mongo_tls_mode = (os.environ.get("MONGO_TLS") or "auto").strip().lower()
+mongo_client_kwargs = {
+    "serverSelectionTimeoutMS": 3000,
+    "connectTimeoutMS": 3000,
+    "socketTimeoutMS": 5000,
+}
+if mongo_tls_mode == "auto":
+    # Atlas/SRV defaults to TLS; local dev mongodb:// typically does not.
+    if mongo_url.startswith("mongodb+srv://"):
+        mongo_client_kwargs["tls"] = True
+        mongo_client_kwargs["tlsCAFile"] = certifi.where()
+elif mongo_tls_mode == "true":
+    mongo_client_kwargs["tls"] = True
+    mongo_client_kwargs["tlsCAFile"] = certifi.where()
+elif mongo_tls_mode == "false":
+    mongo_client_kwargs["tls"] = False
+else:
+    raise RuntimeError("MONGO_TLS must be one of: auto, true, false")
+
+client = AsyncIOMotorClient(mongo_url, **mongo_client_kwargs)
+db = client[db_name]
 
 # ---------- Object Storage ----------
 APP_NAME = "g00dweird"
@@ -294,6 +319,10 @@ class WeirdBotConn:
         self.kill_mode: bool = False
 
 
+def presence_identity(nickname: str) -> str:
+    return " ".join((nickname or "").strip().lower().split())
+
+
 def _clamp_weirdbot_value(value: float, low: float, high: float) -> float:
     return max(low, min(high, value))
 
@@ -372,6 +401,15 @@ async def restore_room_media_state(room: RoomState):
 def record_metric(event: str, fields: Optional[dict] = None):
     logger.info("metric", extra={"event": event, **(fields or {})})
 
+
+async def mongo_ping() -> bool:
+    try:
+        await db.command("ping")
+        return True
+    except Exception:
+        return False
+
+
 async def broadcast(room: RoomState, message: dict, exclude: Optional[str] = None):
     dead: List[str] = []
     payload = json.dumps(message)
@@ -423,13 +461,19 @@ api_router = APIRouter(prefix="/api")
 
 @app.on_event("startup")
 async def on_startup():
+    if not await mongo_ping():
+        raise RuntimeError("MongoDB is unreachable during startup")
     init_storage()
     # Ensure guestbook index
     try:
         await db.guestbook.create_index("created_at")
     except Exception:
-        pass
-    await db.room_media_state.create_index("room_id", unique=True)
+        logger.exception("guestbook_index_create_failed")
+    try:
+        await db.room_media_state.create_index("room_id", unique=True)
+    except Exception:
+        logger.exception("room_media_state_index_create_failed")
+        raise
     for room in ROOM_STATES.values():
         await restore_room_media_state(room)
     # spawn the WeirdBot tick task
@@ -590,6 +634,22 @@ async def weirdbot_react(room: RoomState, trigger_text: str, recent_messages: Op
 @api_router.get("/")
 async def root():
     return {"message": "welcome to g00dweird", "rooms": [r.model_dump() for r in ROOMS]}
+
+
+@api_router.get("/health")
+async def health():
+    return {"status": "ok", "service": "g00dweird-backend"}
+
+
+@api_router.get("/ready")
+async def ready():
+    db_ok = await mongo_ping()
+    status = "ready" if db_ok else "degraded"
+    return {
+        "status": status,
+        "database": {"provider": "mongodb", "ok": db_ok, "name": db_name},
+        "storage": {"provider": OBJECT_STORAGE_PROVIDER, "s3_like": _use_s3_storage()},
+    }
 
 
 @api_router.get("/rooms", response_model=List[RoomInfo])
@@ -1014,8 +1074,18 @@ async def ws_endpoint(websocket: WebSocket, room_id: str,
     room = ROOM_STATES[room_id]
     conn = ClientConn(websocket, user_id, nickname, avatar_url, sprite_id, anim_id)
     async with STATE_LOCK:
-        old = room.connections.get(user_id)
-        if old:
+        new_identity = presence_identity(nickname)
+        old_connections = [
+            old
+            for old in room.connections.values()
+            if old.user_id == user_id
+            or (
+                not old.user_id.startswith("weirdbot-")
+                and presence_identity(old.nickname) == new_identity
+            )
+        ]
+        for old in old_connections:
+            room.connections.pop(old.user_id, None)
             try:
                 await old.ws.close()
             except Exception:

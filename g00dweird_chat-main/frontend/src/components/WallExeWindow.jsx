@@ -977,6 +977,7 @@ export default function WallExeWindow({
         ctx.restore();
     };
 
+    /* eslint-disable react-hooks/exhaustive-deps */
     useEffect(() => {
         if (tool !== "type" && tool !== "sticker" && tool !== "glyph" && tool !== "stencil") {
             typePreviewPointRef.current = null;
@@ -998,6 +999,7 @@ export default function WallExeWindow({
         glyphLoadState,
         activeGlyph,
     ]);
+    /* eslint-enable react-hooks/exhaustive-deps */
 
     const drawGlyph = (point) => {
         const glyph = activeGlyph;

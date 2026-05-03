@@ -2,11 +2,14 @@ import React from "react";
 import Win95Window from "./Win95Window";
 import { fileUrl } from "../lib/api";
 
+export const WORLD_PICKER_WIDTH = 520;
+
 function pickWorldIconUrl(room) {
     if (!room) return "";
     if (room.icon_url) return fileUrl(room.icon_url);
     if (room.iconPath) return room.iconPath;
     if (room.icon) return fileUrl(room.icon);
+    if (room.id) return `/world_icons/${room.id}.png`;
     return room.bg_url ? fileUrl(room.bg_url) : "";
 }
 
@@ -20,8 +23,9 @@ function WorldIcon({ room }) {
                 aria-hidden
                 title={room?.name || ""}
                 style={{
-                    width: 48,
-                    height: 48,
+                    width: 42,
+                    height: 42,
+                    flex: "0 0 42px",
                     border: "2px solid #fff",
                     imageRendering: "pixelated",
                     background: "#000",
@@ -45,8 +49,9 @@ function WorldIcon({ room }) {
             src={iconUrl}
             onError={() => setFailed(true)}
             style={{
-                width: 48,
-                height: 48,
+                width: 42,
+                height: 42,
+                flex: "0 0 42px",
                 objectFit: "cover",
                 objectPosition: "center",
                 border: "2px solid #fff",
@@ -65,7 +70,7 @@ export default function WorldPicker({ rooms, activeRoomId, onPick, onClose, init
             testId="world-picker"
             initialX={initialX}
             initialY={initialY}
-            width={360}
+            width={WORLD_PICKER_WIDTH}
             onClose={onClose}
             requestFocus={requestFocus}
             icon={<span style={{ color: "#ff00ff" }}>◈</span>}
@@ -77,47 +82,73 @@ export default function WorldPicker({ rooms, activeRoomId, onPick, onClose, init
                 >
                     CHOOSE A PIXEL WORLD
                 </div>
-                <ul className="mt-2 flex flex-col gap-1">
+                <ul
+                    className="mt-2 flex flex-col gap-1"
+                    style={{
+                        maxHeight: "min(68vh, 760px)",
+                        overflowY: "auto",
+                        paddingRight: 2,
+                    }}
+                >
                     {rooms.map((r) => (
                         <li key={r.id}>
                             <button
-                                className="w95-button w-full text-left p-0 overflow-hidden"
+                                className="w95-button w-full text-left p-0"
                                 onClick={() => onPick(r)}
                                 data-testid={`world-pick-${r.id}`}
+                                aria-current={r.id === activeRoomId ? "true" : undefined}
                                 style={{
                                     background: r.id === activeRoomId ? "#000080" : undefined,
                                     color: r.id === activeRoomId ? "#fff" : undefined,
                                     position: "relative",
+                                    minHeight: 62,
+                                    overflow: "visible",
                                 }}
                             >
-                                <div className="px-2 py-1">
-                                    <div>
-                                        <span className="font-pixel" style={{ fontSize: 11 }}>
-                                            {r.name}
-                                        </span>
-                                        <span aria-hidden style={{ margin: "0 6px", opacity: 0.55 }}>
-                                            -
-                                        </span>
-                                        <span className="font-mono-retro" style={{ fontSize: 16, opacity: 0.8 }}>
+                                <div
+                                    className="px-2 py-1 flex items-center gap-2"
+                                    style={{ minHeight: 58, minWidth: 0, paddingRight: 8 }}
+                                >
+                                    <WorldIcon room={r} />
+                                    <div style={{ minWidth: 0, flex: 1, display: "grid", gap: 2 }}>
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "baseline",
+                                                gap: 6,
+                                                flexWrap: "wrap",
+                                                minWidth: 0,
+                                                lineHeight: 1.05,
+                                            }}
+                                        >
+                                            <span
+                                                className="font-pixel"
+                                                style={{ fontSize: 10, overflowWrap: "anywhere" }}
+                                            >
+                                                {r.name}
+                                            </span>
+                                            {r.id === activeRoomId && (
+                                                <span
+                                                    className="font-pixel"
+                                                    style={{ fontSize: 9, flexShrink: 0, whiteSpace: "nowrap" }}
+                                                >
+                                                    ◄ ACTIVE
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div
+                                            className="font-mono-retro"
+                                            style={{
+                                                fontSize: 16,
+                                                lineHeight: 1.08,
+                                                opacity: 0.86,
+                                                overflowWrap: "anywhere",
+                                            }}
+                                        >
                                             {r.tagline}
-                                        </span>
-                                    </div>
-                                    <div className="mt-1 flex items-center gap-2">
-                                        <WorldIcon room={r} />
-                                        <span
-                                            aria-hidden
-                                            style={{ height: 1, flex: 1, background: "#8883" }}
-                                        />
+                                        </div>
                                     </div>
                                 </div>
-                                {r.id === activeRoomId && (
-                                    <span
-                                        className="font-pixel"
-                                        style={{ fontSize: 10, position: "absolute", right: 8, top: 8 }}
-                                    >
-                                        ◄ ACTIVE
-                                    </span>
-                                )}
                             </button>
                         </li>
                     ))}

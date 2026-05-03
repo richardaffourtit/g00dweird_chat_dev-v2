@@ -102,7 +102,7 @@
     "wiggle": 4,
     "hop": 4,
     "split": 5,
-    "attack": 4,
+    "attack": 5,
     "hurt": 2,
     "die": 2,
     "emote_a": 1,
@@ -155,5 +155,5 @@
     "glitch": 4,
     "react": 4
   },
-  "__version": 21
+  "__version": 23
 }

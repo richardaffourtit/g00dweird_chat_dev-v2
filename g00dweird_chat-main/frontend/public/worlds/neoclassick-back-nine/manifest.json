@@ -1,0 +1,22 @@
+{
+  "id": "neoclassick-back-nine",
+  "theme": "neoclassick-world",
+  "version": "neoclassick-back-nine-20260503b",
+  "preferredHole8": "hole_8.png",
+  "holes": [
+    { "number": 1, "src": "/worlds/neoclassick-back-nine/hole_1.png" },
+    { "number": 2, "src": "/worlds/neoclassick-back-nine/hole_2.png" },
+    { "number": 3, "src": "/worlds/neoclassick-back-nine/hole_3.png" },
+    { "number": 4, "src": "/worlds/neoclassick-back-nine/hole_4.png" },
+    { "number": 5, "src": "/worlds/neoclassick-back-nine/hole_5.png" },
+    { "number": 6, "src": "/worlds/neoclassick-back-nine/hole_6.png" },
+    { "number": 7, "src": "/worlds/neoclassick-back-nine/hole_7.png" },
+    { "number": 8, "src": "/worlds/neoclassick-back-nine/hole_8.png", "sourceVariant": "v2" },
+    {
+      "number": 9,
+      "src": "/worlds/neoclassick-back-nine/hole_9.png",
+      "sourceVariant": "v2",
+      "spriteSheet": "/worlds/neoclassick-back-nine/hole9/hole9_sprites_v1.png"
+    }
+  ]
+}

@@ -18,7 +18,7 @@ import React, { useEffect, useRef } from "react";
  * STATE_ALIASES maps requested-but-missing states onto sensible existing frames.
  */
 
-export const ANIM_VERSION = 21;
+export const ANIM_VERSION = 23;
 
 // Frame counts per creature/state — mirrors slicer v3 / unified output.
 export const FRAMES = {
@@ -38,7 +38,7 @@ export const FRAMES = {
                 emote_a: 1, emote_b: 1, emote_c: 1, emote_d: 1 },
     skeleton: { idle: 3, walk: 4, run: 4, jump: 3, attack: 4, hurt: 2, die: 2,
                 emote_a: 1, emote_b: 1, emote_c: 1, emote_d: 1 },
-    slime:    { idle: 3, wiggle: 4, hop: 4, split: 5, attack: 4, hurt: 2, die: 2,
+    slime:    { idle: 3, wiggle: 4, hop: 4, split: 5, attack: 5, hurt: 2, die: 2,
                 emote_a: 1, emote_b: 1, emote_c: 1, emote_d: 1 },
     tvhead:   { idle: 3, walk: 4, run: 4, jump: 3, attack: 5, hurt: 2, die: 2,
                 emote_a: 1, emote_b: 1, emote_c: 1, emote_d: 1 },

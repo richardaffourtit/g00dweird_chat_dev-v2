@@ -9,11 +9,15 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import NamedTuple
+
+import numpy as np
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 SHEET = ROOT / "public" / "scenery" / "thoughtbubbles.png"
 OUT = ROOT / "src" / "data" / "thoughtBubbles.json"
+OUT_ASSET_DIR = ROOT / "public" / "scenery" / "thought_bubbles"
 
 # Coarse windows keep generation deterministic while Pillow computes clean,
 # padded bounds from the art. Coordinates are source-sheet pixels.
@@ -44,7 +48,15 @@ SLOTS = [
     ("l8", "long", 8, (1070, 700, 1536, 842)),
 ]
 
-PADDING = 24
+PADDING = 8
+
+
+class Component(NamedTuple):
+    label: int
+    area: int
+    bbox: tuple[int, int, int, int]
+    cx: float
+    cy: float
 
 
 def include_pixel(r: int, g: int, b: int, a: int) -> bool:
@@ -59,20 +71,120 @@ def include_pixel(r: int, g: int, b: int, a: int) -> bool:
     return True
 
 
-def tight_bbox(img: Image.Image, box: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
-    x1, y1, x2, y2 = box
-    pixels = img.load()
-    xs: list[int] = []
-    ys: list[int] = []
-    for y in range(y1, y2):
-        for x in range(x1, x2):
-            r, g, b, a = pixels[x, y]
-            if include_pixel(r, g, b, a):
+def build_component_index(img: Image.Image) -> tuple[np.ndarray, dict[int, Component]]:
+    data = np.array(img)
+    r = data[..., 0]
+    g = data[..., 1]
+    b = data[..., 2]
+    a = data[..., 3]
+    red = (r > 95) & (g < 92) & (b < 92) & (r > g * 1.45) & (r > b * 1.45)
+    yellow = (r > 145) & (g > 110) & (b < 95)
+    mask = (a >= 8) & ~red & ~yellow
+    height, width = mask.shape
+    labels = np.zeros((height, width), dtype=np.int32)
+    components: dict[int, Component] = {}
+    label = 0
+
+    for start_y in range(height):
+        active_xs = np.where(mask[start_y] & (labels[start_y] == 0))[0]
+        for start_x in active_xs:
+            if labels[start_y, start_x] or not mask[start_y, start_x]:
+                continue
+            label += 1
+            stack = [(int(start_x), int(start_y))]
+            labels[start_y, start_x] = label
+            xs: list[int] = []
+            ys: list[int] = []
+
+            while stack:
+                x, y = stack.pop()
                 xs.append(x)
                 ys.append(y)
-    if not xs:
-        raise RuntimeError(f"no bubble pixels found in {box}")
-    return min(xs), min(ys), max(xs) + 1, max(ys) + 1
+                for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                    if nx < 0 or ny < 0 or nx >= width or ny >= height:
+                        continue
+                    if labels[ny, nx] or not mask[ny, nx]:
+                        continue
+                    labels[ny, nx] = label
+                    stack.append((nx, ny))
+
+            area = len(xs)
+            components[label] = Component(
+                label=label,
+                area=area,
+                bbox=(min(xs), min(ys), max(xs) + 1, max(ys) + 1),
+                cx=sum(xs) / area,
+                cy=sum(ys) / area,
+            )
+
+    return labels, components
+
+
+def intersection_area(a: tuple[int, int, int, int], b: tuple[int, int, int, int]) -> int:
+    ax1, ay1, ax2, ay2 = a
+    bx1, by1, bx2, by2 = b
+    return max(0, min(ax2, bx2) - max(ax1, bx1)) * max(0, min(ay2, by2) - max(ay1, by1))
+
+
+def select_bubble_labels(
+    components: dict[int, Component],
+    rough: tuple[int, int, int, int],
+) -> set[int]:
+    candidates = [
+        component
+        for component in components.values()
+        if intersection_area(component.bbox, rough) > 0
+    ]
+    if not candidates:
+        raise RuntimeError(f"no bubble pixels found in {rough}")
+
+    main = max(candidates, key=lambda component: component.area)
+    mx1, my1, mx2, my2 = main.bbox
+    main_w = mx2 - mx1
+    main_h = my2 - my1
+    kept = {main.label}
+
+    for component in components.values():
+        if component.label == main.label:
+            continue
+        x1, y1, x2, _y2 = component.bbox
+        if component.area < 8 or component.area > max(900, main.area * 0.22):
+            continue
+        # Thought dots sit below/left of the main cloud. Neighboring sprite
+        # fragments touch rough-slot edges or sit too far to the side, so they
+        # are intentionally rejected here.
+        if component.cy < my1 + main_h * 0.45:
+            continue
+        if component.cy > my2 + max(48, main_h * 0.45):
+            continue
+        if component.cx < mx1 - 80 or component.cx > mx1 + main_w * 0.55:
+            continue
+        if y1 > my2 + 42:
+            continue
+        if x1 > mx2 + 4:
+            continue
+        kept.add(component.label)
+
+    return kept
+
+
+def render_clean_bubble(
+    img: Image.Image,
+    labels: np.ndarray,
+    kept_labels: set[int],
+) -> tuple[Image.Image, dict[str, int]]:
+    keep_mask = np.isin(labels, list(kept_labels))
+    ys, xs = np.where(keep_mask)
+    if len(xs) == 0:
+        raise RuntimeError("selected bubble contains no pixels")
+
+    x1 = max(0, int(xs.min()) - PADDING)
+    y1 = max(0, int(ys.min()) - PADDING)
+    x2 = min(img.width, int(xs.max()) + 1 + PADDING)
+    y2 = min(img.height, int(ys.max()) + 1 + PADDING)
+    data = np.array(img.crop((x1, y1, x2, y2)).convert("RGBA"))
+    data[..., 3] = np.where(keep_mask[y1:y2, x1:x2], 255, 0).astype(np.uint8)
+    return Image.fromarray(data, "RGBA"), {"x": x1, "y": y1, "w": x2 - x1, "h": y2 - y1}
 
 
 def main_body_text_box(img: Image.Image, source: dict[str, int], tier: str) -> dict[str, int]:
@@ -164,21 +276,21 @@ def font_size(tier: str, rank: int) -> int:
 
 def main() -> None:
     img = Image.open(SHEET).convert("RGBA")
+    labels, components = build_component_index(img)
     variants = []
+    OUT_ASSET_DIR.mkdir(parents=True, exist_ok=True)
     for bubble_id, tier, rank, rough in SLOTS:
-        bx1, by1, bx2, by2 = tight_bbox(img, rough)
-        sx1 = max(0, bx1 - PADDING)
-        sy1 = max(0, by1 - PADDING)
-        sx2 = min(img.width, bx2 + PADDING)
-        sy2 = min(img.height, by2 + PADDING)
-        source = {"x": sx1, "y": sy1, "w": sx2 - sx1, "h": sy2 - sy1}
-        text = main_body_text_box(img, source, tier)
-        tail = tail_anchor(img, source)
+        kept_labels = select_bubble_labels(components, rough)
+        clean_bubble, source = render_clean_bubble(img, labels, kept_labels)
+        clean_bubble.save(OUT_ASSET_DIR / f"{bubble_id}.png")
+        text = main_body_text_box(clean_bubble, {"x": 0, "y": 0, "w": clean_bubble.width, "h": clean_bubble.height}, tier)
+        tail = tail_anchor(clean_bubble, {"x": 0, "y": 0, "w": clean_bubble.width, "h": clean_bubble.height})
         scale = render_scale(tier)
         variants.append({
             "id": bubble_id,
             "tier": tier,
             "rank": rank,
+            "image": f"/scenery/thought_bubbles/{bubble_id}.png",
             "source": source,
             "render": {"scale": scale},
             "tail": tail,

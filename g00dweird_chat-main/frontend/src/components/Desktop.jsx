@@ -7,7 +7,7 @@ import ChatWindow from "./ChatWindow";
 import JukeboxWindow from "./JukeboxWindow";
 import UploadDialog from "./UploadDialog";
 import ProfileWindow from "./ProfileWindow";
-import WorldPicker from "./WorldPicker";
+import WorldPicker, { WORLD_PICKER_WIDTH } from "./WorldPicker";
 import SpritePicker from "./SpritePicker";
 import GuestbookWindow from "./GuestbookWindow";
 import SprayWindow from "./SprayWindow";
@@ -450,7 +450,7 @@ export default function Desktop({ user, onLogout }) {
                 <WorldPicker rooms={rooms} activeRoomId={activeRoom?.id}
                     onPick={pickRoom}
                     onClose={() => toggle("worlds", false)}
-                    initialX={typeof window !== "undefined" ? Math.max(120, window.innerWidth - 400) : 900}
+                    initialX={typeof window !== "undefined" ? Math.max(120, window.innerWidth - WORLD_PICKER_WIDTH - 24) : 900}
                     initialY={80}
                     requestFocus={focusNonces.worlds || 0} />
             )}

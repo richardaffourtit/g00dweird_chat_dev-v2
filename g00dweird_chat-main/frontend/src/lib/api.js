@@ -1,13 +1,14 @@
 import axios from "axios";
 
 const PREVIEW_MOCK = process.env.REACT_APP_PREVIEW_MOCK === "1";
+const API_TIMEOUT_MS = Number(process.env.REACT_APP_API_TIMEOUT_MS || 8000);
 
 const PREVIEW_ROOMS = [
     { id: "hello", name: "HELLO WORLD", tagline: "good weird starts here", theme: "hello", bg_url: "/worlds/hello.png", icon_url: "/world_icons/hello.png" },
     { id: "jello", name: "JELLO LOUNGE", tagline: "wiggly social gelatin", theme: "jello", bg_url: "/worlds/jello.png", icon_url: "/world_icons/jello.png" },
     { id: "heaven", name: "HEAVEN GATE", tagline: "clouds, halos, questionable snacks", theme: "heaven", bg_url: "/worlds/heaven.png", icon_url: "/world_icons/heaven.png" },
     { id: "mars", name: "MARS YARD", tagline: "red dust transmission", theme: "mars", bg_url: "/worlds/mars.png", icon_url: "/world_icons/mars.png" },
-    { id: "neoclassick-world", name: "NEOCLASSICK WORLD", tagline: "where we play golf at a high level", theme: "neoclassick-world", bg_url: "/worlds/neoclassick-world.png", icon_url: "/world_icons/neoclassick-world.png" },
+    { id: "neoclassick-world", name: "NEOCLASSICK WORLD", tagline: "where we play golf at a high level", theme: "neoclassick-world", bg_url: "/worlds/neoclassick-back-nine/hole_1.png", icon_url: "/world_icons/neoclassick-world.png" },
     { id: "wwworld", name: "WWWORLD", tagline: "let's get meta", theme: "wwworld", bg_url: "/worlds/wwworld.png", icon_url: "/world_icons/wwworld.png" },
     { id: "regular-cafe", name: "REGULAR CAFE", tagline: "almost normal", theme: "regular-cafe", bg_url: "/worlds/regular-cafe.png", icon_url: "/world_icons/regular-cafe.png" },
     { id: "toxic-void", name: "TOXIC VOID", tagline: "hazardous signal is alive", theme: "toxic-void", bg_url: "/worlds/toxic-void.png", icon_url: "/world_icons/toxic-void.png" },
@@ -19,13 +20,23 @@ const PREVIEW_ROOMS = [
     { id: "inspiration-theatre", name: "INSPIRATION THEATRE", tagline: "groupwatch weird together", theme: "inspiration-theatre", bg_url: "/worlds/inspiration-theatre.png", icon_url: "/world_icons/inspiration-theatre.png" },
 ];
 
+function normalizeOrigin(value) {
+    const trimmed = String(value || "").trim();
+    if (!trimmed) return "";
+    return trimmed.replace(/\/+$/, "");
+}
+
 function getBackendUrl() {
-    const configured = process.env.REACT_APP_BACKEND_URL?.trim();
-    if (configured) return configured.replace(/\/+$/, "");
+    const configured = normalizeOrigin(process.env.REACT_APP_BACKEND_URL);
+    if (configured) return configured;
+    const globalOverride = normalizeOrigin(
+        typeof window !== "undefined" ? window.__GW_BACKEND_URL__ : ""
+    );
+    if (globalOverride) return globalOverride;
     if (typeof window === "undefined") return "http://localhost:8001";
     const { protocol, hostname, port, origin } = window.location;
     if (port === "3000") return `${protocol}//${hostname}:8001`;
-    return origin;
+    return normalizeOrigin(origin);
 }
 
 const BACKEND_URL = getBackendUrl();
@@ -33,7 +44,7 @@ export const API = `${BACKEND_URL}/api`;
 
 export const api = axios.create({
     baseURL: API,
-    timeout: 8000,
+    timeout: Number.isFinite(API_TIMEOUT_MS) && API_TIMEOUT_MS > 0 ? API_TIMEOUT_MS : 8000,
 });
 
 const warnedPreviewFallbacks = new Set();
@@ -241,5 +252,17 @@ export function wsUrl(room_id, { user_id, nickname, avatar_url, sprite_id, anim_
     if (avatar_url) params.set("avatar_url", avatar_url);
     if (sprite_id) params.set("sprite_id", sprite_id);
     if (anim_id) params.set("anim_id", anim_id);
-    return `${base}/api/ws/${room_id}?${params.toString()}`;
+    return `${base}/api/ws/${encodeURIComponent(room_id)}?${params.toString()}`;
+}
+
+export async function getBackendReadiness() {
+    if (PREVIEW_MOCK) {
+        return {
+            status: "preview",
+            database: { provider: "preview", ok: true },
+            storage: { provider: "preview", s3_like: false },
+        };
+    }
+    const { data } = await api.get("/ready");
+    return data;
 }

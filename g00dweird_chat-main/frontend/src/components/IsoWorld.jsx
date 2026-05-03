@@ -9,6 +9,7 @@ import HelloLivingScene from "./HelloLivingScene";
 import SpiderwebPhase2Scene from "./SpiderwebPhase2Scene";
 import LiminalPhase4Scene from "./LiminalPhase4Scene";
 import NeoclassickPhase2Scene from "./NeoclassickPhase2Scene";
+import Hole9InteractiveScene from "./Hole9InteractiveScene";
 import WWWorldScene from "./WWWorldScene";
 import { isLiminalRoom, liminalAvatarDrift, liminalCornerShadow, liminalDisplayName } from "../lib/liminal";
 import thoughtBubbleManifest from "../data/thoughtBubbles.json";
@@ -18,6 +19,7 @@ const MemoHelloLivingScene = React.memo(HelloLivingScene);
 const MemoSpiderwebPhase2Scene = React.memo(SpiderwebPhase2Scene);
 const MemoLiminalPhase4Scene = React.memo(LiminalPhase4Scene);
 const MemoNeoclassickPhase2Scene = React.memo(NeoclassickPhase2Scene);
+const MemoHole9InteractiveScene = React.memo(Hole9InteractiveScene);
 const MemoWWWorldScene = React.memo(WWWorldScene);
 
 const THEME_ACCENT = {
@@ -88,6 +90,30 @@ const BASKETBALL_HOOP = {
 const BASKETBALL_GRAVITY = 250;
 const BASKETBALL_FLOOR_Y = 486;
 const BASKETBALL_RADIUS = 12;
+const NEOCLASSICK_COURSE_VERSION = "neoclassick-back-nine-20260503b";
+const NEOCLASSICK_HOLE_STORAGE_KEY = "g00dweird.neoclassick.hole";
+const NEOCLASSICK_COURSE_HOLES = Array.from({ length: 9 }, (_, index) => {
+    const number = index + 1;
+    return {
+        number,
+        src: `/worlds/neoclassick-back-nine/hole_${number}.png?v=${NEOCLASSICK_COURSE_VERSION}`,
+    };
+});
+
+function neoclassickHoleIndexFromValue(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return 0;
+    return clamp(Math.round(number) - 1, 0, NEOCLASSICK_COURSE_HOLES.length - 1);
+}
+
+function readStoredNeoclassickHoleIndex() {
+    if (typeof window === "undefined") return 0;
+    try {
+        return neoclassickHoleIndexFromValue(window.localStorage?.getItem(NEOCLASSICK_HOLE_STORAGE_KEY));
+    } catch {
+        return 0;
+    }
+}
 // Basketball court art is square, but the gameplay plane is 1000x500.
 // Keep collider coordinates in source-art pixels and convert once here so
 // the hit areas stay attached to the drawn hoop/fence instead of screen guesswork.
@@ -109,7 +135,7 @@ const BASKETBALL_FENCE_COLLIDERS = [
 const BASKETBALL_FENCE_CLEAR_ZONE = basketballArtRect({ x: 650, y: 30, w: 460, h: 96 });
 const MAX_BASKETBALLS = 10;
 const WORLD_REACTION_TTL_MS = 2600;
-const THOUGHT_BUBBLE_SHEET_SRC = `${thoughtBubbleManifest.sourceImage}?v=thought-clouds-json-20260502`;
+const THOUGHT_BUBBLE_ASSET_VERSION = "thought-clouds-clean-20260503a";
 
 const WORLD_REACTION_HOTSPOTS = {
     hello: [
@@ -152,6 +178,7 @@ function thoughtBubbleVariant(entry) {
         id: entry.id,
         tier: entry.tier,
         rank: entry.rank,
+        image: entry.image || null,
         x: source.x,
         y: source.y,
         w: source.w,
@@ -170,9 +197,6 @@ const THOUGHT_BUBBLE_VARIANTS = thoughtBubbleManifest.variants.reduce((groups, e
         .sort((a, b) => a.rank - b.rank);
     return groups;
 }, { short: [], medium: [], long: [] });
-
-let thoughtBubbleImagePromise = null;
-const thoughtBubbleCanvasCache = new Map();
 
 function clamp(n, min, max) {
     return Math.max(min, Math.min(max, n));
@@ -542,6 +566,11 @@ export default function IsoWorld({
     const [worldReactions, setWorldReactions] = useState([]);
     const [hoveringWorldReaction, setHoveringWorldReaction] = useState(false);
     const isBasketballCourt = room?.theme === "basketball-court";
+    const isNeoclassickWorld = room?.theme === "neoclassick-world";
+    const [neoclassickHoleIndex, setNeoclassickHoleIndex] = useState(readStoredNeoclassickHoleIndex);
+    const neoclassickHole = isNeoclassickWorld ? NEOCLASSICK_COURSE_HOLES[neoclassickHoleIndex] : null;
+    const isNeoclassickHole9 = isNeoclassickWorld && neoclassickHole?.number === 9;
+    const worldBgUrl = neoclassickHole?.src || room?.bg_url || "";
 
     const me = useMemo(
         () => users.find((u) => u.user_id === myId),
@@ -617,7 +646,7 @@ export default function IsoWorld({
     }, []);
 
     useEffect(() => {
-        if (!room?.bg_url) {
+        if (!worldBgUrl) {
             setWorldImageSize({ width: 1, height: 1 });
             return undefined;
         }
@@ -630,9 +659,21 @@ export default function IsoWorld({
                 height: img.naturalHeight || 1,
             });
         };
-        img.src = room.bg_url;
+        img.src = worldBgUrl;
         return () => { alive = false; };
-    }, [room?.bg_url]);
+    }, [worldBgUrl]);
+
+    useEffect(() => {
+        if (!isNeoclassickWorld || typeof window === "undefined") return;
+        try {
+            window.localStorage?.setItem(
+                NEOCLASSICK_HOLE_STORAGE_KEY,
+                String(NEOCLASSICK_COURSE_HOLES[neoclassickHoleIndex]?.number || 1)
+            );
+        } catch {
+            // Local storage can be unavailable in hardened browser contexts.
+        }
+    }, [isNeoclassickWorld, neoclassickHoleIndex]);
 
     // spray-jet frame animation
     useEffect(() => {
@@ -1249,6 +1290,68 @@ export default function IsoWorld({
                 </div>
             )}
 
+            {isNeoclassickWorld && (
+                <div
+                    data-testid="neoclassick-hole-switcher"
+                    className="font-pixel"
+                    onClick={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    style={{
+                        position: "absolute",
+                        left: 8,
+                        top: 8,
+                        zIndex: 7,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                        padding: "4px 5px",
+                        background: "rgba(0,0,0,0.58)",
+                        border: "2px solid rgba(255,255,255,0.72)",
+                        boxShadow: "0 0 0 1px rgba(0,0,0,0.75), inset 1px 1px 0 rgba(255,255,255,0.32)",
+                        color: "#fff",
+                        fontSize: 10,
+                        lineHeight: 1,
+                        textShadow: "1px 1px 0 #000",
+                        pointerEvents: "auto",
+                        userSelect: "none",
+                    }}
+                >
+                    <span style={{ color: "#ffe06a", padding: "0 2px 0 1px" }}>HOLE</span>
+                    {NEOCLASSICK_COURSE_HOLES.map((hole, index) => {
+                        const active = index === neoclassickHoleIndex;
+                        return (
+                            <button
+                                key={hole.number}
+                                type="button"
+                                title={`Hole ${hole.number}`}
+                                aria-pressed={active}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setNeoclassickHoleIndex(index);
+                                }}
+                                style={{
+                                    minWidth: 18,
+                                    height: 18,
+                                    padding: 0,
+                                    border: active ? "2px solid #ffe06a" : "2px solid #c0c0c0",
+                                    background: active ? "#000080" : "#d6d6d6",
+                                    color: active ? "#fff" : "#000",
+                                    font: "inherit",
+                                    lineHeight: "12px",
+                                    cursor: "pointer",
+                                    boxShadow: active
+                                        ? "inset 1px 1px 0 rgba(255,255,255,0.2), 0 0 5px rgba(255,224,106,0.5)"
+                                        : "inset 1px 1px 0 #fff, inset -1px -1px 0 #777",
+                                }}
+                            >
+                                {hole.number}
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+
             <div
                 className="absolute overflow-hidden"
                 data-testid="iso-world-plane"
@@ -1257,17 +1360,18 @@ export default function IsoWorld({
                     top: worldRect.top,
                     width: worldRect.width || "100%",
                     height: worldRect.height || "100%",
-                    backgroundImage: room?.bg_url ? `url(${room.bg_url})` : "none",
+                    backgroundImage: worldBgUrl ? `url(${worldBgUrl})` : "none",
                     backgroundSize: "100% 100%",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
                     imageRendering: "pixelated",
                 }}
             >
-                <div className="iso-floor" style={{ opacity: room?.bg_url ? 0 : 0.2 }} />
+                <div className="iso-floor" style={{ opacity: worldBgUrl ? 0 : 0.2 }} />
                 {room?.theme === "hello" && <MemoHelloLivingScene />}
                 {room?.theme === "spiderweb" && <MemoSpiderwebPhase2Scene />}
-                {room?.theme === "neoclassick-world" && <MemoNeoclassickPhase2Scene />}
+                {isNeoclassickWorld && !isNeoclassickHole9 && <MemoNeoclassickPhase2Scene backgroundSrc={worldBgUrl} />}
+                {isNeoclassickHole9 && <MemoHole9InteractiveScene />}
                 {room?.theme === "wwworld" && (
                     <MemoWWWorldScene
                         avatarPoints={wwworldAvatarPoints}
@@ -2265,50 +2369,11 @@ function thoughtBubbleFitScale(variant, text, fullfunk = false) {
     return Math.max(1, heightPressure, tokenPressure);
 }
 
-function loadThoughtBubbleImage() {
-    if (!thoughtBubbleImagePromise) {
-        thoughtBubbleImagePromise = new Promise((resolve, reject) => {
-            const image = new Image();
-            image.onload = () => resolve(image);
-            image.onerror = reject;
-            image.src = THOUGHT_BUBBLE_SHEET_SRC;
-        });
-    }
-    return thoughtBubbleImagePromise;
-}
-
-function thoughtMatteRedToTransparent(imageData) {
-    const { data } = imageData;
-    for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        const matteRed = r > 180 && g < 92 && b < 92 && r > g * 2.25 && r > b * 2.25;
-        const darkRed = r > 120 && g < 42 && b < 42 && r > g * 3 && r > b * 3;
-        if (matteRed || darkRed) data[i + 3] = 0;
-    }
-    return imageData;
-}
-
-function getThoughtBubbleCanvas(image, variant) {
-    if (thoughtBubbleCanvasCache.has(variant.id)) return thoughtBubbleCanvasCache.get(variant.id);
-
-    const frameCanvas = document.createElement("canvas");
-    frameCanvas.width = variant.w;
-    frameCanvas.height = variant.h;
-    const frameCtx = frameCanvas.getContext("2d", { willReadFrequently: true });
-    frameCtx.imageSmoothingEnabled = false;
-    frameCtx.clearRect(0, 0, variant.w, variant.h);
-    frameCtx.drawImage(image, variant.x, variant.y, variant.w, variant.h, 0, 0, variant.w, variant.h);
-    const keyed = thoughtMatteRedToTransparent(frameCtx.getImageData(0, 0, variant.w, variant.h));
-    frameCtx.putImageData(keyed, 0, 0);
-    thoughtBubbleCanvasCache.set(variant.id, frameCanvas);
-    return frameCanvas;
-}
-
 function ThoughtBubbleSprite({ variant, text, fullfunk, placeBelow, cloudScale = 1 }) {
-    const canvasRef = useRef(null);
     const [failed, setFailed] = useState(false);
+    const standaloneSrc = variant.image
+        ? `${variant.image}?v=${THOUGHT_BUBBLE_ASSET_VERSION}`
+        : null;
     const scaleX = variant.renderW / variant.w;
     const scaleY = variant.renderH / variant.h;
     const textBox = variant.text;
@@ -2326,29 +2391,7 @@ function ThoughtBubbleSprite({ variant, text, fullfunk, placeBelow, cloudScale =
         : Math.round(textBox.y * scaleY);
     const textTop = Math.max(0, Math.round(baseTextTop * cloudScale));
 
-    useEffect(() => {
-        let cancelled = false;
-        loadThoughtBubbleImage()
-            .then((image) => {
-                if (cancelled) return;
-                const canvas = canvasRef.current;
-                const ctx = canvas?.getContext("2d");
-                if (!canvas || !ctx) return;
-                canvas.width = variant.w;
-                canvas.height = variant.h;
-                ctx.imageSmoothingEnabled = false;
-                ctx.clearRect(0, 0, variant.w, variant.h);
-                ctx.drawImage(getThoughtBubbleCanvas(image, variant), 0, 0);
-            })
-            .catch(() => {
-                if (!cancelled) setFailed(true);
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, [variant]);
-
-    if (failed) {
+    if (failed || !standaloneSrc) {
         return (
             <CloudShape>
                 <div className="font-mono-retro" style={{ color: "#000", padding: "4px 14px", fontSize: 14, lineHeight: 1.2 }}>
@@ -2370,11 +2413,12 @@ function ThoughtBubbleSprite({ variant, text, fullfunk, placeBelow, cloudScale =
                 imageRendering: "pixelated",
             }}
         >
-            <canvas
-                ref={canvasRef}
+            <img
+                src={standaloneSrc}
+                alt=""
                 aria-hidden
-                width={variant.w}
-                height={variant.h}
+                draggable={false}
+                onError={() => setFailed(true)}
                 style={{
                     position: "absolute",
                     inset: 0,

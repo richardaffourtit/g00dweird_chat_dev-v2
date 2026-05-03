@@ -7,7 +7,7 @@ const ASSET_VERSION = "neo-phase3-20260430c";
 const NEO_SHEET_SRC = `${BASE}/neo_spritesheet.png?v=neo-sheet-20260430b`;
 const NEO_ACTION_INTERVAL_MS = 55000;
 const SHOW_SMALL_NEO = false;
-const NEOCG_BG_SRC = "/worlds/neoclassick-world.png?v=neoclassick-bg-20260502";
+const NEOCG_BG_SRC = "/worlds/neoclassick-back-nine/hole_1.png?v=neoclassick-back-nine-20260503a";
 const MOON_FACE_SRC = `${BASE}/moon_faces.png?v=moon-faces-20260430c`;
 const MOON_FACE_CHANGE_MIN_MS = 30000;
 const MOON_FACE_CHANGE_RANGE_MS = 30000;
@@ -183,7 +183,7 @@ function pctY(y) {
     return `${(y / CANVAS_H) * 100}%`;
 }
 
-export default function NeoclassickPhase2Scene() {
+export default function NeoclassickPhase2Scene({ backgroundSrc = NEOCG_BG_SRC } = {}) {
     const [step, setStep] = useState(0);
     const [sheetStep, setSheetStep] = useState(0);
     const [sheetAction, setSheetAction] = useState(null);
@@ -311,7 +311,7 @@ export default function NeoclassickPhase2Scene() {
                 }
             `}</style>
 
-            <CosmicMotion />
+            <CosmicMotion backgroundSrc={backgroundSrc} />
             <MoonFaceOrb />
             <EqualizerHolograms />
             {HOLOGRAM_PANELS.map((panel) => (
@@ -414,7 +414,7 @@ export default function NeoclassickPhase2Scene() {
     );
 }
 
-function CosmicMotion() {
+function CosmicMotion({ backgroundSrc = NEOCG_BG_SRC }) {
     return (
         <>
                 <div
@@ -427,7 +427,7 @@ function CosmicMotion() {
                         height: pctX(250),
                         zIndex: 4,
                         borderRadius: "50%",
-                        backgroundImage: `url(${NEOCG_BG_SRC})`,
+                        backgroundImage: `url(${backgroundSrc})`,
                         backgroundRepeat: "no-repeat",
                         backgroundSize: `${CANVAS_W}px ${CANVAS_H}px`,
                         backgroundPosition: "-168px -80px",

@@ -6,28 +6,29 @@
     "w": 1536,
     "h": 1024
   },
-  "padding": 24,
+  "padding": 8,
   "variants": [
     {
       "id": "s1",
       "tier": "short",
       "rank": 1,
+      "image": "/scenery/thought_bubbles/s1.png",
       "source": {
-        "x": 30,
-        "y": 160,
-        "w": 89,
-        "h": 100
+        "x": 46,
+        "y": 176,
+        "w": 57,
+        "h": 68
       },
       "render": {
         "scale": 0.92
       },
       "tail": {
-        "x": 34,
-        "y": 88
+        "x": 18,
+        "y": 60
       },
       "text": {
-        "x": 33,
-        "y": 35,
+        "x": 17,
+        "y": 19,
         "w": 24,
         "h": 25
       },
@@ -37,22 +38,23 @@
       "id": "s2",
       "tier": "short",
       "rank": 2,
+      "image": "/scenery/thought_bubbles/s2.png",
       "source": {
-        "x": 148,
-        "y": 140,
-        "w": 104,
-        "h": 119
+        "x": 164,
+        "y": 156,
+        "w": 72,
+        "h": 87
       },
       "render": {
         "scale": 0.92
       },
       "tail": {
-        "x": 37,
-        "y": 105
+        "x": 20,
+        "y": 77
       },
       "text": {
-        "x": 37,
-        "y": 39,
+        "x": 21,
+        "y": 23,
         "w": 34,
         "h": 27
       },
@@ -62,22 +64,23 @@
       "id": "s3",
       "tier": "short",
       "rank": 3,
+      "image": "/scenery/thought_bubbles/s3.png",
       "source": {
-        "x": 279,
-        "y": 132,
-        "w": 112,
-        "h": 124
+        "x": 295,
+        "y": 148,
+        "w": 80,
+        "h": 96
       },
       "render": {
         "scale": 0.92
       },
       "tail": {
-        "x": 41,
-        "y": 109
+        "x": 23,
+        "y": 84
       },
       "text": {
-        "x": 38,
-        "y": 37,
+        "x": 22,
+        "y": 21,
         "w": 39,
         "h": 30
       },
@@ -87,22 +90,23 @@
       "id": "s4a",
       "tier": "short",
       "rank": 4,
+      "image": "/scenery/thought_bubbles/s4a.png",
       "source": {
-        "x": 408,
-        "y": 121,
-        "w": 123,
-        "h": 135
+        "x": 424,
+        "y": 137,
+        "w": 91,
+        "h": 110
       },
       "render": {
         "scale": 0.92
       },
       "tail": {
-        "x": 47,
-        "y": 119
+        "x": 28,
+        "y": 97
       },
       "text": {
-        "x": 39,
-        "y": 40,
+        "x": 23,
+        "y": 24,
         "w": 47,
         "h": 30
       },
@@ -112,22 +116,23 @@
       "id": "s4b",
       "tier": "short",
       "rank": 5,
+      "image": "/scenery/thought_bubbles/s4b.png",
       "source": {
-        "x": 546,
-        "y": 110,
-        "w": 141,
-        "h": 149
+        "x": 562,
+        "y": 126,
+        "w": 109,
+        "h": 121
       },
       "render": {
         "scale": 0.92
       },
       "tail": {
-        "x": 55,
-        "y": 131
+        "x": 37,
+        "y": 106
       },
       "text": {
-        "x": 41,
-        "y": 44,
+        "x": 25,
+        "y": 28,
         "w": 60,
         "h": 34
       },
@@ -137,22 +142,23 @@
       "id": "s5",
       "tier": "short",
       "rank": 6,
+      "image": "/scenery/thought_bubbles/s5.png",
       "source": {
-        "x": 696,
-        "y": 99,
-        "w": 155,
-        "h": 164
+        "x": 712,
+        "y": 115,
+        "w": 123,
+        "h": 132
       },
       "render": {
         "scale": 0.92
       },
       "tail": {
-        "x": 59,
-        "y": 144
+        "x": 43,
+        "y": 116
       },
       "text": {
-        "x": 43,
-        "y": 45,
+        "x": 27,
+        "y": 29,
         "w": 68,
         "h": 38
       },
@@ -162,22 +168,23 @@
       "id": "s6",
       "tier": "short",
       "rank": 7,
+      "image": "/scenery/thought_bubbles/s6.png",
       "source": {
-        "x": 854,
-        "y": 86,
-        "w": 175,
-        "h": 173
+        "x": 870,
+        "y": 102,
+        "w": 143,
+        "h": 145
       },
       "render": {
         "scale": 0.92
       },
       "tail": {
-        "x": 72,
-        "y": 152
+        "x": 55,
+        "y": 128
       },
       "text": {
-        "x": 48,
-        "y": 48,
+        "x": 32,
+        "y": 32,
         "w": 80,
         "h": 44
       },
@@ -187,22 +194,23 @@
       "id": "s7",
       "tier": "short",
       "rank": 8,
+      "image": "/scenery/thought_bubbles/s7.png",
       "source": {
-        "x": 1038,
-        "y": 76,
-        "w": 191,
-        "h": 183
+        "x": 1054,
+        "y": 92,
+        "w": 159,
+        "h": 155
       },
       "render": {
         "scale": 0.92
       },
       "tail": {
-        "x": 81,
-        "y": 161
+        "x": 65,
+        "y": 136
       },
       "text": {
-        "x": 50,
-        "y": 50,
+        "x": 34,
+        "y": 34,
         "w": 92,
         "h": 50
       },
@@ -212,22 +220,23 @@
       "id": "s8",
       "tier": "short",
       "rank": 9,
+      "image": "/scenery/thought_bubbles/s8.png",
       "source": {
-        "x": 1239,
-        "y": 61,
-        "w": 254,
-        "h": 193
+        "x": 1255,
+        "y": 77,
+        "w": 222,
+        "h": 170
       },
       "render": {
         "scale": 0.92
       },
       "tail": {
-        "x": 116,
-        "y": 170
+        "x": 98,
+        "y": 150
       },
       "text": {
-        "x": 63,
-        "y": 53,
+        "x": 47,
+        "y": 37,
         "w": 131,
         "h": 58
       },
@@ -237,23 +246,24 @@
       "id": "m1",
       "tier": "medium",
       "rank": 1,
+      "image": "/scenery/thought_bubbles/m1.png",
       "source": {
-        "x": 128,
-        "y": 359,
-        "w": 174,
-        "h": 140
+        "x": 144,
+        "y": 375,
+        "w": 142,
+        "h": 109
       },
       "render": {
         "scale": 0.82
       },
       "tail": {
-        "x": 59,
-        "y": 123
+        "x": 43,
+        "y": 96
       },
       "text": {
-        "x": 44,
-        "y": 38,
-        "w": 110,
+        "x": 25,
+        "y": 22,
+        "w": 92,
         "h": 31
       },
       "fontSize": 13
@@ -262,23 +272,24 @@
       "id": "m2",
       "tier": "medium",
       "rank": 2,
+      "image": "/scenery/thought_bubbles/m2.png",
       "source": {
-        "x": 274,
-        "y": 341,
-        "w": 189,
-        "h": 151
+        "x": 290,
+        "y": 357,
+        "w": 157,
+        "h": 127
       },
       "render": {
         "scale": 0.82
       },
       "tail": {
-        "x": 67,
-        "y": 133
+        "x": 45,
+        "y": 112
       },
       "text": {
-        "x": 25,
-        "y": 40,
-        "w": 140,
+        "x": 26,
+        "y": 24,
+        "w": 104,
         "h": 36
       },
       "fontSize": 13
@@ -287,24 +298,25 @@
       "id": "m3",
       "tier": "medium",
       "rank": 3,
+      "image": "/scenery/thought_bubbles/m3.png",
       "source": {
-        "x": 433,
-        "y": 327,
-        "w": 200,
-        "h": 165
+        "x": 449,
+        "y": 343,
+        "w": 168,
+        "h": 141
       },
       "render": {
         "scale": 0.82
       },
       "tail": {
-        "x": 74,
-        "y": 145
+        "x": 53,
+        "y": 124
       },
       "text": {
-        "x": 26,
-        "y": 41,
-        "w": 148,
-        "h": 41
+        "x": 28,
+        "y": 25,
+        "w": 112,
+        "h": 42
       },
       "fontSize": 13
     },
@@ -312,24 +324,25 @@
       "id": "m4",
       "tier": "medium",
       "rank": 4,
+      "image": "/scenery/thought_bubbles/m4.png",
       "source": {
-        "x": 604,
-        "y": 313,
-        "w": 245,
-        "h": 187
+        "x": 814,
+        "y": 319,
+        "w": 216,
+        "h": 166
       },
       "render": {
         "scale": 0.82
       },
       "tail": {
-        "x": 116,
-        "y": 165
+        "x": 84,
+        "y": 146
       },
       "text": {
-        "x": 32,
-        "y": 45,
-        "w": 181,
-        "h": 46
+        "x": 34,
+        "y": 30,
+        "w": 147,
+        "h": 53
       },
       "fontSize": 13
     },
@@ -337,24 +350,25 @@
       "id": "m5",
       "tier": "medium",
       "rank": 5,
+      "image": "/scenery/thought_bubbles/m5.png",
       "source": {
-        "x": 798,
-        "y": 303,
-        "w": 268,
-        "h": 191
+        "x": 1032,
+        "y": 309,
+        "w": 261,
+        "h": 177
       },
       "render": {
         "scale": 0.82
       },
       "tail": {
-        "x": 122,
-        "y": 168
+        "x": 105,
+        "y": 156
       },
       "text": {
-        "x": 35,
-        "y": 48,
-        "w": 198,
-        "h": 52
+        "x": 41,
+        "y": 33,
+        "w": 179,
+        "h": 58
       },
       "fontSize": 12
     },
@@ -362,24 +376,25 @@
       "id": "m7",
       "tier": "medium",
       "rank": 6,
+      "image": "/scenery/thought_bubbles/m7.png",
       "source": {
-        "x": 1016,
-        "y": 293,
-        "w": 316,
-        "h": 196
+        "x": 1032,
+        "y": 309,
+        "w": 261,
+        "h": 177
       },
       "render": {
         "scale": 0.82
       },
       "tail": {
-        "x": 148,
-        "y": 172
+        "x": 105,
+        "y": 156
       },
       "text": {
         "x": 41,
-        "y": 50,
-        "w": 234,
-        "h": 57
+        "y": 33,
+        "w": 179,
+        "h": 58
       },
       "fontSize": 12
     },
@@ -387,24 +402,25 @@
       "id": "m8",
       "tier": "medium",
       "rank": 7,
+      "image": "/scenery/thought_bubbles/m8.png",
       "source": {
-        "x": 1256,
-        "y": 282,
-        "w": 280,
-        "h": 204
+        "x": 1032,
+        "y": 309,
+        "w": 261,
+        "h": 177
       },
       "render": {
         "scale": 0.82
       },
       "tail": {
-        "x": 128,
-        "y": 180
+        "x": 105,
+        "y": 156
       },
       "text": {
-        "x": 34,
-        "y": 54,
-        "w": 192,
-        "h": 61
+        "x": 41,
+        "y": 33,
+        "w": 179,
+        "h": 58
       },
       "fontSize": 12
     },
@@ -412,23 +428,24 @@
       "id": "l1",
       "tier": "long",
       "rank": 1,
+      "image": "/scenery/thought_bubbles/l1.png",
       "source": {
-        "x": 163,
-        "y": 530,
-        "w": 303,
-        "h": 156
+        "x": 185,
+        "y": 565,
+        "w": 265,
+        "h": 120
       },
       "render": {
         "scale": 0.76
       },
       "tail": {
-        "x": 138,
-        "y": 137
+        "x": 93,
+        "y": 106
       },
       "text": {
-        "x": 33,
-        "y": 58,
-        "w": 240,
+        "x": 36,
+        "y": 23,
+        "w": 195,
         "h": 40
       },
       "fontSize": 12
@@ -437,24 +454,25 @@
       "id": "l2",
       "tier": "long",
       "rank": 2,
+      "image": "/scenery/thought_bubbles/l2.png",
       "source": {
-        "x": 439,
-        "y": 541,
-        "w": 381,
-        "h": 153
+        "x": 784,
+        "y": 551,
+        "w": 330,
+        "h": 138
       },
       "render": {
         "scale": 0.76
       },
       "tail": {
-        "x": 185,
-        "y": 135
+        "x": 140,
+        "y": 121
       },
       "text": {
-        "x": 38,
-        "y": 44,
-        "w": 305,
-        "h": 45
+        "x": 40,
+        "y": 28,
+        "w": 250,
+        "h": 49
       },
       "fontSize": 12
     },
@@ -462,24 +480,25 @@
       "id": "l3",
       "tier": "long",
       "rank": 3,
+      "image": "/scenery/thought_bubbles/l3.png",
       "source": {
-        "x": 768,
-        "y": 535,
-        "w": 382,
-        "h": 161
+        "x": 1116,
+        "y": 544,
+        "w": 410,
+        "h": 147
       },
       "render": {
         "scale": 0.76
       },
       "tail": {
-        "x": 179,
-        "y": 142
+        "x": 185,
+        "y": 129
       },
       "text": {
-        "x": 38,
-        "y": 44,
-        "w": 306,
-        "h": 49
+        "x": 48,
+        "y": 29,
+        "w": 314,
+        "h": 53
       },
       "fontSize": 12
     },
@@ -487,23 +506,24 @@
       "id": "l4",
       "tier": "long",
       "rank": 4,
+      "image": "/scenery/thought_bubbles/l4.png",
       "source": {
-        "x": 1100,
-        "y": 528,
-        "w": 436,
-        "h": 171
+        "x": 1116,
+        "y": 544,
+        "w": 410,
+        "h": 147
       },
       "render": {
         "scale": 0.76
       },
       "tail": {
-        "x": 204,
-        "y": 150
+        "x": 185,
+        "y": 129
       },
       "text": {
-        "x": 42,
-        "y": 45,
-        "w": 334,
+        "x": 48,
+        "y": 29,
+        "w": 314,
         "h": 53
       },
       "fontSize": 12
@@ -512,23 +532,24 @@
       "id": "l5",
       "tier": "long",
       "rank": 5,
+      "image": "/scenery/thought_bubbles/l5.png",
       "source": {
-        "x": 0,
-        "y": 698,
-        "w": 428,
-        "h": 168
+        "x": 8,
+        "y": 714,
+        "w": 378,
+        "h": 144
       },
       "render": {
         "scale": 0.76
       },
       "tail": {
-        "x": 202,
-        "y": 148
+        "x": 163,
+        "y": 127
       },
       "text": {
-        "x": 58,
-        "y": 46,
-        "w": 329,
+        "x": 45,
+        "y": 30,
+        "w": 287,
         "h": 50
       },
       "fontSize": 12
@@ -537,24 +558,25 @@
       "id": "l6",
       "tier": "long",
       "rank": 6,
+      "image": "/scenery/thought_bubbles/l6.png",
       "source": {
-        "x": 372,
-        "y": 700,
-        "w": 418,
-        "h": 172
+        "x": 388,
+        "y": 716,
+        "w": 367,
+        "h": 144
       },
       "render": {
         "scale": 0.76
       },
       "tail": {
-        "x": 204,
-        "y": 151
+        "x": 158,
+        "y": 127
       },
       "text": {
-        "x": 42,
-        "y": 45,
-        "w": 334,
-        "h": 49
+        "x": 44,
+        "y": 28,
+        "w": 279,
+        "h": 50
       },
       "fontSize": 12
     },
@@ -562,24 +584,25 @@
       "id": "l7",
       "tier": "long",
       "rank": 7,
+      "image": "/scenery/thought_bubbles/l7.png",
       "source": {
-        "x": 737,
-        "y": 706,
-        "w": 381,
-        "h": 162
+        "x": 1078,
+        "y": 719,
+        "w": 452,
+        "h": 142
       },
       "render": {
         "scale": 0.76
       },
       "tail": {
-        "x": 180,
-        "y": 143
+        "x": 192,
+        "y": 125
       },
       "text": {
-        "x": 38,
-        "y": 43,
-        "w": 305,
-        "h": 48
+        "x": 52,
+        "y": 26,
+        "w": 348,
+        "h": 51
       },
       "fontSize": 12
     },
@@ -587,24 +610,25 @@
       "id": "l8",
       "tier": "long",
       "rank": 8,
+      "image": "/scenery/thought_bubbles/l8.png",
       "source": {
-        "x": 1046,
-        "y": 703,
-        "w": 490,
-        "h": 163
+        "x": 1078,
+        "y": 719,
+        "w": 452,
+        "h": 142
       },
       "render": {
         "scale": 0.76
       },
       "tail": {
-        "x": 229,
-        "y": 143
+        "x": 192,
+        "y": 125
       },
       "text": {
-        "x": 48,
-        "y": 43,
-        "w": 380,
-        "h": 50
+        "x": 52,
+        "y": 26,
+        "w": 348,
+        "h": 51
       },
       "fontSize": 12
     }

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Patch small accidental transparent holes in the frog animation frames.
+"""Patch accidental transparent holes in avatar animation frames.
 
 The unified slicer already removes the red sheet background correctly, but some
-frog frames end up with small interior alpha gaps in green body regions. This
-post-pass fills only transparent components that are enclosed by mostly green
-opaque pixels, leaving open silhouette gaps and black/white face details alone.
+green avatar frames end up with interior alpha gaps where body pixels should be.
+This post-pass fills only transparent components that are enclosed by mostly
+green opaque pixels, leaving open silhouette gaps and black/white face details
+alone.
 """
 
 from __future__ import annotations
@@ -173,14 +174,14 @@ def repair_image(
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("frog_dir", type=Path, nargs="?", default=Path("frontend/public/anim/frog"))
+    parser.add_argument("frames_dir", type=Path, nargs="?", default=Path("frontend/public/anim/frog"))
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--mode", choices=("green", "neighbor"), default="green")
     parser.add_argument("--max-component-pixels", type=int, default=460)
     args = parser.parse_args()
 
     total = 0
-    for path in sorted(args.frog_dir.glob("*.png")):
+    for path in sorted(args.frames_dir.glob("*.png")):
         repaired = repair_image(
             path,
             dry_run=args.dry_run,

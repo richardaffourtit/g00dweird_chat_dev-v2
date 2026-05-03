@@ -23,12 +23,29 @@ from PIL import Image
 
 from repair_frog_alpha import repair_image
 
-OUT_BASE = "/app/frontend/public/anim"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+OUT_BASE = os.environ.get("GW_ANIM_OUT", str(REPO_ROOT / "frontend/public/anim"))
+SOURCE_BASE = Path(
+    os.environ.get(
+        "GW_AVATAR_SOURCE_DIR",
+        str(REPO_ROOT / "frontend/public/source-assets/avatar"),
+    )
+)
 MANIFEST = os.path.join(OUT_BASE, "manifest.json")
+
+
+def sheet_src(filename: str) -> str:
+    return str(SOURCE_BASE / filename)
+
+
+ALPHA_REPAIR_MAX_COMPONENT_PIXELS = {
+    "frog": 460,
+    "slime": 8000,
+}
 
 SHEETS: Dict[str, dict] = {
     "alien": {
-        "src": "/tmp/sprite_alien.png",
+        "src": sheet_src("g00dwierd_avatar_alien.png"),
         "rows": [
             [("idle", 3), ("walk", 4), ("run", 4)],
             [("jump", 3), ("attack", 5)],
@@ -37,7 +54,7 @@ SHEETS: Dict[str, dict] = {
         ],
     },
     "ape": {
-        "src": "/tmp/sprite_ape.png",
+        "src": sheet_src("g00dwierd_avatar_ape.png"),
         "rows": [
             [("idle", 3), ("walk", 4), ("jump", 3)],
             [("action", 4)],
@@ -46,7 +63,7 @@ SHEETS: Dict[str, dict] = {
         ],
     },
     "cat": {
-        "src": "/tmp/sprite_cat.png",
+        "src": sheet_src("g00dwierd_avatar_cat.png"),
         "rows": [
             [("idle", 3)],
             [("walk", 4)],
@@ -58,7 +75,7 @@ SHEETS: Dict[str, dict] = {
         ],
     },
     "fairy": {
-        "src": "/tmp/sprite_fairy.png",
+        "src": sheet_src("g00dwierd_avatar_fairy.png"),
         "rows": [
             [("idle", 3), ("walk", 4), ("jump", 3)],
             [("action", 4)],
@@ -67,7 +84,7 @@ SHEETS: Dict[str, dict] = {
         ],
     },
     "frog": {
-        "src": "/tmp/sprite_frog.png",
+        "src": sheet_src("g00dwierd_avatar_frog.png"),
         "rows": [
             [("idle", 3)],
             [("hop", 4)],
@@ -79,7 +96,7 @@ SHEETS: Dict[str, dict] = {
         ],
     },
     "ghost": {
-        "src": "/tmp/sprite_ghost.png",
+        "src": sheet_src("g00dwierd_avatar_ghost.png"),
         "rows": [
             [("idle", 3)],
             [("float", 4)],
@@ -91,7 +108,7 @@ SHEETS: Dict[str, dict] = {
         ],
     },
     "robot": {
-        "src": "/tmp/sprite_robot.png",
+        "src": sheet_src("g00dwierd_avatar_robot.png"),
         "rows": [
             [("idle", 3), ("walk", 4), ("jump", 3)],
             [("action", 4)],
@@ -100,7 +117,7 @@ SHEETS: Dict[str, dict] = {
         ],
     },
     "skeleton": {
-        "src": "/tmp/sprite_skeleton.png",
+        "src": sheet_src("g00dwierd_avatar_skeleton.png"),
         "rows": [
             [("idle", 3), ("walk", 4), ("run", 4)],
             [("jump", 3), ("attack", 4)],
@@ -109,7 +126,7 @@ SHEETS: Dict[str, dict] = {
         ],
     },
     "slime": {
-        "src": "/tmp/sprite_slime.png",
+        "src": sheet_src("g00dwierd_avatar_slime.png"),
         "rows": [
             [("idle", 3), ("wiggle", 4), ("hop", 4)],
             [("split", 5), ("attack", 5)],
@@ -118,7 +135,7 @@ SHEETS: Dict[str, dict] = {
         ],
     },
     "tvhead": {
-        "src": "/tmp/sprite_tvhead.png",
+        "src": sheet_src("g00dwierd_avatar_tv_head.png"),
         "rows": [
             [("idle", 3), ("walk", 4), ("run", 4)],
             [("jump", 3), ("attack", 5), ("hurt", 2)],
@@ -487,10 +504,14 @@ def slice_creature(creature: str, cfg: dict) -> dict:
             if kept:
                 cm[state] = kept; total_kept += kept
     print(f"  {creature}: {cm}  (canvas={canvas_w}x{canvas_h}, {total_kept} frames)")
-    if creature == "frog":
-        repaired = sum(repair_image(path) for path in Path(out_dir).glob("*.png"))
+    if creature in ALPHA_REPAIR_MAX_COMPONENT_PIXELS:
+        repair_limit = ALPHA_REPAIR_MAX_COMPONENT_PIXELS[creature]
+        repaired = sum(
+            repair_image(path, max_component_pixels=repair_limit)
+            for path in Path(out_dir).glob("*.png")
+        )
         if repaired:
-            print(f"  frog alpha repair: {repaired} pixels")
+            print(f"  {creature} alpha repair: {repaired} pixels")
     return cm
 
 

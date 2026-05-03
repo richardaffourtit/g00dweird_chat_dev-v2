@@ -3,7 +3,7 @@
   {"id":"jello","name":"Jello","theme":"jello","tagline":"rainbow gelatin kingdom, bring a spoon","bg_url":"/worlds/jello.png"},
   {"id":"heaven","name":"Heaven","theme":"heaven","tagline":"pearly gates, floating colonnades, rainbows","bg_url":"/worlds/heaven.png"},
   {"id":"mars","name":"Mars","theme":"mars","tagline":"red mesas, outpost lights, two moons","bg_url":"/worlds/mars.png"},
-  {"id":"neoclassick-world","name":"Neoclassick World","theme":"neoclassick-world","tagline":"where we play golf at a high level","bg_url":"/worlds/neoclassick-world.png"},
+  {"id":"neoclassick-world","name":"Neoclassick World","theme":"neoclassick-world","tagline":"where we play golf at a high level","bg_url":"/worlds/neoclassick-back-nine/hole_1.png"},
   {"id":"wwworld","name":"WWWorld","theme":"wwworld","tagline":"let's get meta","bg_url":"/worlds/wwworld.png"},
   {"id":"regular-cafe","name":"Regular Cafe","theme":"regular-cafe","tagline":"green stools, ivy, espresso machine hum","bg_url":"/worlds/regular-cafe.png"},
   {"id":"toxic-void","name":"GW Toxic Void","theme":"toxic-void","tagline":"good weird hazardous signal is alive","bg_url":"/worlds/toxic-void.png"},
