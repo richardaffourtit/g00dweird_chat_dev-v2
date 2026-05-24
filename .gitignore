@@ -7,5 +7,10 @@ backend/.mongo-logs/
 rtassh
 rtassh.pub
 
+# System and local tool output
+.DS_Store
+.playwright-mcp/
+pixel-mcp/
+
 # Separate local video-production workspace
 viral-g00dweird-video/
