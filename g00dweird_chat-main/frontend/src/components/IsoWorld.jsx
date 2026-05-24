@@ -1613,7 +1613,7 @@ export default function IsoWorld({
                         const displayX = renderX + liminalDrift.x;
                         const displayY = renderY + liminalDrift.y;
                         const displayCss = stageToAvatarCssPixels({ x: displayX, y: displayY }, worldRect, u);
-                        const renderStanceBox = spriteFrameBox(renderCreature, renderStance, avatarBoxSize.width);
+                        const renderStanceBox = spriteFrameBox(renderAnimId, renderStance, avatarBoxSize.width);
                         const thoughtBubbleWidth = (renderStanceBox?.width || avatarBoxSize.width);
                         const thoughtBubbleHeight = (renderStanceBox?.height || avatarBoxSize.height);
                         const edgeScale = avatarEdgeScale(displayCss.x, worldRect);
