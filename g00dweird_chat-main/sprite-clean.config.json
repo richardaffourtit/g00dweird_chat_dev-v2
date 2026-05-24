@@ -1,0 +1,28 @@
+{
+  "inputDirs": [
+    "assets",
+    "public",
+    "sprites",
+    "src/assets",
+    "imported",
+    "frontend/public",
+    "frontend/src/assets"
+  ],
+  "outputDir": "frontend/public/assets/cleaned-sprites",
+  "keyColors": [
+    "#ff0000"
+  ],
+  "keyTolerance": 32,
+  "padding": 2,
+  "minVisiblePixels": 8,
+  "duplicateThreshold": 0.995,
+  "defaultFps": 8,
+  "defaultPivot": {
+    "x": 0.5,
+    "y": 0.85
+  },
+  "frameSizeOverrides": {},
+  "manualOverridesFile": "frontend/public/assets/cleaned-sprites/manual-overrides.json",
+  "maxSingleSpritePixels": 1048576,
+  "maxProcessPixels": 2097152
+}

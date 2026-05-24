@@ -13,12 +13,12 @@ import React, { useEffect, useRef } from "react";
  *   - ATTACK  : attack | action               (action used for melee creatures)
  *   - HURT, DIE
  *   - emote_a / emote_b / emote_c / emote_d   (user-pickable poses)
- *   - split (slime), bite/spitseed/sway (plant), talk/think/glitch/react (weirdbot), etc.
+ *   - split (slime), talk/think/glitch/react (weirdbot), etc.
  *
  * STATE_ALIASES maps requested-but-missing states onto sensible existing frames.
  */
 
-export const ANIM_VERSION = 21;
+export const ANIM_VERSION = 23;
 
 // Frame counts per creature/state — mirrors slicer v3 / unified output.
 export const FRAMES = {
@@ -57,8 +57,58 @@ export const STATE_ALIASES = {
 };
 
 export const ANIM_CREATURES = Object.keys(FRAMES);
+const ANIM_CREATURE_SET = new Set(ANIM_CREATURES);
+
+export function sanitizeAnimCreature(creature) {
+    return ANIM_CREATURE_SET.has(creature) ? creature : null;
+}
+
+export function shouldUseCleanedSprites(env = process.env) {
+    return env?.REACT_APP_USE_CLEANED_SPRITES !== "0";
+}
+
+const USE_CLEANED_SPRITES = shouldUseCleanedSprites();
+
+let cleanedSpriteManifest = null;
+let cleanedSpriteManifestLoading = false;
+const cleanedSpriteSubscribers = new Set();
+
+function publicUrlFromOutput(outputSheet) {
+    if (!outputSheet) return "";
+    const marker = "frontend/public/";
+    return outputSheet.includes(marker) ? `/${outputSheet.split(marker, 2)[1]}` : `/${outputSheet.replace(/^\/+/, "")}`;
+}
+
+function cleanedFrameSrc(creature, state, frame) {
+    const id = `anim-${creature}-${state}_${frame}`;
+    if (cleanedSpriteManifest === null) {
+        return `/assets/cleaned-sprites/${id}.png?v=${ANIM_VERSION}`;
+    }
+    const item = cleanedSpriteManifest?.[id];
+    return item ? `${publicUrlFromOutput(item.outputSheet)}?v=${ANIM_VERSION}` : null;
+}
+
+function ensureCleanedSpriteManifest() {
+    if (!USE_CLEANED_SPRITES) return;
+    if (cleanedSpriteManifest || cleanedSpriteManifestLoading || typeof window === "undefined") return;
+    cleanedSpriteManifestLoading = true;
+    fetch(`/assets/cleaned-sprites/manifest.json?v=${ANIM_VERSION}`)
+        .then((response) => (response.ok ? response.json() : { sprites: [] }))
+        .then((data) => {
+            cleanedSpriteManifest = Object.fromEntries((data.sprites || []).map((item) => [item.id, item]));
+            cleanedSpriteSubscribers.forEach((subscriber) => subscriber());
+        })
+        .catch(() => {
+            cleanedSpriteManifest = {};
+        })
+        .finally(() => {
+            cleanedSpriteManifestLoading = false;
+        });
+}
 
 function frameSrc(creature, state, frame) {
+    const cleaned = USE_CLEANED_SPRITES ? cleanedFrameSrc(creature, state, frame) : null;
+    if (cleaned) return cleaned;
     return `/anim/${creature}/${state}_${frame}.png?v=${ANIM_VERSION}`;
 }
 
@@ -116,6 +166,16 @@ export function resolveState(creature, wanted) {
     return Object.keys(avail)[0];
 }
 
+export function spriteFrameBox(creature, state, size) {
+    if (creature === "weirdbot" && state === "walk") {
+        return {
+            width: Math.round(size * 1.24),
+            height: size,
+        };
+    }
+    return null;
+}
+
 // ---- Locomotion mapping (per spec) ----
 // SLOW: walk | float | hop | wiggle
 // FAST: run | dash | hop | walk (fallback)
@@ -126,19 +186,26 @@ export function pickTravelStance(creature, dist, dy = 0) {
     const isVertical = Math.abs(dy) > 110;
 
     if (isVertical) {
+        if (F.dive) return "dive";
         if (F.jump) return "jump";
         if (F.hop) return "hop";
+        if (F.fly) return "fly";
     }
     if (isFar) {
         if (F.run) return "run";
         if (F.dash) return "dash";
+        if (F.fly) return "fly";
         if (F.hop) return "hop";
         if (F.walk) return "walk";
+        if (F.float) return "float";
+        if (F.sway) return "sway";
     }
     if (F.walk) return "walk";
     if (F.float) return "float";
+    if (F.fly) return "fly";
     if (F.hop) return "hop";
     if (F.wiggle) return "wiggle";
+    if (F.sway) return "sway";
     return "idle";
 }
 
@@ -162,27 +229,37 @@ export default function AnimSprite({
     paused = false, flip = false, testId, alt = "",
     frameWidth = null, frameHeight = null,
 }) {
-    const resolved = resolveState(creature, state);
-    const rawCount = (FRAMES[creature] && FRAMES[creature][resolved]) || 1;
-    const steadyIdle = creature === "cat" && resolved === "idle";
+    const renderCreature = sanitizeAnimCreature(creature) || "ghost";
+    const resolved = resolveState(renderCreature, state);
+    const rawCount = (FRAMES[renderCreature] && FRAMES[renderCreature][resolved]) || 1;
+    const steadyIdle = renderCreature === "cat" && resolved === "idle";
     const count = steadyIdle ? 1 : rawCount;
     const imgRef = useRef(null);
     const lastRef = useRef(0);
     const frameRef = useRef(0);
+
+    useEffect(() => {
+        ensureCleanedSpriteManifest();
+        const refresh = () => {
+            if (imgRef.current) imgRef.current.src = frameSrc(renderCreature, resolved, frameRef.current);
+        };
+        cleanedSpriteSubscribers.add(refresh);
+        return () => cleanedSpriteSubscribers.delete(refresh);
+    }, [renderCreature, resolved]);
 
     // Reset frame on creature/state change without triggering a React render per animation tick.
     useEffect(() => {
         frameRef.current = 0;
         lastRef.current = 0;
         if (imgRef.current) {
-            imgRef.current.src = frameSrc(creature, resolved, 0);
+            imgRef.current.src = frameSrc(renderCreature, resolved, 0);
         }
-    }, [creature, resolved, count]);
+    }, [renderCreature, resolved, count]);
 
     // Preload all frames so swaps come from cache
     useEffect(() => {
-        preloadFrames(creature, resolved, count);
-    }, [creature, resolved, count]);
+        preloadFrames(renderCreature, resolved, count);
+    }, [renderCreature, resolved, count]);
 
     // Shared RAF ticker: one frame loop drives every animated sprite instance.
     useEffect(() => {
@@ -199,7 +276,7 @@ export default function AnimSprite({
                 lastRef.current += framesToAdvance * frameMs;
                 frameRef.current = (frameRef.current + framesToAdvance) % count;
                 if (imgRef.current) {
-                    imgRef.current.src = frameSrc(creature, resolved, frameRef.current);
+                    imgRef.current.src = frameSrc(renderCreature, resolved, frameRef.current);
                 }
             }
         };
@@ -208,14 +285,17 @@ export default function AnimSprite({
             unsubscribe();
             lastRef.current = 0;
         };
-    }, [creature, resolved, count, fps, paused]);
+    }, [renderCreature, resolved, count, fps, paused]);
 
-    const src = frameSrc(creature, resolved, 0);
-    const isGhost = creature === "ghost";
+    const src = frameSrc(renderCreature, resolved, 0);
+    const isGhost = renderCreature === "ghost";
     const ghostGlow = isGhost
         ? "drop-shadow(0 0 2px rgba(190,255,232,0.95)) drop-shadow(0 0 7px rgba(86,255,214,0.78)) drop-shadow(0 0 14px rgba(112,192,255,0.55))"
         : undefined;
     const fixedFrame = Number.isFinite(frameWidth) && Number.isFinite(frameHeight);
+    const frameBox = fixedFrame
+        ? { width: frameWidth, height: frameHeight }
+        : spriteFrameBox(renderCreature, resolved, size);
 
     return (
         <img
@@ -225,10 +305,10 @@ export default function AnimSprite({
             data-testid={testId}
             draggable={false}
             style={{
-                height: fixedFrame ? frameHeight : size,
-                width: fixedFrame ? frameWidth : "auto",
-                objectFit: fixedFrame ? "contain" : undefined,
-                objectPosition: fixedFrame ? "center bottom" : undefined,
+                height: frameBox ? frameBox.height : size,
+                width: frameBox ? frameBox.width : "auto",
+                objectFit: frameBox ? "contain" : undefined,
+                objectPosition: frameBox ? "center bottom" : undefined,
                 imageRendering: "pixelated",
                 display: "block",
                 position: "relative",

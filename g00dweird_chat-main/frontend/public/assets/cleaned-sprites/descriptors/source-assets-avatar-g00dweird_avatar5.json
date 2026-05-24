@@ -1,0 +1,44 @@
+{
+  "id": "source-assets-avatar-g00dweird_avatar5",
+  "source": "frontend/public/source-assets/avatar/g00dweird_avatar5.png",
+  "outputSheet": "frontend/public/assets/cleaned-sprites/source-assets-avatar-g00dweird_avatar5.png",
+  "frameWidth": 1598,
+  "frameHeight": 867,
+  "frameCount": 1,
+  "fps": 8,
+  "loop": true,
+  "pivot": {
+    "x": 0.5,
+    "y": 0.85
+  },
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 1598,
+      "h": 867,
+      "bbox": {
+        "x": 27,
+        "y": 27,
+        "w": 1594,
+        "h": 863
+      },
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "w": 1672,
+        "h": 941
+      },
+      "hash": "7027c2b80d1a2cee5c951e46c7e30233d2586bd4cf906e231e902e06ebbe4549",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 227440,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    }
+  ],
+  "warnings": []
+}

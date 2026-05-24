@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Win95Window from "./Win95Window";
-import { isPresetTag, TAG_WORDS, tagImageUrl } from "../lib/tags";
+import { isPresetTag, readUserTags, TAG_WORDS, tagImageUrl, USER_TAGS_CHANGED_EVENT } from "../lib/tags";
 import FullfunkText from "./FullfunkText";
 
 /**
@@ -13,9 +13,12 @@ export default function SprayWindow({
     active,
     onToggleActive,
     selectedTag,
+    selectedTagImageUrl,
+    selectedTagName,
     isCustom,
     customText,
     onPickPreset,
+    onPickUserTag,
     onSetCustom,
     tagSize,
     onSetSize,
@@ -26,10 +29,21 @@ export default function SprayWindow({
     requestFocus = 0,
 }) {
     const [custom, setCustom] = useState(customText || "");
+    const [userTags, setUserTags] = useState(() => readUserTags());
 
     useEffect(() => {
         setCustom(customText || "");
     }, [customText]);
+
+    useEffect(() => {
+        const update = () => setUserTags(readUserTags());
+        window.addEventListener(USER_TAGS_CHANGED_EVENT, update);
+        window.addEventListener("storage", update);
+        return () => {
+            window.removeEventListener(USER_TAGS_CHANGED_EVENT, update);
+            window.removeEventListener("storage", update);
+        };
+    }, []);
 
     const setCustomSubmit = (e) => {
         e.preventDefault();
@@ -136,7 +150,7 @@ export default function SprayWindow({
                     </button>
                 </form>
 
-                {/* preset tags grid */}
+                {/* preset and user tags */}
                 <div
                     className="w95-bevel-inset flex-1"
                     style={{ overflow: "auto", background: "#000", minHeight: 360 }}
@@ -195,6 +209,67 @@ export default function SprayWindow({
                             </button>
                         ))}
                     </div>
+                    <div
+                        className="font-pixel px-2 py-1"
+                        style={{
+                            background: "#003000",
+                            color: "#b3ff00",
+                            fontSize: 10,
+                            position: "sticky",
+                            top: 22,
+                            zIndex: 1,
+                            borderTop: "1px solid #333",
+                        }}
+                    >
+                        USER TAGS [{userTags.length}]
+                    </div>
+                    <div
+                        className="p-2"
+                        style={{
+                            background: "#050505",
+                            display: "grid",
+                            gridTemplateColumns: "repeat(auto-fill, minmax(92px, 1fr))",
+                            gap: 8,
+                            alignItems: "stretch",
+                        }}
+                    >
+                        {userTags.length === 0 && (
+                            <div className="font-mono-retro" style={{ color: "#888", fontSize: 15, gridColumn: "1 / -1" }}>
+                                snapshots from Wall.exe appear here
+                            </div>
+                        )}
+                        {userTags.map((tag) => (
+                            <button
+                                key={tag.id}
+                                onClick={() => onPickUserTag?.(tag)}
+                                className="flex flex-col items-center justify-center p-1"
+                                data-testid={`spray-user-tag-${tag.id}`}
+                                title={tag.name}
+                                style={{
+                                    background: "#000",
+                                    border:
+                                        isCustom && selectedTag === tag.id
+                                            ? "2px solid #b3ff00"
+                                            : "2px solid #333",
+                                    minHeight: 76,
+                                    cursor: "pointer",
+                                    overflow: "hidden",
+                                }}
+                            >
+                                <img
+                                    src={tag.dataUrl}
+                                    alt={tag.name || "user tag"}
+                                    style={{
+                                        maxWidth: "100%",
+                                        maxHeight: 54,
+                                        imageRendering: "pixelated",
+                                        objectFit: "contain",
+                                    }}
+                                    draggable={false}
+                                />
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Preview of currently selected tag */}
@@ -206,7 +281,14 @@ export default function SprayWindow({
                     <span className="font-pixel" style={{ fontSize: 9, color: "#ff00ff" }}>
                         SEL:
                     </span>
-                    {isCustom || !isPresetTag(selectedTag || "GOOD") ? (
+                    {isCustom && selectedTagImageUrl ? (
+                        <img
+                            src={selectedTagImageUrl}
+                            alt={selectedTagName || "user tag"}
+                            style={{ height: 36, maxWidth: 170, objectFit: "contain", imageRendering: "pixelated" }}
+                            draggable={false}
+                        />
+                    ) : isCustom || !isPresetTag(selectedTag || "GOOD") ? (
                         <FullfunkText text={selectedTag || "—"} size={20} />
                     ) : (
                         <img
@@ -220,7 +302,7 @@ export default function SprayWindow({
                         className="font-pixel ml-auto"
                         style={{ fontSize: 9, color: "#888" }}
                     >
-                        {isCustom ? "custom fullfunk" : "preset"}
+                        {selectedTagImageUrl ? "user tag" : isCustom ? "custom fullfunk" : "preset"}
                     </span>
                 </div>
             </div>

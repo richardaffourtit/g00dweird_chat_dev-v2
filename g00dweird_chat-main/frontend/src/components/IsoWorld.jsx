@@ -1,7 +1,11 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState, useEffect } from "react";
 import { Sprite, SPRITES } from "../lib/sprites";
 import FullfunkText from "./FullfunkText";
-import AnimSprite, { pickTravelStance } from "./AnimSprite";
+import AnimSprite, {
+    pickTravelStance,
+    sanitizeAnimCreature,
+    spriteFrameBox,
+} from "./AnimSprite";
 import { isPresetTag, tagImageUrl, jetFrameUrl, canUrl, JET_FRAMES } from "../lib/tags";
 import { youtubeEmbedUrl, THEATRE_SCREEN_BBOX, elapsedSinceStart } from "../lib/youtube";
 import EmojiBurst from "./EmojiBurst";
@@ -11,6 +15,7 @@ import LiminalPhase4Scene from "./LiminalPhase4Scene";
 import NeoclassickPhase2Scene from "./NeoclassickPhase2Scene";
 import WWWorldScene from "./WWWorldScene";
 import { isLiminalRoom, liminalAvatarDrift, liminalCornerShadow, liminalDisplayName } from "../lib/liminal";
+import { clearThoughtBubbleMatte } from "../lib/thoughtBubbleMatte";
 import thoughtBubbleManifest from "../data/thoughtBubbles.json";
 
 const MemoEmojiBurst = React.memo(EmojiBurst);
@@ -19,6 +24,119 @@ const MemoSpiderwebPhase2Scene = React.memo(SpiderwebPhase2Scene);
 const MemoLiminalPhase4Scene = React.memo(LiminalPhase4Scene);
 const MemoNeoclassickPhase2Scene = React.memo(NeoclassickPhase2Scene);
 const MemoWWWorldScene = React.memo(WWWorldScene);
+
+function JungleFog() {
+    return (
+        <div className="jungle-fog-layer" aria-hidden data-testid="jungle-fog">
+            <div className="jungle-fog-bank jungle-fog-bank-a" />
+            <div className="jungle-fog-bank jungle-fog-bank-b" />
+            <div className="jungle-fog-bank jungle-fog-bank-c" />
+        </div>
+    );
+}
+
+function MarsRover({ stageRect }) {
+    const roverRef = useRef(null);
+    const stageRef = useRef({ width: STAGE_W, height: STAGE_H });
+
+    useEffect(() => {
+        stageRef.current = {
+            width: Math.max(1, Number(stageRect?.width) || STAGE_W),
+            height: Math.max(1, Number(stageRect?.height) || STAGE_H),
+        };
+    }, [stageRect?.width, stageRect?.height]);
+
+    useEffect(() => {
+        let rafId = 0;
+        let startMs = null;
+        const reduceMotion = typeof window !== "undefined" &&
+            window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+        const applyRoverPose = (elapsedMs) => {
+            const node = roverRef.current;
+            if (!node) return;
+            const progress = (((elapsedMs % MARS_ROVER_PATROL_MS) + MARS_ROVER_PATROL_MS) % MARS_ROVER_PATROL_MS) / MARS_ROVER_PATROL_MS;
+            const pose = marsRoverPoseAt(progress);
+            const { width, height } = stageRef.current;
+            const x = width * pose.x;
+            const y = height * pose.y;
+            const anchorX = (width * MARS_ROVER_PLATFORM_ANCHOR.x) / MARS_ROVER_SOURCE_WIDTH;
+            const anchorY = (height * MARS_ROVER_PLATFORM_ANCHOR.y) / MARS_ROVER_SOURCE_HEIGHT;
+            const tx = x - anchorX * (pose.scale - 1);
+            const ty = y - anchorY * (pose.scale - 1);
+            const snappedTx = Math.round(tx * 4) / 4;
+            const snappedTy = Math.round(ty * 4) / 4;
+            const frame = Math.floor((elapsedMs % (MARS_ROVER_FRAME_MS * MARS_ROVER_FRAMES.length)) / MARS_ROVER_FRAME_MS);
+
+            node.style.transform = `translate3d(${snappedTx}px, ${snappedTy}px, 0) scale(${pose.scale.toFixed(4)})`;
+            if (node.dataset.facing !== pose.facing) node.dataset.facing = pose.facing;
+            if (node.dataset.frame !== String(frame)) node.dataset.frame = String(frame);
+        };
+
+        const step = (timestamp) => {
+            if (startMs == null) startMs = timestamp;
+            applyRoverPose(timestamp - startMs);
+            if (!reduceMotion) rafId = requestAnimationFrame(step);
+        };
+
+        rafId = requestAnimationFrame(step);
+        return () => {
+            if (rafId) cancelAnimationFrame(rafId);
+        };
+    }, []);
+
+    return (
+        <div
+            ref={roverRef}
+            className="mars-rover-layer"
+            aria-hidden
+            data-testid="mars-rover"
+            data-facing="right"
+            data-frame="0"
+            style={MARS_ROVER_PLATFORM_STYLE}
+        >
+            {MARS_ROVER_DIRECTIONS.flatMap((direction) => (
+                MARS_ROVER_FRAMES.map((frame) => (
+                    <img
+                        key={`${direction}-${frame}`}
+                        className="mars-rover-sprite"
+                        data-direction={direction}
+                        data-frame={frame}
+                        src={`/assets/mars-rover/${direction}_${frame}.png?v=${MARS_ROVER_ASSET_VERSION}`}
+                        alt=""
+                        draggable={false}
+                        decoding="async"
+                    />
+                ))
+            ))}
+        </div>
+    );
+}
+
+function marsRoverPoseAt(progress) {
+    const p = clamp(progress, 0, 1);
+    let from = MARS_ROVER_PATROL[0];
+    let to = MARS_ROVER_PATROL[MARS_ROVER_PATROL.length - 1];
+
+    for (let index = 0; index < MARS_ROVER_PATROL.length - 1; index += 1) {
+        const current = MARS_ROVER_PATROL[index];
+        const next = MARS_ROVER_PATROL[index + 1];
+        if (p >= current.at && p <= next.at) {
+            from = current;
+            to = next;
+            break;
+        }
+    }
+
+    const span = Math.max(0.0001, to.at - from.at);
+    const t = clamp((p - from.at) / span, 0, 1);
+    return {
+        x: from.x + (to.x - from.x) * t,
+        y: from.y + (to.y - from.y) * t,
+        scale: from.scale + (to.scale - from.scale) * t,
+        facing: from.facing,
+    };
+}
 
 const THEME_ACCENT = {
     hello: "#ff6ec7",
@@ -90,7 +208,7 @@ const BASKETBALL_FLOOR_Y = 486;
 const BASKETBALL_RADIUS = 12;
 // Basketball court art is square, but the gameplay plane is 1000x500.
 // Keep collider coordinates in source-art pixels and convert once here so
-// the hit areas stay attached to the drawn hoop/fence instead of screen guesswork.
+// the hit areas stay attached to the drawn hoop/backboard instead of screen guesswork.
 const BASKETBALL_BACKBOARD_COLLIDER = basketballArtRect({
     id: "backboard",
     x: 796,
@@ -100,16 +218,45 @@ const BASKETBALL_BACKBOARD_COLLIDER = basketballArtRect({
     restitution: 0.64,
     tangentDamping: 0.82,
 });
-const BASKETBALL_FENCE_COLLIDERS = [
-    basketballArtRect({ id: "fence-top-left", x: 610, y: 158, w: 172, h: 50, restitution: 0.54, tangentDamping: 0.88 }),
-    basketballArtRect({ id: "fence-top-right", x: 928, y: 150, w: 148, h: 54, restitution: 0.54, tangentDamping: 0.88 }),
-    basketballArtRect({ id: "fence-left", x: 704, y: 220, w: 32, h: 280, restitution: 0.54, tangentDamping: 0.86 }),
-    basketballArtRect({ id: "fence-right", x: 940, y: 205, w: 40, h: 420, restitution: 0.58, tangentDamping: 0.86 }),
-];
-const BASKETBALL_FENCE_CLEAR_ZONE = basketballArtRect({ x: 650, y: 30, w: 460, h: 96 });
+const BASKETBALL_RIM_COLLIDER = {
+    id: "rim",
+    x: BASKETBALL_HOOP.x - BASKETBALL_HOOP.rimWidth / 2,
+    y: BASKETBALL_HOOP.y - BASKETBALL_HOOP.rimHeight * 0.15,
+    w: BASKETBALL_HOOP.rimWidth,
+    h: Math.max(4, BASKETBALL_HOOP.rimHeight * 0.5),
+    restitution: 0.72,
+    tangentDamping: 0.78,
+};
 const MAX_BASKETBALLS = 10;
 const WORLD_REACTION_TTL_MS = 2600;
-const THOUGHT_BUBBLE_SHEET_SRC = `${thoughtBubbleManifest.sourceImage}?v=thought-clouds-json-20260502`;
+const THOUGHT_BUBBLE_SHEET_SRC = `${thoughtBubbleManifest.sourceImage}?v=thought-clouds-json-20260507b`;
+const MARS_ROVER_PATROL_MS = 28000;
+const MARS_ROVER_FRAME_MS = 160;
+const MARS_ROVER_DIRECTIONS = ["right", "back", "left", "front"];
+const MARS_ROVER_FRAMES = [0, 1, 2, 3];
+const MARS_ROVER_CANVAS_PAD_PX = 12;
+const MARS_ROVER_BASE_SIDE_PAD_PX = 2;
+const MARS_ROVER_SIDE_PAD_PX = 10;
+const MARS_ROVER_SIDE_PAD_TOTAL_PX = MARS_ROVER_BASE_SIDE_PAD_PX + MARS_ROVER_SIDE_PAD_PX;
+const MARS_ROVER_SOURCE_WIDTH = 398 + (MARS_ROVER_CANVAS_PAD_PX * 2) + (MARS_ROVER_SIDE_PAD_TOTAL_PX * 2);
+const MARS_ROVER_SOURCE_HEIGHT = 306 + (MARS_ROVER_CANVAS_PAD_PX * 2);
+const MARS_ROVER_ASSET_VERSION = "v8-right3-wheel-repair";
+const MARS_ROVER_PLATFORM_ANCHOR = {
+    x: 199 + MARS_ROVER_CANVAS_PAD_PX + MARS_ROVER_SIDE_PAD_PX,
+    y: 293 + MARS_ROVER_CANVAS_PAD_PX,
+};
+const MARS_ROVER_PLATFORM_STYLE = {
+    "--rover-frame-offset-x": `${((-MARS_ROVER_PLATFORM_ANCHOR.x / MARS_ROVER_SOURCE_WIDTH) * 100).toFixed(4)}%`,
+    "--rover-frame-offset-y": `${((-MARS_ROVER_PLATFORM_ANCHOR.y / MARS_ROVER_SOURCE_HEIGHT) * 100).toFixed(4)}%`,
+};
+const MARS_ROVER_PATROL = [
+    { at: 0, x: 0.08, y: 0.62, scale: 0.86, facing: "right" },
+    { at: 0.24, x: 0.70, y: 0.58, scale: 0.94, facing: "back" },
+    { at: 0.36, x: 0.78, y: 0.42, scale: 0.8, facing: "left" },
+    { at: 0.61, x: 0.18, y: 0.46, scale: 0.76, facing: "front" },
+    { at: 0.74, x: 0.12, y: 0.64, scale: 0.92, facing: "front" },
+    { at: 1, x: 0.08, y: 0.62, scale: 0.86, facing: "right" },
+];
 
 const WORLD_REACTION_HOTSPOTS = {
     hello: [
@@ -194,7 +341,8 @@ function movementFacing(dx) {
 }
 
 function avatarCreature(user) {
-    if (user?.anim_id) return user.anim_id;
+    const animCreature = sanitizeAnimCreature(user?.anim_id);
+    if (animCreature) return animCreature;
     const spriteDef = user?.sprite_id ? SPRITES[user.sprite_id] : null;
     return spriteDef?.kind || null;
 }
@@ -202,7 +350,7 @@ function avatarCreature(user) {
 function isWeirdbotUser(user) {
     const id = String(user?.user_id || "").toLowerCase();
     const nickname = String(user?.nickname || "").toLowerCase();
-    return id.startsWith("weirdbot") || nickname.includes("weirdbot") || user?.anim_id === "weirdbot";
+    return id.startsWith("weirdbot") || nickname.includes("weirdbot") || sanitizeAnimCreature(user?.anim_id) === "weirdbot";
 }
 
 function avatarRenderPoint(user) {
@@ -356,16 +504,6 @@ function resolveBasketballRectCollision(prevX, prevY, x, y, vx, vy, radius, rect
     };
 }
 
-function basketballClearedFence(x, y, radius) {
-    const zone = BASKETBALL_FENCE_CLEAR_ZONE;
-    return (
-        x + radius >= zone.x &&
-        x - radius <= zone.x + zone.w &&
-        y >= zone.y &&
-        y <= zone.y + zone.h
-    );
-}
-
 function basketballShotVector(origin, target) {
     const dx = target.x - origin.x;
     const dy = target.y - origin.y;
@@ -419,17 +557,18 @@ function snapRect(rect) {
 
 function stageToCssPixels(point, rect) {
     return {
-        x: Math.round((point.x / STAGE_W) * (rect.width || STAGE_W)),
-        y: Math.round((point.y / STAGE_H) * (rect.height || STAGE_H)),
+        x: (point.x / STAGE_W) * (rect.width || STAGE_W),
+        y: (point.y / STAGE_H) * (rect.height || STAGE_H),
     };
 }
 
 function avatarCssSize(user) {
+    const animCreature = sanitizeAnimCreature(user?.anim_id);
     const spriteDef = user?.sprite_id ? SPRITES[user.sprite_id] : null;
     const spriteSize = spriteDef ? SPRITE_RENDER_SIZE[spriteDef.size] : 56;
     return {
-        width: user?.anim_id ? 96 : user?.avatar_url ? 42 : spriteSize,
-        height: user?.anim_id ? 112 : user?.avatar_url ? 46 : spriteSize,
+        width: animCreature ? 96 : user?.avatar_url ? 42 : spriteSize,
+        height: animCreature ? 112 : user?.avatar_url ? 46 : spriteSize,
     };
 }
 
@@ -542,6 +681,12 @@ export default function IsoWorld({
     const [worldReactions, setWorldReactions] = useState([]);
     const [hoveringWorldReaction, setHoveringWorldReaction] = useState(false);
     const isBasketballCourt = room?.theme === "basketball-court";
+    const isToxicVoid = room?.theme === "toxic-void";
+    const [fullVoid, setFullVoid] = useState(false);
+
+    useEffect(() => {
+        if (!isToxicVoid) setFullVoid(false);
+    }, [isToxicVoid]);
 
     const me = useMemo(
         () => users.find((u) => u.user_id === myId),
@@ -577,15 +722,20 @@ export default function IsoWorld({
         if (!node) return;
 
         const displayPoint = point || getAvatarDisplayPoint(u, nowMs);
-        const drift = liminalAvatarDrift(u, Date.now(), liminal);
+        const drift = liminalAvatarDrift(u, nowMs, liminal);
         const cssPoint = stageToAvatarCssPixels(
             { x: displayPoint.x + drift.x, y: displayPoint.y + drift.y },
             worldRect,
             u
         );
 
+        const safeCssPoint = {
+            x: Math.round(cssPoint.x * 4) / 4,
+            y: Math.round(cssPoint.y * 4) / 4,
+        };
+
         // Keep movement on the compositor while still snapping to whole pixels.
-        node.style.transform = `translate3d(${cssPoint.x}px, ${cssPoint.y}px, 0)`;
+        node.style.transform = `translate3d(${safeCssPoint.x}px, ${safeCssPoint.y}px, 0)`;
     }, [getAvatarDisplayPoint, liminal, worldRect]);
 
     const applyAvatarNodeTransforms = useCallback((items, nowMs = performance.now()) => {
@@ -1249,15 +1399,50 @@ export default function IsoWorld({
                 </div>
             )}
 
+            {isToxicVoid && (
+                <button
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setFullVoid((value) => !value);
+                    }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    className="font-pixel"
+                    data-testid="fullvoid-toggle"
+                    title="toggle full black void background"
+                    style={{
+                        position: "absolute",
+                        top: 8,
+                        left: 8,
+                        zIndex: 96,
+                        padding: "5px 9px",
+                        fontSize: 10,
+                        letterSpacing: "0.12em",
+                        background: fullVoid ? "#000" : "rgba(0,0,0,0.72)",
+                        color: fullVoid ? "#b3ff00" : "#ff003c",
+                        border: fullVoid ? "2px solid #b3ff00" : "2px solid #ff003c",
+                        boxShadow: fullVoid
+                            ? "0 0 10px rgba(179,255,0,0.72)"
+                            : "0 0 10px rgba(255,0,60,0.62)",
+                        textShadow: "0 0 5px currentColor",
+                        cursor: "pointer",
+                    }}
+                >
+                    {fullVoid ? "FULLVOID ON" : "FULLVOID"}
+                </button>
+            )}
+
             <div
-                className="absolute overflow-hidden"
+                className="absolute overflow-visible"
                 data-testid="iso-world-plane"
                 style={{
                     left: worldRect.left,
                     top: worldRect.top,
                     width: worldRect.width || "100%",
                     height: worldRect.height || "100%",
-                    backgroundImage: room?.bg_url ? `url(${room.bg_url})` : "none",
+                    backgroundColor: fullVoid ? "#000" : undefined,
+                    backgroundImage: fullVoid ? "none" : (room?.bg_url ? `url(${room.bg_url})` : "none"),
                     backgroundSize: "100% 100%",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
@@ -1274,6 +1459,8 @@ export default function IsoWorld({
                     />
                 )}
                 {liminal && <MemoLiminalPhase4Scene />}
+                {room?.theme === "jungle" && <JungleFog />}
+                    {room?.theme === "mars" && <MarsRover stageRect={worldRect} />}
 
             {/* YouTube communal screen overlay (only in Inspiration Theatre) */}
             {room?.theme === "inspiration-theatre" && (
@@ -1396,6 +1583,8 @@ export default function IsoWorld({
                 const isMe = u.user_id === myId;
                 const spriteDef = u.sprite_id ? SPRITES[u.sprite_id] : null;
                 const spriteSize = spriteDef ? SPRITE_RENDER_SIZE[spriteDef.size] : 56;
+                const renderAnimId = sanitizeAnimCreature(u.anim_id);
+                const avatarBoxSize = avatarCssSize(u);
                 const targetPoint = avatarRenderPoint(u);
                 const { x: renderX, y: renderY } = getAvatarDisplayPoint(u);
                 const creature = avatarCreature(u);
@@ -1420,12 +1609,16 @@ export default function IsoWorld({
                 const trailAnchor = flip ? "0%" : "100%";
                 const isWeirdbot = isWeirdbotUser(u);
                 const liminalDrift = liminalAvatarDrift(u, now, liminal);
-                const displayName = liminalDisplayName(u.nickname, u.user_id, now);
-                const displayX = renderX + liminalDrift.x;
-                const displayY = renderY + liminalDrift.y;
-                const displayCss = stageToAvatarCssPixels({ x: displayX, y: displayY }, worldRect, u);
-                const edgeScale = avatarEdgeScale(displayCss.x, worldRect);
-                const liminalCorner = liminalCornerShadow(displayX, displayY, liminal, STAGE_W, STAGE_H);
+                        const displayName = liminalDisplayName(u.nickname, u.user_id, now);
+                        const displayX = renderX + liminalDrift.x;
+                        const displayY = renderY + liminalDrift.y;
+                        const displayCss = stageToAvatarCssPixels({ x: displayX, y: displayY }, worldRect, u);
+                        const renderStanceBox = spriteFrameBox(renderCreature, renderStance, avatarBoxSize.width);
+                        const thoughtBubbleWidth = (renderStanceBox?.width || avatarBoxSize.width);
+                        const thoughtBubbleHeight = (renderStanceBox?.height || avatarBoxSize.height);
+                        const edgeScale = avatarEdgeScale(displayCss.x, worldRect);
+                        const liminalCorner = liminalCornerShadow(displayX, displayY, liminal, STAGE_W, STAGE_H);
+                        const thoughtBubbleBelow = displayY < 320 || displayCss.y - avatarBoxSize.height - 126 < 6;
                 const avatarFilter = [
                     liminalCorner.filter,
                     liminalDrift.filter || "drop-shadow(2px 2px 0 rgba(0,0,0,0.6))",
@@ -1455,16 +1648,16 @@ export default function IsoWorld({
                         data-user-id={u.user_id}
                         data-nickname={u.nickname}
                         data-stance={renderStance}
-                        data-anim-id={u.anim_id || ""}
+                        data-anim-id={renderAnimId || ""}
                         data-facing={facing}
                         data-liminal-corner-shadow={liminalCorner.strength ? liminalCorner.strength.toFixed(2) : "0"}
-                        style={{
-                            left: 0,
-                            top: 0,
-                            transform: `translate3d(${displayCss.x}px, ${displayCss.y}px, 0)`,
-                            pointerEvents: "none",
-                            transition: "none",
-                            willChange: "transform",
+                style={{
+                    left: 0,
+                    top: 0,
+                    transform: `translate3d(${displayCss.x}px, ${displayCss.y}px, 0)`,
+                    pointerEvents: "none",
+                    transition: "none",
+                    willChange: "transform",
                             filter: avatarFilter,
                             opacity: avatarOpacity,
                             zIndex: (quoteFresh || u.thought) ? 90 + Math.round((displayY / STAGE_H) * 10) : avatarZ,
@@ -1482,15 +1675,16 @@ export default function IsoWorld({
                             }}
                         >
                         {u.thought && (
-                            <ThoughtCloud
-                                text={u.thought}
-                                fullfunk={!!u.thought_fullfunk}
-                                offsetSide={isWeirdbot ? "center" : ((u.user_id || "").charCodeAt(0) % 2 === 0 ? "left" : "right")}
-                                fading={isWeirdbot}
-                                placeBelow={bubbleBelow}
-                                anchored={isWeirdbot}
-                                avatarSize={spriteSize}
-                            />
+                                <ThoughtCloud
+                                    text={u.thought}
+                                    fullfunk={!!u.thought_fullfunk}
+                                    offsetSide="right"
+                                    fading={isWeirdbot}
+                                    placeBelow={thoughtBubbleBelow}
+                                    anchored={isWeirdbot}
+                                    avatarWidth={thoughtBubbleWidth}
+                                    avatarHeight={thoughtBubbleHeight}
+                                />
                         )}
                         {quoteFresh && !u.thought && (
                             <QuoteBubble text={quoteFresh.text} fullfunk={!!quoteFresh.fullfunk} placeBelow={bubbleBelow} />
@@ -1565,9 +1759,9 @@ export default function IsoWorld({
                                         transform: flip ? "scaleX(-1)" : "none",
                                     }}
                                 />
-                            ) : u.anim_id ? (
+                            ) : renderAnimId ? (
                                 <AnimSprite
-                                    creature={u.anim_id}
+                                    creature={renderAnimId}
                                     state={renderStance}
                                     size={88}
                                     fps={fpsForStance(renderStance)}
@@ -1899,7 +2093,6 @@ const Basketball = React.memo(function Basketball({ ball, onScore, onDone }) {
             let vy = current.vy + BASKETBALL_GRAVITY * dt;
             let bounces = current.bounces;
             let scoredFlag = current.scored;
-            let behindFence = current.behindFence || basketballClearedFence(x, y, BASKETBALL_RADIUS);
 
             if (!scoredFlag && basketballScored(prevY, { ...current, x, y, vx, vy })) {
                 scoredFlag = true;
@@ -1911,7 +2104,7 @@ const Basketball = React.memo(function Basketball({ ball, onScore, onDone }) {
                 }
             }
 
-            if (!scoredFlag && !behindFence) {
+            if (!scoredFlag) {
                 const boardHit = resolveBasketballRectCollision(
                     prevX,
                     prevY,
@@ -1928,26 +2121,23 @@ const Basketball = React.memo(function Basketball({ ball, onScore, onDone }) {
                     vx = boardHit.vx;
                     vy = boardHit.vy;
                     bounces += 1;
-                    behindFence = false;
-                } else if (!behindFence) {
-                    for (const fence of BASKETBALL_FENCE_COLLIDERS) {
-                        const fenceHit = resolveBasketballRectCollision(
-                            prevX,
-                            prevY,
-                            x,
-                            y,
-                            vx,
-                            vy,
-                            BASKETBALL_RADIUS,
-                            fence
-                        );
-                        if (!fenceHit) continue;
-                        x = fenceHit.x;
-                        y = fenceHit.y;
-                        vx = fenceHit.vx;
-                        vy = fenceHit.vy;
+                } else {
+                    const rimHit = resolveBasketballRectCollision(
+                        prevX,
+                        prevY,
+                        x,
+                        y,
+                        vx,
+                        vy,
+                        BASKETBALL_RADIUS,
+                        BASKETBALL_RIM_COLLIDER
+                    );
+                    if (rimHit) {
+                        x = rimHit.x;
+                        y = rimHit.y;
+                        vx = rimHit.vx;
+                        vy = rimHit.vy;
                         bounces += 1;
-                        break;
                     }
                 }
             }
@@ -2102,6 +2292,7 @@ function PlacedTag({ tag }) {
     const yAnchor = customVertical
         ? (y < 150 ? "0%" : y > STAGE_H - 150 ? "-100%" : "-50%")
         : "-50%";
+    const imageUrl = tag?.image_url || tag?.imageUrl || null;
     const renderAsCustom = !!tag?.custom || !isPresetTag(safeText);
     return (
         <div
@@ -2122,7 +2313,21 @@ function PlacedTag({ tag }) {
             }}
             title={`${safeText} by ${tag.nickname || "someone"}`}
         >
-            {renderAsCustom ? (
+            {imageUrl ? (
+                <img
+                    src={imageUrl}
+                    alt={tag?.image_name || safeText}
+                    style={{
+                        height: Math.round(baseHeight * 1.45),
+                        maxWidth: Math.round(baseHeight * 2.4),
+                        width: "auto",
+                        imageRendering: "pixelated",
+                        display: "block",
+                        objectFit: "contain",
+                    }}
+                    draggable={false}
+                />
+            ) : renderAsCustom ? (
                 <FullfunkText text={safeText} size={Math.round(baseHeight)} vertical={customVertical} />
             ) : (
                 <img
@@ -2277,21 +2482,9 @@ function loadThoughtBubbleImage() {
     return thoughtBubbleImagePromise;
 }
 
-function thoughtMatteRedToTransparent(imageData) {
-    const { data } = imageData;
-    for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        const matteRed = r > 180 && g < 92 && b < 92 && r > g * 2.25 && r > b * 2.25;
-        const darkRed = r > 120 && g < 42 && b < 42 && r > g * 3 && r > b * 3;
-        if (matteRed || darkRed) data[i + 3] = 0;
-    }
-    return imageData;
-}
-
 function getThoughtBubbleCanvas(image, variant) {
-    if (thoughtBubbleCanvasCache.has(variant.id)) return thoughtBubbleCanvasCache.get(variant.id);
+    const cacheKey = `${variant.id}:${variant.x},${variant.y},${variant.w},${variant.h}`;
+    if (thoughtBubbleCanvasCache.has(cacheKey)) return thoughtBubbleCanvasCache.get(cacheKey);
 
     const frameCanvas = document.createElement("canvas");
     frameCanvas.width = variant.w;
@@ -2300,9 +2493,9 @@ function getThoughtBubbleCanvas(image, variant) {
     frameCtx.imageSmoothingEnabled = false;
     frameCtx.clearRect(0, 0, variant.w, variant.h);
     frameCtx.drawImage(image, variant.x, variant.y, variant.w, variant.h, 0, 0, variant.w, variant.h);
-    const keyed = thoughtMatteRedToTransparent(frameCtx.getImageData(0, 0, variant.w, variant.h));
+    const keyed = clearThoughtBubbleMatte(frameCtx.getImageData(0, 0, variant.w, variant.h));
     frameCtx.putImageData(keyed, 0, 0);
-    thoughtBubbleCanvasCache.set(variant.id, frameCanvas);
+    thoughtBubbleCanvasCache.set(cacheKey, frameCanvas);
     return frameCanvas;
 }
 
@@ -2418,17 +2611,28 @@ function ThoughtBubbleSprite({ variant, text, fullfunk, placeBelow, cloudScale =
     );
 }
 
-function ThoughtCloud({ text, fullfunk, offsetSide = "left", fading = false, placeBelow = false, anchored = false, avatarSize = 56 }) {
+function ThoughtCloud({
+    text,
+    fullfunk,
+    offsetSide = "right",
+    fading = false,
+    placeBelow = false,
+    anchored = false,
+    avatarSize = 56,
+    avatarWidth = avatarSize,
+    avatarHeight = avatarSize,
+}) {
     const raw = String(text || "");
     const t = raw;
     const variant = pickThoughtBubbleVariant(t, fullfunk);
     const scaleX = variant.renderW / variant.w;
     const cloudScale = Math.max(1, Math.min(2.4, thoughtBubbleFitScale(variant, t, fullfunk)));
     const anchorX = Math.round(variant.tailX * scaleX * cloudScale);
-    const headSideOffset = Math.round(clamp(avatarSize * 0.36, 18, 34));
-    const headVerticalOffset = Math.round(clamp(avatarSize * 0.42, 22, 44));
-    const topOffset = Math.round(clamp(avatarSize * 0.1, 4, 10));
-    const transformX = headSideOffset - anchorX;
+    const sideSign = offsetSide === "left" ? -1 : 1;
+    const headSideOffset = Math.round(clamp(avatarWidth * 0.6, 22, 64));
+    const headVerticalOffset = Math.round(clamp(avatarHeight * 0.28, 20, 42));
+    const belowOffset = Math.round(clamp(avatarHeight * 0.08, 4, 10));
+    const transformX = (sideSign * headSideOffset) - anchorX;
     return (
         <div
             data-testid="thought-bubble"
@@ -2437,10 +2641,12 @@ function ThoughtCloud({ text, fullfunk, offsetSide = "left", fading = false, pla
             data-place-below={placeBelow ? "true" : "false"}
             data-offset-side={offsetSide}
             data-anchored={anchored ? "true" : "false"}
+            data-head-side-offset={headSideOffset}
+            data-tail-anchor-x={anchorX}
             className={fading ? "thought-fading" : ""}
             style={{
                 position: "absolute",
-                ...(placeBelow ? { top: `${topOffset}px` } : { bottom: `calc(100% - ${headVerticalOffset}px)` }),
+                ...(placeBelow ? { top: `calc(100% + ${belowOffset}px)` } : { bottom: `calc(100% - ${headVerticalOffset}px)` }),
                 left: "50%",
                 transform: `translateX(${transformX}px)`,
                 pointerEvents: "none",

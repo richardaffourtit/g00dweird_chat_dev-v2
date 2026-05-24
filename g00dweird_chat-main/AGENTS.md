@@ -2,166 +2,102 @@
 
 ## Project Identity
 
-This project is **g00dweird chat**.
+This project is **g00dweird chat**: a strange, living, multi-world interactive chat experience made of browser rooms, isometric spaces, autonomous sprites, retro UI, weird props, ambient creatures, and world-specific moods.
 
-It is a strange, living, multi-world interactive chat experience made of different spaces, moods, aesthetics, mechanics, and characters.
+Do not treat the app as only one world or one aesthetic. Neoclassick is one thread. The platform should support many distinct worlds without forcing them to behave or feel the same.
 
-Do **not** treat the project as only "Neoclassick world."
+The app should feel playful, uncanny, lo-fi, reactive, nostalgic, alive, expressive, sometimes funny, sometimes eerie, and never bland or generic.
 
-Neoclassick may be one world, one influence, or one aesthetic thread, but the broader project includes **multiple worlds** and should be built as a flexible system that can support many distinct environments.
+## Current Repo Map
 
-The app should feel:
-- playful
-- uncanny
-- lo-fi
-- weird
-- reactive
-- nostalgic
-- alive
-- expressive
-- sometimes funny
-- sometimes eerie
-- never bland or generic
+Work from this project root unless explicitly told otherwise:
 
-Think:
-- retro computer interfaces
-- isometric spaces
-- browser worlds
-- chatroom worlds
-- surreal environments
-- autonomous sprites
-- ambient creatures
-- strange props
-- living UI
-- different themed zones or worlds
-- world-specific interactions and moods
+```text
+g00dweird_chat_dev/
+  g00dweird_chat-main/             app source of truth
+    backend/                       backend services and APIs
+    frontend/                      frontend source of truth
+      src/                         React app code
+      public/                      runtime-served public assets
+      public/assets/               runtime-ready app assets
+      public/source-assets/        raw/imported/source art
+      public/tools/                standalone dev tools
+      public/assets/cleaned-sprites/ generated sprite outputs
+      scripts/                     frontend asset/tooling scripts
+    scripts/                       project-level tooling scripts
+    tests/                         project-level tests
+    docs/                          plans, specs, notes
+    reports/                       generated reports
+  viral-g00dweird-video/           separate video-production workspace, not app runtime
+```
 
-## Core Product Direction
+Do not recreate root-level `frontend/`, root-level `assets/`, or root-level `index.html` for the app. The active frontend lives at `g00dweird_chat-main/frontend`.
 
-Build for **all worlds in g00dweird chat**, not just one.
+The video workspace is separate. Do not include `viral-g00dweird-video/` in app work, commits, builds, asset paths, or runtime assumptions unless explicitly asked.
 
-The architecture should make it easy to:
-- create new worlds
-- define different world aesthetics
-- support different background scenes
-- load different entity sets per world
-- support world-specific sprites and behaviors
-- support world-specific interaction rules
-- support different UI overlays or modes
-- add future worlds without rewriting core systems
-
-Every system should be evaluated with this question:
-
-**Does this help the entire g00dweird chat platform support multiple worlds more cleanly and creatively?**
-
-## Working Rules
-
-- Work inside the developer project unless explicitly told otherwise.
-- Do not rely on external drive paths at runtime.
-- Do not make huge rewrites unless the current structure is blocking progress.
-- Preserve what already works.
-- Prefer focused, reviewable changes.
-- Make the app better in visible ways, not just cleaner internally.
-- Improve foundations in ways that benefit multiple worlds when possible.
-- Do not ask for constant clarification. Make strong, reasonable decisions and continue.
-- If something is risky, document the risk and choose the safest useful implementation.
-
-## Codex Behavior
+## Default Workflow
 
 When given a task:
-1. Inspect the existing app structure first.
-2. Identify which systems are global and which are world-specific.
-3. Make a brief plan.
-4. Execute the plan.
-5. Run available validation.
-6. Summarize exactly what changed.
 
-Prefer action over long explanation.
+1. Inspect the relevant existing structure first.
+2. Identify whether the change belongs to platform/shared code, world-specific code, asset organization, or tooling.
+3. Make a brief plan for non-trivial work.
+4. Execute with focused, reviewable changes.
+5. Run the smallest validation that proves the change works.
+6. Summarize exactly what changed and what was verified.
 
-When editing, distinguish between:
-- **global engine/platform code**
-- **shared systems**
-- **world-specific content**
-- **asset/content organization**
+Prefer action over long explanation. Do not ask for constant clarification; make strong, reasonable decisions and continue. If a decision is risky, document the risk and choose the safest useful implementation.
 
-Do not hardcode one world's assumptions into shared systems.
+Do not commit or push unless explicitly asked. The repo may contain large generated assets and local production work nearby.
+
+## Creative Standard
+
+Every user-facing change should add at least one of these:
+
+- a visible weird, expressive, funny, eerie, or tactile behavior
+- a reusable primitive that makes future weirdness easier
+- a clearer world-specific mood, interaction, or visual identity
+- a reduction in friction for creating, testing, or arranging worlds and sprites
+
+Before building, ask:
+
+**What should feel alive, surprising, funny, eerie, or reactive here?**
+
+Small details matter: hover reactions, cursor behavior, idle animation, flicker, tiny rituals, subtle movement, sprite personality, responsive props, weird UI toys, and controlled randomness can make the world feel alive.
+
+Randomness should feel intentional, not chaotic. Use deterministic or seeded randomness when it helps debugging.
 
 ## Architecture Direction
 
-Do not build the app around one giant static JSON file.
-
-Do not hardwire the engine around a single world.
+Build for all worlds in g00dweird chat, not just the current scene.
 
 Prefer:
+
 - small modular systems
-- typed registries where helpful
-- reusable sprite helpers
+- reusable sprite and animation helpers
 - lightweight entity definitions
 - behavior modules for autonomous sprites
-- clean asset manifests
-- separate systems for rendering, input, world state, animation, asset loading, and world configuration
-- a clear distinction between shared engine logic and per-world data/content
+- asset manifests where they reduce hardcoding
+- clear separation between rendering, input, world state, animation, asset loading, and world configuration
+- registries/modules for world definitions and shared primitives
 
 Avoid:
-- massive hardcoded world files
-- tangled state logic
-- repeated sprite animation code
-- unnecessary React re-renders
+
+- giant hardcoded world files
+- tangled shared/world-specific state
+- repeated sprite animation logic
+- unnecessary React re-renders in animation-heavy surfaces
 - fragile absolute paths
 - external-drive runtime dependencies
 - bloated global state
-- clunky JSON-only architecture
-- assumptions that every world behaves like Neoclassick
+- assuming every world behaves like Neoclassick
 
-## World System Direction
+JSON is fine for content manifests. Do not make JSON the whole architecture when behavior, rendering, or interaction logic needs real modules.
 
-The platform should support multiple worlds cleanly.
+## Shared vs World-Specific
 
-A good world system should make it easy to define:
-- world id / slug
-- world name
-- world visual style
-- background image or scene
-- world-specific entities
-- ambient effects
-- collision/navigation rules if needed
-- interactive objects
-- music/sound hooks if supported
-- cursor rules if world-specific
-- event behaviors
-- UI overlays or interface framing
+Keep shared systems reusable:
 
-Worlds may vary in:
-- aesthetic
-- tone
-- density
-- animation style
-- interaction model
-- props
-- character population
-- surreal logic
-
-Some worlds may be:
-- isometric
-- screen-based
-- room-like
-- browser-like
-- theatrical
-- celestial
-- chat-native
-- abstract
-- heavily retro
-- minimally designed
-- crowded and alive
-- sparse and eerie
-
-Design systems that allow this variation.
-
-## Shared vs World-Specific Logic
-
-Whenever possible, separate:
-
-### Shared systems
 - renderer
 - animation engine
 - input handling
@@ -172,132 +108,146 @@ Whenever possible, separate:
 - world loading
 - interaction primitives
 
-### World-specific content
+Keep world-specific content close to the world:
+
 - backgrounds
 - props
 - sprite sets
 - behavior parameters
 - event rules
-- themed interactions
 - environmental effects
-- dialogue flavor or UI flavor if applicable
+- dialogue or UI flavor
+- interaction style
+- cursor rules
+- sound/music hooks, when present
 
-Do not bury world-specific logic inside shared engine code unless absolutely necessary.
+Do not bury world-specific behavior inside shared engine code unless the current structure makes that unavoidable. Do not add global avatar/sprite assets into a world as ambient content unless explicitly requested; prefer elements that match the scene's visual language.
 
-Do not add global avatar/sprite assets into a world as ambient content unless explicitly requested. Prefer world-specific elements and assets that match the scene's existing visual language.
+## World Contract
 
-## Sprite / Entity System
+A world should be easy to define, load, inspect, and extend. When adding or refactoring world support, aim for a clear contract with:
+
+- id / slug
+- display name
+- visual style notes
+- background image or scene component
+- entity definitions
+- ambient behavior rules
+- interactive objects
+- collision/navigation rules, if needed
+- UI overlay or interface framing, if world-specific
+- cursor rules, if world-specific
+- music/sound hooks, if supported
+- debug affordances, if useful
+
+Worlds may be isometric, screen-based, room-like, browser-like, theatrical, celestial, chat-native, abstract, crowded, sparse, loud, quiet, retro, or eerie. The shared system should allow this variation.
+
+## Sprite And Entity Rules
 
 Sprites should be easy to add, test, animate, and reuse across worlds.
 
-A good sprite system should support:
-- idle animations
-- walking animations
-- autonomous behavior
-- click / hover reactions
-- layered props
+Support where practical:
+
+- idle, walk, run, jump, float, hurt, emote, and special animations
+- click and hover reactions
 - frame timing
-- hitboxes
+- hitboxes and pivots
 - scale controls
-- z-index or depth sorting
-- debug visualization where useful
+- z-index/depth sorting
+- debug visualization
+- autonomous behavior
 - world-specific animation sets
 
-Entity behavior should live close to the entity or in reusable behavior modules.
+Entity behavior should live close to the entity or in reusable behavior modules. Good behavior primitives include wandering, floating, blinking, pulsing, thinking, reacting to cursor, avoiding objects, drifting, rare actions, and world-specific special events.
 
-Examples:
-- wandering
-- floating
-- blinking
-- pulsing
-- praying
-- thinking
-- bouncing
-- reacting to cursor
-- avoiding other objects
-- drifting across the world
-- performing occasional rare actions
-- world-specific special behaviors
+## Asset Lifecycle
 
-The entity system should make it easy to reuse patterns across worlds without forcing all worlds to feel the same.
+Keep runtime assets inside the project. Do not depend on external drive paths.
 
-## World Behavior
-
-Each world should feel alive even when the user is idle.
-
-Add ambient behavior when appropriate:
-- clouds drifting
-- moon faces changing
-- browser windows flickering
-- characters wandering
-- thought bubbles appearing
-- strange props animating
-- cursors reacting
-- UI objects blinking
-- background creatures doing tiny rituals
-- random but controlled world events
-- world-specific idle phenomena
-
-Randomness should feel intentional, not chaotic.
-
-Use deterministic or seeded randomness if it helps debugging.
-
-Different worlds can have different ambient logic and different levels of activity.
-
-## Interaction Direction
-
-Interactions should feel playful and weird.
-
-Prefer:
-- hover states
-- click reactions
-- custom cursors
-- draggable or pushable objects
-- tiny sound/visual feedback where supported
-- browser-window interactions
-- weird UI toys
-- object-specific reactions
-- hidden surprises
-- world-specific interaction rules
-
-Avoid generic app-feeling interactions unless they serve the world.
-
-Interaction systems should be reusable, but worlds should be free to express different interaction styles.
-
-## Asset Rules
-
-Assets may come from:
-- generated sprite sheets
-- uploaded files
-- copied external drive folders
-- project-local art
-- developer-side imports
-
-Rules:
-- Keep runtime assets inside the project.
-- Do not depend on external drive paths.
-- Do not rename files unnecessarily.
-- Organize assets clearly by type and/or by world.
-- Preserve source filenames when practical.
-- Add notes when assets are moved from uploaded or external locations.
-- Keep raw, rotoscope, processed, and runtime-ready assets distinguishable when useful.
-
-Suggested structure:
+Use the current structure:
 
 ```text
-assets/
-  shared/
-    sprites/
-    ui/
-    cursors/
-    effects/
-  worlds/
-    world-name/
-      backgrounds/
-      sprites/
-      props/
-      ui/
-      data/
-  raw/
-  processed/
+g00dweird_chat-main/frontend/public/
+  assets/                 runtime-ready public app assets
+    cleaned-sprites/      generated cleaned sprite sheets and descriptors
+    world-icons/          runtime world picker icons
+    multitaire-cards/     runtime card faces
+    effects/              runtime effects
+  source-assets/          raw/imported/source art for processing
+    avatar/
+    sheets/
+    worlds/
+    debug/
+  tools/                  standalone browser tools
 ```
+
+Preserve source filenames when practical. Do not rename files unnecessarily. Keep raw/imported, processed/generated, and runtime-ready assets distinguishable.
+
+When moving assets from uploaded, external, or local scratch locations, put them in the right app-local folder and note the move in docs or the final summary when it affects future work.
+
+Do not place app runtime assets in root-level `assets/`. Do not place app code in root-level `frontend/`.
+
+## Performance Guardrails
+
+Animated worlds can get expensive quickly.
+
+Prefer:
+
+- stable props and memoized derived data where useful
+- refs and `requestAnimationFrame` for high-frequency animation state
+- CSS animation for simple loops
+- bounded timers and cleanup for ambient behavior
+- sprite manifests over repeated path construction
+- lightweight entity objects
+
+Avoid:
+
+- pushing every animation tick through React state
+- recreating large arrays/objects on every render
+- unbounded random timers
+- fetching manifests repeatedly
+- duplicating large asset sets
+
+## Validation
+
+Run the smallest check that proves the change.
+
+Frontend:
+
+```bash
+cd g00dweird_chat-main/frontend
+npm run build
+```
+
+Sprite tooling:
+
+```bash
+cd g00dweird_chat-main/frontend
+npm run sprites
+```
+
+Backend/project tests when relevant:
+
+```bash
+cd g00dweird_chat-main
+pytest
+```
+
+Use browser verification for visible frontend changes. The local dev server usually runs from:
+
+```text
+http://127.0.0.1:3000
+```
+
+If validation cannot be run, say why and name the remaining risk.
+
+## Practical Editing Rules
+
+- Preserve what already works.
+- Prefer focused, reviewable changes.
+- Make visible improvements when the task is user-facing.
+- Improve foundations when the foundation clearly benefits multiple worlds.
+- Do not make huge rewrites unless the current structure is blocking progress.
+- Do not rely on external drive paths at runtime.
+- Do not introduce new top-level project folders without a clear reason.
+- Keep generated folders, dependencies, caches, and separated video work out of app commits unless explicitly requested.

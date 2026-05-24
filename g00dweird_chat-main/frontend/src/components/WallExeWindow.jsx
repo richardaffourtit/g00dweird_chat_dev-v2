@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import Win95Window from "./Win95Window";
 import { drawThinGlyphText } from "../lib/wallGlyphs";
+import { saveUserTag } from "../lib/tags";
 
 const WALL_W = 960;
 const WALL_H = 560;
@@ -49,13 +50,6 @@ const PALETTE = [
     "#00d5ff", "#0074ff", "#4f37ff", "#b24dff", "#ffffff", "#111111",
     "#7b2cff", "#ff2f92", "#7c3f16", "#755d28", "#b28b27", "#0f6f4d",
     "#1e6da8", "#132b73", "#a8a8a8", "#c0c0c0",
-];
-
-const FAKE_ARTISTS = [
-    ["PIXELPHANT", "#ff6ec7"], ["MINITAGER", "#c28b44"], ["GRAFFITI-G", "#00d5ff"],
-    ["DRIPMASTER", "#7b2cff"], ["VAPORWAVY", "#ff7a00"], ["BYTEKING", "#b3ff00"],
-    ["LUNA_TAGZ", "#b24dff"], ["OLD_SKOOL", "#8b6f4d"], ["NEONNOIR", "#00ff88"],
-    ["STICKY-ICKY", "#00aaff"], ["WALLGHOST", "#eaeaea"],
 ];
 
 function clamp(value, min, max) {
@@ -490,22 +484,14 @@ function useWallArtists(users, currentUser) {
         [currentUser, ...(users || [])].filter(Boolean).forEach((u) => {
             byId.set(u.user_id || u.nickname, u);
         });
-        const live = [...byId.values()].map((u, index) => ({
+        return [...byId.values()].map((u, index) => ({
             id: u.user_id || u.nickname,
             name: String(u.nickname || "artist").replace(/\s+/g, "_").toUpperCase(),
-            color: index === 0 ? "#ff6ec7" : "#00ff88",
+            color: u.user_id === currentUser?.user_id ? "#ff6ec7" : String(u.nickname || "").toLowerCase().includes("weirdbot") ? "#b3ff00" : "#00ff88",
             avatarUrl: u.avatar_url || null,
             animId: u.anim_id || null,
             current: u.user_id === currentUser?.user_id,
-        }));
-        const filler = FAKE_ARTISTS.map(([name, color], index) => ({
-            id: `fake-${name}`,
-            name,
-            color,
-            fake: true,
-            animId: ["ghost", "cat", "robot", "slime", "alien"][index % 5],
-        }));
-        return [...live, ...filler].slice(0, 12);
+        })).slice(0, 12);
     }, [currentUser, users]);
 }
 
@@ -1369,12 +1355,13 @@ export default function WallExeWindow({
             setStatus("SPRAYING STENCIL");
             return;
         }
-        if (tool === "select") {
+        if (tool === "select" || tool === "snapshot") {
             dragStartRef.current = point;
             sprayStrokeRef.current = null;
             setSelection({ x: point.x, y: point.y, w: 0, h: 0 });
             drawingRef.current = true;
             e.currentTarget.setPointerCapture?.(e.pointerId);
+            setStatus(tool === "snapshot" ? "DRAG SNAPSHOT AREA" : "SELECTING");
             return;
         }
         if (tool !== "spray" && tool !== "erase" && tool !== "pen") return;
@@ -1394,7 +1381,7 @@ export default function WallExeWindow({
             return;
         }
         if (!drawingRef.current) return;
-        if (tool === "select") {
+        if (tool === "select" || tool === "snapshot") {
             const start = dragStartRef.current || point;
             setSelection({ x: start.x, y: start.y, w: point.x - start.x, h: point.y - start.y });
             return;
@@ -1415,9 +1402,18 @@ export default function WallExeWindow({
         if (!drawingRef.current) return;
         drawingRef.current = false;
         e.currentTarget.releasePointerCapture?.(e.pointerId);
+        if (tool === "snapshot") {
+            const end = pointFromEvent(e);
+            const start = dragStartRef.current || end;
+            const rect = { x: start.x, y: start.y, w: end.x - start.x, h: end.y - start.y };
+            setSelection(rect);
+            saveSnapshotArea(rect);
+        }
         dragStartRef.current = null;
         sprayStrokeRef.current = null;
-        setStatus(tool === "select" ? "SELECTION READY" : tool === "stencil" ? "STENCIL READY" : "READY");
+        if (tool !== "snapshot") {
+            setStatus(tool === "select" ? "SELECTION READY" : tool === "stencil" ? "STENCIL READY" : "READY");
+        }
         scheduleSave();
     };
 
@@ -1651,6 +1647,45 @@ export default function WallExeWindow({
         return canvas.toDataURL("image/png");
     };
 
+    const normalizedSelection = (rect = selection) => {
+        if (!rect) return null;
+        const x = Math.round(clamp(Math.min(rect.x, rect.x + rect.w), 0, WALL_W));
+        const y = Math.round(clamp(Math.min(rect.y, rect.y + rect.h), 0, WALL_H));
+        const w = Math.round(clamp(Math.abs(rect.w), 0, WALL_W - x));
+        const h = Math.round(clamp(Math.abs(rect.h), 0, WALL_H - y));
+        return w >= 8 && h >= 8 ? { x, y, w, h } : null;
+    };
+
+    const saveSnapshotArea = (rect = selection) => {
+        const marksCanvas = canvasRef.current;
+        const box = normalizedSelection(rect);
+        if (!marksCanvas || !box) {
+            setStatus("DRAG A BIGGER SNAPSHOT AREA");
+            return;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = box.w;
+        canvas.height = box.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.imageSmoothingEnabled = false;
+        ctx.clearRect(0, 0, box.w, box.h);
+        ctx.drawImage(marksCanvas, box.x, box.y, box.w, box.h, 0, 0, box.w, box.h);
+        const dataUrl = canvas.toDataURL("image/png");
+        try {
+            const tag = saveUserTag({
+                dataUrl,
+                name: `Wall snap ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
+                width: box.w,
+                height: box.h,
+            });
+            setStatus(tag ? "SNAPSHOT SAVED TO SPRAYTOOL USER TAGS" : "SNAPSHOT SAVE FAILED");
+            if (tag) toast.success("snapshot saved to SprayTool", { description: "open SprayTool.exe > user tags" });
+        } catch {
+            setStatus("SNAPSHOT TOO BIG");
+            toast.error("snapshot too big for local storage");
+        }
+    };
+
     const saveSnapshot = async () => {
         const dataUrl = await composeSnapshot();
         if (!dataUrl) return;
@@ -1723,7 +1758,11 @@ export default function WallExeWindow({
                             const onClick = item.id === "upload"
                                 ? () => fileInputRef.current?.click()
                                 : item.id === "snapshot"
-                                    ? saveSnapshot
+                                    ? () => {
+                                        setTool("snapshot");
+                                        setSelection(null);
+                                        setStatus("SNAPSHOT: CLICK + DRAG AREA");
+                                    }
                                     : item.id === "clear"
                                         ? clearCanvas
                                         : () => setTool(item.id);
@@ -2139,7 +2178,7 @@ export default function WallExeWindow({
                     <div className="flex gap-2 p-2 overflow-x-auto" data-testid="wall-active-artists">
                         {artists.map((artist) => (
                             <div key={artist.id} className="w95-bevel-inset relative p-1 text-center" style={{ width: 76, flex: "0 0 auto", background: "#d4d0c8" }}>
-                                <div className="absolute" style={{ right: 3, top: 3, width: 8, height: 8, background: artist.fake ? "#9cff00" : "#00ff55", border: "1px solid #063" }} />
+                                <div className="absolute" style={{ right: 3, top: 3, width: 8, height: 8, background: "#00ff55", border: "1px solid #063" }} />
                                 <div style={{ width: 58, height: 58, margin: "0 auto", background: artist.color, border: "2px solid #000", overflow: "hidden", display: "grid", placeItems: "center" }}>
                                     {artist.avatarUrl ? (
                                         <img src={artist.avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", imageRendering: "pixelated" }} draggable={false} />

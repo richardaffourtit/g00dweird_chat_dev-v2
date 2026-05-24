@@ -1,0 +1,71 @@
+{
+  "id": "spray-sources-tags1",
+  "source": "frontend/public/spray/sources/tags1.png",
+  "outputSheet": "frontend/public/assets/cleaned-sprites/spray-sources-tags1.png",
+  "frameWidth": 750,
+  "frameHeight": 750,
+  "frameCount": 2,
+  "fps": 8,
+  "loop": true,
+  "pivot": {
+    "x": 0.5,
+    "y": 0.85
+  },
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 750,
+      "h": 750,
+      "bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 750,
+        "h": 750
+      },
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "w": 750,
+        "h": 750
+      },
+      "hash": "1fea24f07712a377d7cea932b5d818afa22f659681f0eee08b8e7f2088c097c8",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 562500,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 1,
+      "x": 750,
+      "y": 0,
+      "w": 750,
+      "h": 750,
+      "bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 750,
+        "h": 750
+      },
+      "sourceRect": {
+        "x": 0,
+        "y": 750,
+        "w": 750,
+        "h": 750
+      },
+      "hash": "1d774f28030e9978463bd06ba6fded4b573fc2f7dbccaa7a23da7d9fdb8a3ace",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 562500,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    }
+  ],
+  "warnings": []
+}

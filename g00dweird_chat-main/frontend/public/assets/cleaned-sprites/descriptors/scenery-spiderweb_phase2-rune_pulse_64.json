@@ -1,0 +1,241 @@
+{
+  "id": "scenery-spiderweb_phase2-rune_pulse_64",
+  "source": "frontend/public/scenery/spiderweb_phase2/rune_pulse_64.png",
+  "outputSheet": "frontend/public/assets/cleaned-sprites/scenery-spiderweb_phase2-rune_pulse_64.png",
+  "frameWidth": 33,
+  "frameHeight": 33,
+  "frameCount": 8,
+  "fps": 8,
+  "loop": true,
+  "pivot": {
+    "x": 0.5,
+    "y": 0.85
+  },
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 33,
+      "h": 33,
+      "bbox": {
+        "x": 22,
+        "y": 22,
+        "w": 21,
+        "h": 21
+      },
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "4c9edd26fe3888881c8821dfb3ec3184eae24df90e0d7292ee57e9c7a71c47a5",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 124,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 1,
+      "x": 33,
+      "y": 0,
+      "w": 33,
+      "h": 33,
+      "bbox": {
+        "x": 20,
+        "y": 20,
+        "w": 25,
+        "h": 25
+      },
+      "sourceRect": {
+        "x": 64,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "45a85abf1fcacc0ec5dad7bf7305b4d85e150114c0791dbd0bf4bfc7dd47fbdb",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 140,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 2,
+      "x": 66,
+      "y": 0,
+      "w": 33,
+      "h": 33,
+      "bbox": {
+        "x": 18,
+        "y": 18,
+        "w": 29,
+        "h": 29
+      },
+      "sourceRect": {
+        "x": 128,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "08ada2a6be7747a7068a6399596c110c09e8fc5a381a03679d1905e399800370",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 160,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 3,
+      "x": 99,
+      "y": 0,
+      "w": 33,
+      "h": 33,
+      "bbox": {
+        "x": 20,
+        "y": 20,
+        "w": 25,
+        "h": 25
+      },
+      "sourceRect": {
+        "x": 192,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "45a85abf1fcacc0ec5dad7bf7305b4d85e150114c0791dbd0bf4bfc7dd47fbdb",
+      "duplicateOf": 1,
+      "warnings": [
+        "duplicate-frame"
+      ],
+      "visiblePixels": 140,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 4,
+      "x": 132,
+      "y": 0,
+      "w": 33,
+      "h": 33,
+      "bbox": {
+        "x": 22,
+        "y": 22,
+        "w": 21,
+        "h": 21
+      },
+      "sourceRect": {
+        "x": 256,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "4c9edd26fe3888881c8821dfb3ec3184eae24df90e0d7292ee57e9c7a71c47a5",
+      "duplicateOf": 0,
+      "warnings": [
+        "duplicate-frame"
+      ],
+      "visiblePixels": 124,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 5,
+      "x": 165,
+      "y": 0,
+      "w": 33,
+      "h": 33,
+      "bbox": {
+        "x": 24,
+        "y": 24,
+        "w": 17,
+        "h": 17
+      },
+      "sourceRect": {
+        "x": 320,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "6fbb2c54aafe70affed19ce379316400331b723de36e3b5860ae951d235f91ba",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 84,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 6,
+      "x": 198,
+      "y": 0,
+      "w": 33,
+      "h": 33,
+      "bbox": {
+        "x": 26,
+        "y": 26,
+        "w": 13,
+        "h": 13
+      },
+      "sourceRect": {
+        "x": 384,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "c5e74cfd19307a647126dabb6cf42b9f560a76abbdd786ce79b9dd62a87a7f84",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 7,
+      "x": 231,
+      "y": 0,
+      "w": 33,
+      "h": 33,
+      "bbox": {
+        "x": 24,
+        "y": 24,
+        "w": 17,
+        "h": 17
+      },
+      "sourceRect": {
+        "x": 448,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "6fbb2c54aafe70affed19ce379316400331b723de36e3b5860ae951d235f91ba",
+      "duplicateOf": 5,
+      "warnings": [
+        "duplicate-frame"
+      ],
+      "visiblePixels": 84,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    }
+  ],
+  "warnings": [
+    "duplicate-frame"
+  ]
+}

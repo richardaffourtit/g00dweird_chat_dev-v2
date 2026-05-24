@@ -13,6 +13,8 @@ import GuestbookWindow from "./GuestbookWindow";
 import SprayWindow from "./SprayWindow";
 import WallExeWindow from "./WallExeWindow";
 import YouTubeWindow from "./YouTubeWindow";
+import MultitaireWindow from "./MultitaireWindow";
+import { sanitizeAnimCreature } from "./AnimSprite";
 
 function useIsMobile(bp = 640) {
     const [m, setM] = useState(typeof window !== "undefined" && window.innerWidth < bp);
@@ -86,6 +88,7 @@ export default function Desktop({ user, onLogout }) {
         guestbook: false,
         spray: false,
         wall: false,
+        multitaire: false,
         youtube: false,
     });
     // Per-window focus nonce — incremented on every "open" request so that
@@ -101,6 +104,7 @@ export default function Desktop({ user, onLogout }) {
     // Spray config
     const [spraySelTag, setSpraySelTag] = useState("GOOD");
     const [sprayIsCustom, setSprayIsCustom] = useState(false);
+    const [sprayUserTag, setSprayUserTag] = useState(null);
     const [spraySize, setSpraySize] = useState(1.0);
     const [sprayActive, setSprayActive] = useState(false);
 
@@ -143,8 +147,9 @@ export default function Desktop({ user, onLogout }) {
         }
         const savedSprite = localStorage.getItem("gw_sprite");
         if (savedSprite) setSpriteId(savedSprite);
-        const savedAnim = localStorage.getItem("gw_anim");
+        const savedAnim = sanitizeAnimCreature(localStorage.getItem("gw_anim"));
         if (savedAnim) setAnimId(savedAnim);
+        else localStorage.removeItem("gw_anim");
         const savedStance = localStorage.getItem("gw_rest_stance");
         if (savedStance) setRestStance(savedStance);
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -254,9 +259,13 @@ export default function Desktop({ user, onLogout }) {
     };
 
     const pickAnim = (id) => {
-        setAnimId(id);
-        localStorage.setItem("gw_anim", id);
-        socket.send({ type: "stance", stance: restStance || "idle" });
+        const cleanId = sanitizeAnimCreature(id);
+        if (!cleanId) return;
+        setRestStance("idle");
+        setAnimId(cleanId);
+        localStorage.setItem("gw_anim", cleanId);
+        localStorage.setItem("gw_rest_stance", "idle");
+        socket.send({ type: "stance", stance: "idle" });
         clearAvatar();
     };
 
@@ -300,6 +309,8 @@ export default function Desktop({ user, onLogout }) {
             room_id: activeRoom?.id,
             tag: spraySelTag,
             custom: sprayIsCustom,
+            image_url: sprayUserTag?.dataUrl || null,
+            image_name: sprayUserTag?.name || null,
             x, y, rot,
             scale: spraySize,
         });
@@ -317,6 +328,7 @@ export default function Desktop({ user, onLogout }) {
         active: sprayActive,
         tag: spraySelTag,
         custom: sprayIsCustom,
+        image_url: sprayUserTag?.dataUrl || null,
         size: spraySize,
     };
 
@@ -332,6 +344,7 @@ export default function Desktop({ user, onLogout }) {
         if (openWindows.guestbook) entries.push({ key: "guestbook", label: "Guestbook" });
         if (openWindows.spray) entries.push({ key: "spray", label: "SprayTool" });
         if (openWindows.wall) entries.push({ key: "wall", label: "WALL" });
+        if (openWindows.multitaire) entries.push({ key: "multitaire", label: "MULTITAIRE.exe" });
         if (openWindows.youtube) entries.push({ key: "youtube", label: "Theatre" });
         return entries;
     }, [openWindows, activeRoom]);
@@ -353,6 +366,7 @@ export default function Desktop({ user, onLogout }) {
                 <DesktopIcon testId="icon-sprite" label="Sprites" glyph="☻" color="#b3ff00" onDoubleClick={() => toggle("sprite", true)} />
                 <DesktopIcon testId="icon-spray" label="SprayTool" glyph="※" color="#ff8844" onDoubleClick={openSpray} />
                 <DesktopIcon testId="icon-wall" label="WALL" glyph="▥" color="#b24dff" onDoubleClick={() => toggle("wall", true)} />
+                <DesktopIcon testId="icon-multitaire" label="MULTITAIRE" glyph="♠" color="#7f2ca8" onDoubleClick={() => toggle("multitaire", true)} />
                 <DesktopIcon testId="icon-jukebox" label="Jukebox" glyph="♪" color="#00ffff" onDoubleClick={() => toggle("jukebox", true)} />
                 <DesktopIcon testId="icon-video" label="Video Wall" glyph="▶" color="#ff8844" onDoubleClick={() => toggle("video", true)} />
                 <DesktopIcon testId="icon-youtube" label="Theatre" glyph="▶" color="#ff0033" onDoubleClick={() => toggle("youtube", true)} />
@@ -450,7 +464,7 @@ export default function Desktop({ user, onLogout }) {
                 <WorldPicker rooms={rooms} activeRoomId={activeRoom?.id}
                     onPick={pickRoom}
                     onClose={() => toggle("worlds", false)}
-                    initialX={typeof window !== "undefined" ? Math.max(120, window.innerWidth - 400) : 900}
+                    initialX={typeof window !== "undefined" ? Math.max(16, Math.min(120, window.innerWidth - 476)) : 120}
                     initialY={80}
                     requestFocus={focusNonces.worlds || 0} />
             )}
@@ -483,10 +497,13 @@ export default function Desktop({ user, onLogout }) {
                     active={sprayActive}
                     onToggleActive={() => setSprayActive((s) => !s)}
                     selectedTag={spraySelTag}
+                    selectedTagImageUrl={sprayUserTag?.dataUrl || null}
+                    selectedTagName={sprayUserTag?.name || null}
                     isCustom={sprayIsCustom}
                     customText={sprayIsCustom ? spraySelTag : ""}
-                    onPickPreset={(w) => { setSpraySelTag(w); setSprayIsCustom(false); }}
-                    onSetCustom={(t) => { setSpraySelTag(t); setSprayIsCustom(true); }}
+                    onPickPreset={(w) => { setSpraySelTag(w); setSprayIsCustom(false); setSprayUserTag(null); }}
+                    onPickUserTag={(tag) => { setSpraySelTag(tag.id); setSprayIsCustom(true); setSprayUserTag(tag); }}
+                    onSetCustom={(t) => { setSpraySelTag(t); setSprayIsCustom(true); setSprayUserTag(null); }}
                     tagSize={spraySize}
                     onSetSize={setSpraySize}
                     onClearAll={clearAllTags}
@@ -505,6 +522,17 @@ export default function Desktop({ user, onLogout }) {
                     initialX={mobile ? 0 : 88}
                     initialY={mobile ? 0 : 58}
                     requestFocus={focusNonces.wall || 0}
+                />
+            )}
+
+            {openWindows.multitaire && (
+                <MultitaireWindow
+                    user={user}
+                    users={socket.users}
+                    onClose={() => toggle("multitaire", false)}
+                    initialX={mobile ? 0 : 170}
+                    initialY={mobile ? 0 : 72}
+                    requestFocus={focusNonces.multitaire || 0}
                 />
             )}
 
@@ -534,6 +562,7 @@ export default function Desktop({ user, onLogout }) {
                         <StartItem label="Sprites" onClick={() => { toggle("sprite", true); setStartOpen(false); }} testId="start-sprite" />
                         <StartItem label="Spray Tool" onClick={() => { openSpray(); setStartOpen(false); }} testId="start-spray" />
                         <StartItem label="WALL" onClick={() => { toggle("wall", true); setStartOpen(false); }} testId="start-wall" />
+                        <StartItem label="MULTITAIRE" onClick={() => { toggle("multitaire", true); setStartOpen(false); }} testId="start-multitaire" />
                         <StartItem label="Jukebox" onClick={() => { toggle("jukebox", true); setStartOpen(false); }} testId="start-jukebox" />
                         <StartItem label="Video Wall" onClick={() => { toggle("video", true); setStartOpen(false); }} testId="start-video" />
                         <StartItem label="Upload Zone" onClick={() => { toggle("upload", true); setStartOpen(false); }} testId="start-upload" />

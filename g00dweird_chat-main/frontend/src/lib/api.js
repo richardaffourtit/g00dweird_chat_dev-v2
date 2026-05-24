@@ -229,6 +229,26 @@ export async function getPublicProfile(nickname, userId = null) {
     }
 }
 
+export async function listSprites() {
+    const { data } = await api.get("/sprites/list");
+    return data.sprites || [];
+}
+
+export async function getSpriteDescriptor(id) {
+    const { data } = await api.get(`/sprites/${encodeURIComponent(id)}`);
+    return data;
+}
+
+export async function saveSpriteOverrides(id, frames, source = "") {
+    const { data } = await api.post(`/sprites/${encodeURIComponent(id)}/overrides`, { source, frames });
+    return data;
+}
+
+export async function rebuildSprite(id) {
+    const { data } = await api.post(`/sprites/${encodeURIComponent(id)}/rebuild`);
+    return data;
+}
+
 export function fileUrl(storage_path) {
     if (!storage_path) return "";
     if (/^(data:|blob:|https?:\/\/|\/)/.test(storage_path)) return storage_path;

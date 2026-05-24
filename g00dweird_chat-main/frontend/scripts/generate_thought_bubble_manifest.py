@@ -15,8 +15,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SHEET = ROOT / "public" / "scenery" / "thoughtbubbles.png"
 OUT = ROOT / "src" / "data" / "thoughtBubbles.json"
 
-# Coarse windows keep generation deterministic while Pillow computes clean,
-# padded bounds from the art. Coordinates are source-sheet pixels.
+# Coarse windows keep generation deterministic while Pillow computes clean
+# bounds from the art. Neighboring cells can overlap these windows, so the
+# generator rejects non-primary components that touch the left/right slot edge.
+# Coordinates are source-sheet pixels.
 SLOTS = [
     ("s1", "short", 1, (40, 168, 115, 240)),
     ("s2", "short", 2, (154, 148, 242, 235)),
@@ -44,7 +46,9 @@ SLOTS = [
     ("l8", "long", 8, (1070, 700, 1536, 842)),
 ]
 
-PADDING = 24
+PADDING = 0
+MIN_COMPONENT_PIXELS = 8
+BODY_ROW_THRESHOLD = 0.10
 
 
 def include_pixel(r: int, g: int, b: int, a: int) -> bool:
@@ -75,7 +79,72 @@ def tight_bbox(img: Image.Image, box: tuple[int, int, int, int]) -> tuple[int, i
     return min(xs), min(ys), max(xs) + 1, max(ys) + 1
 
 
-def main_body_text_box(img: Image.Image, source: dict[str, int], tier: str) -> dict[str, int]:
+def component_bboxes(img: Image.Image, box: tuple[int, int, int, int]) -> list[dict[str, object]]:
+    x1, y1, x2, y2 = box
+    crop = img.crop(box)
+    pixels = crop.load()
+    seen: set[tuple[int, int]] = set()
+    components: list[dict[str, object]] = []
+
+    for y in range(crop.height):
+        for x in range(crop.width):
+            if (x, y) in seen:
+                continue
+            r, g, b, a = pixels[x, y]
+            if not include_pixel(r, g, b, a):
+                continue
+
+            stack = [(x, y)]
+            seen.add((x, y))
+            points: list[tuple[int, int]] = []
+            while stack:
+                px, py = stack.pop()
+                points.append((px, py))
+                for ny in (py - 1, py, py + 1):
+                    for nx in (px - 1, px, px + 1):
+                        if nx == px and ny == py:
+                            continue
+                        if not (0 <= nx < crop.width and 0 <= ny < crop.height):
+                            continue
+                        if (nx, ny) in seen:
+                            continue
+                        r, g, b, a = pixels[nx, ny]
+                        if include_pixel(r, g, b, a):
+                            seen.add((nx, ny))
+                            stack.append((nx, ny))
+
+            xs = [point[0] for point in points]
+            ys = [point[1] for point in points]
+            components.append({
+                "count": len(points),
+                "bbox": (min(xs) + x1, min(ys) + y1, max(xs) + x1 + 1, max(ys) + y1 + 1),
+                "touchesSide": min(xs) == 0 or max(xs) == crop.width - 1,
+            })
+
+    return sorted(components, key=lambda component: int(component["count"]), reverse=True)
+
+
+def clean_sprite_bbox(img: Image.Image, box: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
+    components = component_bboxes(img, box)
+    if not components:
+        raise RuntimeError(f"no bubble pixels found in {box}")
+
+    kept = []
+    for index, component in enumerate(components):
+        if index == 0:
+            kept.append(component)
+            continue
+        if int(component["count"]) < MIN_COMPONENT_PIXELS:
+            continue
+        if component["touchesSide"]:
+            continue
+        kept.append(component)
+
+    xs1, ys1, xs2, ys2 = zip(*(component["bbox"] for component in kept))
+    return min(xs1), min(ys1), max(xs2), max(ys2)
+
+
+def cloud_body_bbox(img: Image.Image, source: dict[str, int]) -> tuple[int, int, int, int]:
     crop = img.crop((source["x"], source["y"], source["x"] + source["w"], source["y"] + source["h"]))
     px = crop.load()
     row_counts = []
@@ -87,7 +156,7 @@ def main_body_text_box(img: Image.Image, source: dict[str, int], tier: str) -> d
                 count += 1
         row_counts.append(count)
     max_row = max(row_counts) or 1
-    threshold = max(8, max_row * 0.28)
+    threshold = max(8, max_row * BODY_ROW_THRESHOLD)
 
     top = next((i for i, c in enumerate(row_counts) if c >= threshold), 0)
     bottom = top
@@ -113,16 +182,21 @@ def main_body_text_box(img: Image.Image, source: dict[str, int], tier: str) -> d
     col_threshold = max(4, max_col * 0.12)
     left = next((i for i, c in enumerate(col_counts) if c >= col_threshold), 0)
     right = crop.width - 1 - next((i for i, c in enumerate(reversed(col_counts)) if c >= col_threshold), 0)
+    return left, top, right + 1, bottom + 1
+
+
+def main_body_text_box(img: Image.Image, source: dict[str, int], tier: str) -> dict[str, int]:
+    crop = img.crop((source["x"], source["y"], source["x"] + source["w"], source["y"] + source["h"]))
+    left, top, right, bottom = cloud_body_bbox(img, source)
 
     inset_x = 0.18 if tier == "short" else 0.13 if tier == "medium" else 0.10
-    inset_top = 0.22 if tier == "short" else 0.20 if tier == "medium" else 0.18
-    inset_bottom = 0.27 if tier == "short" else 0.25 if tier == "medium" else 0.23
-    body_w = max(1, right - left + 1)
-    body_h = max(1, bottom - top + 1)
+    fill_y = 0.46 if tier == "short" else 0.48 if tier == "medium" else 0.46
+    body_w = max(1, right - left)
+    body_h = max(1, bottom - top)
     text_x = round(left + body_w * inset_x)
-    text_y = round(top + body_h * inset_top)
+    text_h = round(body_h * fill_y)
+    text_y = round(top + (body_h - text_h) / 2)
     text_w = round(body_w * (1 - inset_x * 2))
-    text_h = round(body_h * (1 - inset_top - inset_bottom))
     return {
         "x": max(0, text_x),
         "y": max(0, text_y),
@@ -166,11 +240,12 @@ def main() -> None:
     img = Image.open(SHEET).convert("RGBA")
     variants = []
     for bubble_id, tier, rank, rough in SLOTS:
-        bx1, by1, bx2, by2 = tight_bbox(img, rough)
-        sx1 = max(0, bx1 - PADDING)
-        sy1 = max(0, by1 - PADDING)
-        sx2 = min(img.width, bx2 + PADDING)
-        sy2 = min(img.height, by2 + PADDING)
+        bx1, by1, bx2, by2 = clean_sprite_bbox(img, rough)
+        rx1, ry1, rx2, ry2 = rough
+        sx1 = max(rx1, bx1 - PADDING)
+        sy1 = max(ry1, by1 - PADDING)
+        sx2 = min(rx2, bx2 + PADDING)
+        sy2 = min(ry2, by2 + PADDING)
         source = {"x": sx1, "y": sy1, "w": sx2 - sx1, "h": sy2 - sy1}
         text = main_body_text_box(img, source, tier)
         tail = tail_anchor(img, source)

@@ -1,0 +1,69 @@
+# Sprite Audit
+
+- Sprites processed: 2
+- Frames processed: 770
+
+## Suspicious Frames
+
+### spray-sources-tags2
+- Source: `frontend/public/spray/sources/tags2.png`
+- Sheet warnings: duplicate-frame
+- Frame 14: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 15: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 16: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 17: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 20: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 21: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 22: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 23: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 38: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 167: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 190: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 191: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 208: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 240: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 264: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 271: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 288: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 294: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 295: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 319: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 359: duplicate-frame; visible pixels: 4096; duplicateOf: 335
+- Frame 439: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 440: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 441: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 442: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 463: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 464: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 465: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 466: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 467: duplicate-frame; visible pixels: 4096; duplicateOf: 443
+- Frame 600: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 601: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 602: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 624: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 625: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 626: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 648: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 649: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 650: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 651: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 671: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 672: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 673: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 674: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 696: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 697: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 698: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 712: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 720: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 721: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 722: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 736: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 744: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 745: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 746: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 759: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 760: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 761: duplicate-frame; visible pixels: 4096; duplicateOf: 9
+- Frame 765: duplicate-frame; visible pixels: 4096; duplicateOf: 9

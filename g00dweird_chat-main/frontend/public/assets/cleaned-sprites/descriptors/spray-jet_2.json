@@ -1,0 +1,44 @@
+{
+  "id": "spray-jet_2",
+  "source": "frontend/public/spray/jet_2.png",
+  "outputSheet": "frontend/public/assets/cleaned-sprites/spray-jet_2.png",
+  "frameWidth": 45,
+  "frameHeight": 98,
+  "frameCount": 1,
+  "fps": 8,
+  "loop": true,
+  "pivot": {
+    "x": 0.5,
+    "y": 0.85
+  },
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 45,
+      "h": 98,
+      "bbox": {
+        "x": 0,
+        "y": 88,
+        "w": 45,
+        "h": 94
+      },
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "w": 45,
+        "h": 285
+      },
+      "hash": "22a77415bb0e0065d93bc84f583273ab6ea4d4a8bd2b221ea8da10b95f00027f",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 1489,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    }
+  ],
+  "warnings": []
+}

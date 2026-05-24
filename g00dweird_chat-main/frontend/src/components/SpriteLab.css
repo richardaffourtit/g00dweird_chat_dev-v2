@@ -1,0 +1,310 @@
+.sprite-lab {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    background: #101010;
+    color: #f2f2f2;
+    font-family: "VT323", monospace;
+}
+
+.sprite-lab button,
+.sprite-lab select,
+.sprite-lab input {
+    font: inherit;
+    border: 2px solid #000;
+    background: #d8d8d8;
+    color: #000;
+    box-shadow: inset -1px -1px 0 #777, inset 1px 1px 0 #fff;
+}
+
+.sprite-lab-sidebar {
+    padding: 16px;
+    border-right: 2px solid #000;
+    background: #c0c0c0;
+    color: #000;
+    min-height: 0;
+}
+
+.sprite-lab-title {
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.sprite-lab-sidebar select {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 10px;
+}
+
+.sprite-list {
+    display: grid;
+    gap: 4px;
+    max-height: calc(100vh - 92px);
+    overflow: auto;
+}
+
+.sprite-list button {
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    padding: 4px 7px;
+}
+
+.sprite-list button.active,
+.sprite-lab button.active {
+    background: #ffff99;
+}
+
+.sprite-lab-main {
+    min-width: 0;
+    display: grid;
+    grid-template-rows: auto 1fr;
+}
+
+.sprite-lab-toolbar {
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #202020;
+    border-bottom: 2px solid #000;
+}
+
+.sprite-lab-toolbar strong,
+.sprite-lab-toolbar span {
+    display: block;
+}
+
+.sprite-lab-toolbar strong {
+    font-size: 24px;
+}
+
+.sprite-lab-toolbar span {
+    color: #cfcfcf;
+}
+
+.tool-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tool-buttons button,
+.scrubber button,
+.inspector button {
+    min-width: 32px;
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 4px 8px;
+}
+
+.sprite-lab-content {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 260px minmax(320px, 1fr) 220px;
+    gap: 14px;
+    padding: 14px;
+    overflow: auto;
+}
+
+.preview-column,
+.editor-column,
+.inspector {
+    min-width: 0;
+}
+
+.sprite-lab h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.image-preview {
+    height: 180px;
+    margin-bottom: 16px;
+    border: 2px solid #000;
+    overflow: auto;
+}
+
+.image-preview img {
+    max-width: none;
+    image-rendering: pixelated;
+}
+
+.image-preview.show-red {
+    background-color: #ff0000;
+    background-image: none;
+}
+
+.frame-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.frame-grid button {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.frame-grid b,
+.sprite-list b {
+    color: #a00000;
+}
+
+.stage-wrap {
+    position: relative;
+    border: 2px solid #000;
+    overflow: hidden;
+    max-width: 100%;
+    max-height: 62vh;
+}
+
+.sprite-stage {
+    position: relative;
+    overflow: hidden;
+}
+
+.sprite-stage.red-visible {
+    background: #ff0000;
+}
+
+.current-frame,
+.onion {
+    position: absolute;
+    inset: 0 auto auto 0;
+    height: 100%;
+    object-fit: none;
+    object-position: 0 0;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.current-frame {
+    opacity: 1;
+}
+
+.onion {
+    opacity: 0.28;
+    mix-blend-mode: multiply;
+}
+
+.onion.prev {
+    filter: sepia(1) hue-rotate(150deg) saturate(2);
+}
+
+.onion.next {
+    filter: sepia(1) hue-rotate(300deg) saturate(2);
+}
+
+.bbox {
+    position: absolute;
+    border: 2px solid #00ff66;
+    background: rgba(0, 255, 102, 0.08);
+    cursor: move;
+    z-index: 3;
+}
+
+.bbox-handle,
+.pivot {
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    min-height: 10px;
+    position: absolute;
+    z-index: 4;
+    padding: 0;
+}
+
+.bbox-handle {
+    background: #00ff66;
+}
+
+.pivot {
+    border-radius: 50%;
+    background: #ffea00;
+}
+
+.scrubber {
+    display: grid;
+    grid-template-columns: 36px 1fr 36px;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.inspector {
+    background: #c0c0c0;
+    color: #000;
+    border: 2px solid #000;
+    padding: 10px;
+    align-self: start;
+}
+
+.inspector label {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 7px;
+}
+
+.inspector input {
+    min-width: 0;
+    width: 100%;
+    padding: 3px 5px;
+}
+
+.inspector button {
+    width: 100%;
+    margin-top: 6px;
+    justify-content: flex-start;
+}
+
+.warning-box {
+    border: 2px solid #000;
+    background: #f1f1f1;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.sprite-status {
+    min-height: 24px;
+    margin-top: 10px;
+    color: #004d21;
+}
+
+.sprite-lab-empty {
+    margin: 24px;
+    font-size: 24px;
+}
+
+@media (max-width: 980px) {
+    .sprite-lab {
+        grid-template-columns: 1fr;
+    }
+
+    .sprite-lab-content {
+        grid-template-columns: 1fr;
+    }
+
+    .sprite-lab-sidebar {
+        border-right: 0;
+        border-bottom: 2px solid #000;
+    }
+
+    .sprite-list {
+        max-height: 180px;
+    }
+}

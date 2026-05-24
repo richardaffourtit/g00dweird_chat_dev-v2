@@ -1,0 +1,44 @@
+{
+  "id": "scenery-spiderweb_phase2-spider_walk_row_1",
+  "source": "frontend/public/scenery/spiderweb_phase2/spider_walk_row_1.png",
+  "outputSheet": "frontend/public/assets/cleaned-sprites/scenery-spiderweb_phase2-spider_walk_row_1.png",
+  "frameWidth": 1741,
+  "frameHeight": 134,
+  "frameCount": 1,
+  "fps": 8,
+  "loop": true,
+  "pivot": {
+    "x": 0.5,
+    "y": 0.85
+  },
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 1741,
+      "h": 134,
+      "bbox": {
+        "x": 16,
+        "y": 58,
+        "w": 1737,
+        "h": 130
+      },
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "w": 1774,
+        "h": 222
+      },
+      "hash": "dbc321143921b0276d6456dd81d2eb62c897b7e8d989fe9baaac2b37383307b1",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 48874,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    }
+  ],
+  "warnings": []
+}

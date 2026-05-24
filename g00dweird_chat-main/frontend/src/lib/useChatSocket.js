@@ -129,6 +129,7 @@ export function useChatSocket({ user, room, avatarUrl, spriteId, animId }) {
     const [messages, setMessages] = useState([]);
     const [users, setUsers] = useState([]);
     const [connected, setConnected] = useState(false);
+    const [localPreview, setLocalPreview] = useState(false);
     const [currentAudio, setCurrentAudio] = useState(null);
     const [currentVideo, setCurrentVideo] = useState(null);
     const [audioQueue, setAudioQueue] = useState([]);
@@ -142,6 +143,10 @@ export function useChatSocket({ user, room, avatarUrl, spriteId, animId }) {
     const attackTimersRef = useRef(new Map());
     const previewHitCountsRef = useRef(new Map());
     const roomId = room?.id;
+
+    useEffect(() => {
+        setLocalPreview(false);
+    }, [roomId, user?.user_id]);
 
     useEffect(() => () => {
         attackTimersRef.current.forEach((timerId) => clearTimeout(timerId));
@@ -162,7 +167,7 @@ export function useChatSocket({ user, room, avatarUrl, spriteId, animId }) {
                 ? { ...x, avatar_url: null, anim_id: obj.anim_id || null, anim_stance: "idle" }
                 : x));
         }
-        if (PREVIEW_MOCK) {
+        if (PREVIEW_MOCK || localPreview) {
             if (obj.type === "chat" && obj.text) {
                 const text = obj.text.trim();
                 const fullfunk = isFullfunk(obj);
@@ -199,6 +204,8 @@ export function useChatSocket({ user, room, avatarUrl, spriteId, animId }) {
                     rot: Number.isFinite(obj.rot) ? Math.max(-45, Math.min(45, obj.rot)) : 0,
                     scale: Number.isFinite(obj.scale) ? Math.max(0.3, Math.min(3, obj.scale)) : 1,
                     id: `preview-tag-${roomId || "room"}-${Date.now()}`,
+                    image_url: obj.image_url || null,
+                    image_name: obj.image_name || null,
                     room_id: roomId,
                     user_id: user?.user_id,
                     nickname: user?.nickname || "preview",
@@ -276,11 +283,11 @@ export function useChatSocket({ user, room, avatarUrl, spriteId, animId }) {
         if (wsRef.current && wsRef.current.readyState === 1) {
             wsRef.current.send(JSON.stringify(obj));
         }
-    }, [roomId, user?.nickname, user?.user_id]);
+    }, [localPreview, roomId, user?.nickname, user?.user_id]);
 
     useEffect(() => {
         if (!roomId || !user) return undefined;
-        if (PREVIEW_MOCK) {
+        if (PREVIEW_MOCK || localPreview) {
             const botUid = `weirdbot-${roomId}`;
             const timers = new Set();
             const schedule = (fn, ms) => {
@@ -433,16 +440,24 @@ export function useChatSocket({ user, room, avatarUrl, spriteId, animId }) {
             anim_id: animId || undefined,
         });
         const ws = new WebSocket(url);
+        let opened = false;
         wsRef.current = ws;
         const isCurrentSocket = () => wsRef.current === ws;
         ws.onopen = () => {
+            opened = true;
             if (isCurrentSocket()) setConnected(true);
         };
         ws.onclose = () => {
-            if (isCurrentSocket()) setConnected(false);
+            if (isCurrentSocket()) {
+                setConnected(false);
+                if (!opened) setLocalPreview(true);
+            }
         };
         ws.onerror = () => {
-            if (isCurrentSocket()) setConnected(false);
+            if (isCurrentSocket()) {
+                setConnected(false);
+                if (!opened) setLocalPreview(true);
+            }
         };
         ws.onmessage = (ev) => {
             if (!isCurrentSocket()) return;
@@ -567,7 +582,7 @@ export function useChatSocket({ user, room, avatarUrl, spriteId, animId }) {
             try { ws.close(); } catch { /* ignore */ }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [roomId, user?.user_id, user?.nickname]);
+    }, [localPreview, roomId, user?.user_id, user?.nickname]);
 
     useEffect(() => {
         if (!connected) return;

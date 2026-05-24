@@ -11,6 +11,8 @@ import json
 import time
 import logging
 import asyncio
+import subprocess
+import re
 from pathlib import Path
 from collections import defaultdict, deque
 from datetime import datetime, timezone
@@ -595,6 +597,126 @@ async def root():
 @api_router.get("/rooms", response_model=List[RoomInfo])
 async def list_rooms():
     return ROOMS
+
+
+# ---------- Sprite Lab dev endpoints ----------
+PROJECT_ROOT = ROOT_DIR.parent
+SPRITE_CLEAN_CONFIG = PROJECT_ROOT / "sprite-clean.config.json"
+
+
+def _sprite_config() -> dict:
+    if not SPRITE_CLEAN_CONFIG.exists():
+        return {
+            "outputDir": "frontend/public/assets/cleaned-sprites",
+            "manualOverridesFile": "frontend/public/assets/cleaned-sprites/manual-overrides.json",
+        }
+    with SPRITE_CLEAN_CONFIG.open() as fh:
+        return json.load(fh)
+
+
+def _sprite_output_dir() -> Path:
+    return (PROJECT_ROOT / _sprite_config().get("outputDir", "frontend/public/assets/cleaned-sprites")).resolve()
+
+
+def _manual_overrides_path() -> Path:
+    return (PROJECT_ROOT / _sprite_config().get(
+        "manualOverridesFile",
+        "frontend/public/assets/cleaned-sprites/manual-overrides.json",
+    )).resolve()
+
+
+def _public_asset_url(path_value: str) -> str:
+    marker = "frontend/public/"
+    if marker in path_value:
+        return "/" + path_value.split(marker, 1)[1]
+    return "/" + path_value.lstrip("/")
+
+
+def _safe_sprite_id(sprite_id: str) -> str:
+    if not re.match(r"^[A-Za-z0-9_.-]+$", sprite_id):
+        raise HTTPException(400, "invalid sprite id")
+    return sprite_id
+
+
+def _load_descriptor(sprite_id: str) -> dict:
+    safe_id = _safe_sprite_id(sprite_id)
+    path = _sprite_output_dir() / "descriptors" / f"{safe_id}.json"
+    if not path.exists():
+        raise HTTPException(404, "sprite descriptor not found")
+    with path.open() as fh:
+        data = json.load(fh)
+    data["cleanedImageUrl"] = _public_asset_url(data.get("outputSheet", ""))
+    source = data.get("source", "")
+    if source:
+        data["originalImageUrl"] = _public_asset_url(f"frontend/public/{source}") if source.startswith(("anim/", "assets/", "scenery/", "tags/", "wall/")) else _public_asset_url(source)
+    return data
+
+
+@api_router.get("/sprites/list")
+async def list_cleaned_sprites():
+    descriptor_dir = _sprite_output_dir() / "descriptors"
+    if not descriptor_dir.exists():
+        return {"sprites": []}
+    sprites = []
+    for path in sorted(descriptor_dir.glob("*.json")):
+        try:
+            data = json.loads(path.read_text())
+        except Exception:
+            continue
+        sprites.append({
+            "id": data.get("id", path.stem),
+            "source": data.get("source", ""),
+            "frameCount": data.get("frameCount", 0),
+            "warnings": data.get("warnings", []),
+            "cleanedImageUrl": _public_asset_url(data.get("outputSheet", "")),
+        })
+    return {"sprites": sprites}
+
+
+@api_router.get("/sprites/{sprite_id}")
+async def get_cleaned_sprite(sprite_id: str):
+    return _load_descriptor(sprite_id)
+
+
+@api_router.post("/sprites/{sprite_id}/overrides")
+async def save_sprite_overrides(sprite_id: str, payload: dict):
+    safe_id = _safe_sprite_id(sprite_id)
+    descriptor = _load_descriptor(safe_id)
+    overrides_path = _manual_overrides_path()
+    overrides_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        overrides = json.loads(overrides_path.read_text()) if overrides_path.exists() else {}
+    except Exception:
+        overrides = {}
+    frames = payload.get("frames") if isinstance(payload, dict) else None
+    if not isinstance(frames, dict):
+        raise HTTPException(400, "frames override map required")
+    overrides[safe_id] = {
+        "source": descriptor.get("source", payload.get("source", "")),
+        "frames": frames,
+    }
+    overrides_path.write_text(json.dumps(overrides, indent=2) + "\n")
+    return {"ok": True, "id": safe_id, "path": str(overrides_path.relative_to(PROJECT_ROOT))}
+
+
+@api_router.post("/sprites/{sprite_id}/rebuild")
+async def rebuild_cleaned_sprite(sprite_id: str):
+    _safe_sprite_id(sprite_id)
+
+    def _run():
+        return subprocess.run(
+            ["python3", "scripts/sprite_cleaner.py"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=360,
+            check=False,
+        )
+
+    result = await asyncio.to_thread(_run)
+    if result.returncode != 0:
+        raise HTTPException(500, {"stdout": result.stdout, "stderr": result.stderr})
+    return {"ok": True, "stdout": result.stdout}
 
 
 @api_router.post("/join", response_model=JoinResponse)

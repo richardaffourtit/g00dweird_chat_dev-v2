@@ -6,3 +6,6 @@ backend/.mongo-logs/
 # Local SSH key files
 rtassh
 rtassh.pub
+
+# Separate local video-production workspace
+viral-g00dweird-video/

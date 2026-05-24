@@ -76,6 +76,7 @@ backend/local_storage/
 
 # Build caches
 .cache/
+.superpowers/
 
 memory/test_credentials.md
 

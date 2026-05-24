@@ -5,6 +5,8 @@ import "@/App.css";
 import LoginDialog from "./components/LoginDialog";
 import Desktop from "./components/Desktop";
 import ProfilePage from "./components/ProfilePage";
+import SpriteLab from "./components/SpriteLab";
+import EnchantedForestWorld from "./components/EnchantedForestWorld";
 
 function Shell() {
     const [user, setUser] = useState(null);
@@ -50,10 +52,12 @@ export default function App() {
                     }}
                 />
                 <Routes>
+                    <Route path="/v2" element={<EnchantedForestWorld />} />
                     <Route path="/" element={<Shell />} />
                     <Route path="/r/:roomId" element={<Shell />} />
                     <Route path="/u/:nickname" element={<ProfilePage />} />
                     <Route path="/guestbook" element={<Shell />} />
+                    <Route path="/sprite-lab" element={<SpriteLab />} />
                 </Routes>
             </BrowserRouter>
         </div>

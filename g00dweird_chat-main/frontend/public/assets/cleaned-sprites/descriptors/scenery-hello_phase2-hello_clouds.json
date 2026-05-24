@@ -1,0 +1,44 @@
+{
+  "id": "scenery-hello_phase2-hello_clouds",
+  "source": "frontend/public/scenery/hello_phase2/hello_clouds.png",
+  "outputSheet": "frontend/public/assets/cleaned-sprites/scenery-hello_phase2-hello_clouds.png",
+  "frameWidth": 1310,
+  "frameHeight": 925,
+  "frameCount": 1,
+  "fps": 8,
+  "loop": true,
+  "pivot": {
+    "x": 0.5,
+    "y": 0.85
+  },
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 1310,
+      "h": 925,
+      "bbox": {
+        "x": 83,
+        "y": 70,
+        "w": 1306,
+        "h": 921
+      },
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "w": 1448,
+        "h": 1086
+      },
+      "hash": "cb4c1f65708fa7c7c6924de4a4b6e3b5c62a24b58fdc3df82c4feb0f67490675",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 467167,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    }
+  ],
+  "warnings": []
+}

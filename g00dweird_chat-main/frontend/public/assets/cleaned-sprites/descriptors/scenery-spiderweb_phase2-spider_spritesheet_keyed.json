@@ -1,0 +1,71 @@
+{
+  "id": "scenery-spiderweb_phase2-spider_spritesheet_keyed",
+  "source": "frontend/public/scenery/spiderweb_phase2/spider_spritesheet_keyed.png",
+  "outputSheet": "frontend/public/assets/cleaned-sprites/scenery-spiderweb_phase2-spider_spritesheet_keyed.png",
+  "frameWidth": 857,
+  "frameHeight": 792,
+  "frameCount": 2,
+  "fps": 8,
+  "loop": true,
+  "pivot": {
+    "x": 0.5,
+    "y": 0.85
+  },
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 857,
+      "h": 792,
+      "bbox": {
+        "x": 15,
+        "y": 41,
+        "w": 853,
+        "h": 788
+      },
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "w": 887,
+        "h": 887
+      },
+      "hash": "d96ea86aba92c78c5085eb5c44b8d38f8f1cd7e3e71b294f486701c894f5c77b",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 94150,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 1,
+      "x": 857,
+      "y": 0,
+      "w": 857,
+      "h": 792,
+      "bbox": {
+        "x": 22,
+        "y": 50,
+        "w": 844,
+        "h": 779
+      },
+      "sourceRect": {
+        "x": 887,
+        "y": 0,
+        "w": 887,
+        "h": 887
+      },
+      "hash": "444e5833931da3befa6182068d110cd8374e13c0613abfa44ecf949aae29d789",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 94574,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    }
+  ],
+  "warnings": []
+}

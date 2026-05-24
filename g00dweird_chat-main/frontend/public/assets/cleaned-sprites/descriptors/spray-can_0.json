@@ -1,0 +1,44 @@
+{
+  "id": "spray-can_0",
+  "source": "frontend/public/spray/can_0.png",
+  "outputSheet": "frontend/public/assets/cleaned-sprites/spray-can_0.png",
+  "frameWidth": 154,
+  "frameHeight": 418,
+  "frameCount": 1,
+  "fps": 8,
+  "loop": true,
+  "pivot": {
+    "x": 0.5,
+    "y": 0.85
+  },
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 154,
+      "h": 418,
+      "bbox": {
+        "x": 0,
+        "y": 14,
+        "w": 154,
+        "h": 414
+      },
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "w": 154,
+        "h": 431
+      },
+      "hash": "80fb9259ac1bfa46e6edf7ec8fa9635c799499a8f03e9ccf7ec726dac0503cd2",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 34541,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    }
+  ],
+  "warnings": []
+}

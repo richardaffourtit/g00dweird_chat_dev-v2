@@ -369,6 +369,163 @@ a {
     box-shadow: 2px 2px 0 rgba(0,0,0,0.82);
     text-shadow: 0 0 4px currentColor;
 }
+
+.jungle-fog-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 48;
+    pointer-events: none;
+    overflow: hidden;
+    mix-blend-mode: screen;
+    filter: saturate(0.72);
+}
+
+.jungle-fog-bank {
+    position: absolute;
+    top: 0;
+    left: -62%;
+    width: 58%;
+    aspect-ratio: 1 / 1;
+    background-image: url("/assets/effects/fog-sprite.png");
+    background-size: 400% 400%;
+    background-repeat: no-repeat;
+    opacity: var(--fog-opacity, 0.34);
+    mix-blend-mode: screen;
+    image-rendering: auto;
+    filter: blur(var(--fog-blur, 1.6px)) contrast(0.86) brightness(1.18);
+    transform: translate3d(-10%, var(--fog-y, 0), 0) scale(var(--fog-scale, 1));
+    will-change: transform, background-position, opacity;
+    animation:
+        jungleFogFrame var(--fog-frame-time, 2.8s) steps(1) infinite,
+        jungleFogDrift var(--fog-drift-time, 34s) linear infinite,
+        jungleFogBreathe var(--fog-breathe-time, 8s) ease-in-out infinite;
+}
+
+.jungle-fog-bank-a {
+    --fog-y: 23%;
+    --fog-scale: 1.22;
+    --fog-opacity: 0.34;
+    --fog-opacity-low: 0.24;
+    --fog-opacity-mid: 0.29;
+    --fog-blur: 2.2px;
+    --fog-frame-time: 3.1s;
+    --fog-drift-time: 42s;
+    --fog-breathe-time: 10s;
+    animation-delay: -1.2s, -18s, -3s;
+}
+
+.jungle-fog-bank-b {
+    --fog-y: 39%;
+    --fog-scale: 0.98;
+    --fog-opacity: 0.26;
+    --fog-opacity-low: 0.18;
+    --fog-opacity-mid: 0.22;
+    --fog-blur: 1.4px;
+    --fog-frame-time: 2.55s;
+    --fog-drift-time: 31s;
+    --fog-breathe-time: 7.4s;
+    top: 2%;
+    animation-delay: -0.35s, -9s, -1s;
+}
+
+.jungle-fog-bank-c {
+    --fog-y: 12%;
+    --fog-scale: 1.48;
+    --fog-opacity: 0.19;
+    --fog-opacity-low: 0.13;
+    --fog-opacity-mid: 0.16;
+    --fog-blur: 3px;
+    --fog-frame-time: 3.6s;
+    --fog-drift-time: 58s;
+    --fog-breathe-time: 12s;
+    top: 11%;
+    animation-delay: -2.2s, -34s, -5s;
+}
+
+@keyframes jungleFogDrift {
+    0% { transform: translate3d(-18%, var(--fog-y, 0), 0) scale(var(--fog-scale, 1)); }
+    100% { transform: translate3d(286%, calc(var(--fog-y, 0) - 5%), 0) scale(var(--fog-scale, 1)); }
+}
+
+@keyframes jungleFogBreathe {
+    0%, 100% { opacity: var(--fog-opacity-low, 0.22); }
+    35% { opacity: var(--fog-opacity, 0.3); }
+    68% { opacity: var(--fog-opacity-mid, 0.25); }
+}
+
+@keyframes jungleFogFrame {
+    0% { background-position: 0% 0%; }
+    6.25% { background-position: 33.333% 0%; }
+    12.5% { background-position: 66.666% 0%; }
+    18.75% { background-position: 100% 0%; }
+    25% { background-position: 0% 33.333%; }
+    31.25% { background-position: 33.333% 33.333%; }
+    37.5% { background-position: 66.666% 33.333%; }
+    43.75% { background-position: 100% 33.333%; }
+    50% { background-position: 0% 66.666%; }
+    56.25% { background-position: 33.333% 66.666%; }
+    62.5% { background-position: 66.666% 66.666%; }
+    68.75% { background-position: 100% 66.666%; }
+    75% { background-position: 0% 100%; }
+    81.25% { background-position: 33.333% 100%; }
+    87.5% { background-position: 66.666% 100%; }
+    93.75%, 100% { background-position: 100% 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .jungle-fog-bank {
+        animation-duration: 16s, 80s, 18s;
+    }
+}
+
+.mars-rover-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18%;
+    aspect-ratio: 446 / 330;
+    z-index: 47;
+    pointer-events: none;
+    overflow: visible;
+    transform: translate3d(0, 0, 0) scale(1);
+    transform-origin: 0 0;
+    will-change: transform;
+    contain: layout style;
+}
+
+.mars-rover-sprite {
+    position: absolute;
+    left: var(--rover-frame-offset-x, -50%);
+    top: var(--rover-frame-offset-y, -100%);
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    opacity: 0;
+    filter: drop-shadow(4px 6px 0 rgba(35, 7, 0, 0.42));
+    backface-visibility: hidden;
+    will-change: opacity;
+}
+
+.mars-rover-layer[data-facing="right"][data-frame="0"] .mars-rover-sprite[data-direction="right"][data-frame="0"],
+.mars-rover-layer[data-facing="right"][data-frame="1"] .mars-rover-sprite[data-direction="right"][data-frame="1"],
+.mars-rover-layer[data-facing="right"][data-frame="2"] .mars-rover-sprite[data-direction="right"][data-frame="2"],
+.mars-rover-layer[data-facing="right"][data-frame="3"] .mars-rover-sprite[data-direction="right"][data-frame="3"],
+.mars-rover-layer[data-facing="back"][data-frame="0"] .mars-rover-sprite[data-direction="back"][data-frame="0"],
+.mars-rover-layer[data-facing="back"][data-frame="1"] .mars-rover-sprite[data-direction="back"][data-frame="1"],
+.mars-rover-layer[data-facing="back"][data-frame="2"] .mars-rover-sprite[data-direction="back"][data-frame="2"],
+.mars-rover-layer[data-facing="back"][data-frame="3"] .mars-rover-sprite[data-direction="back"][data-frame="3"],
+.mars-rover-layer[data-facing="left"][data-frame="0"] .mars-rover-sprite[data-direction="left"][data-frame="0"],
+.mars-rover-layer[data-facing="left"][data-frame="1"] .mars-rover-sprite[data-direction="left"][data-frame="1"],
+.mars-rover-layer[data-facing="left"][data-frame="2"] .mars-rover-sprite[data-direction="left"][data-frame="2"],
+.mars-rover-layer[data-facing="left"][data-frame="3"] .mars-rover-sprite[data-direction="left"][data-frame="3"],
+.mars-rover-layer[data-facing="front"][data-frame="0"] .mars-rover-sprite[data-direction="front"][data-frame="0"],
+.mars-rover-layer[data-facing="front"][data-frame="1"] .mars-rover-sprite[data-direction="front"][data-frame="1"],
+.mars-rover-layer[data-facing="front"][data-frame="2"] .mars-rover-sprite[data-direction="front"][data-frame="2"],
+.mars-rover-layer[data-facing="front"][data-frame="3"] .mars-rover-sprite[data-direction="front"][data-frame="3"] {
+    opacity: 1;
+}
+
 @keyframes emojiBurstFloat {
     0% {
         opacity: 0;
@@ -418,6 +575,470 @@ a {
     100% {
         opacity: 0;
         transform: translate(-50%, -92%) scale(1);
+    }
+}
+
+.multitaire-app {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: #0b2d15;
+    color: #d5ffcf;
+    overflow: hidden;
+}
+
+.multitaire-topbar {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 9px;
+    background: #031507;
+    border-bottom: 2px solid #286b29;
+    color: #9dff7a;
+    font-family: "Silkscreen", monospace;
+    font-size: 10px;
+    letter-spacing: 0;
+    text-shadow: 0 0 6px #35ff38;
+}
+
+.multitaire-mini-button {
+    border: 1px solid #7f2ca8;
+    background: #120616;
+    color: #dca6ff;
+    font-family: "Silkscreen", monospace;
+    font-size: 9px;
+    padding: 2px 7px;
+    box-shadow: inset 1px 1px 0 rgba(255,255,255,0.18), 2px 2px 0 #000;
+    cursor: pointer;
+}
+
+.multitaire-board {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 43%, rgba(110, 255, 110, 0.12), transparent 33%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 5px),
+        linear-gradient(135deg, #17461c, #071c0d 72%);
+    box-shadow: inset 0 0 0 3px #031507, inset 0 0 48px rgba(0,0,0,0.72);
+}
+
+.multitaire-board::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(127,44,168,0.18), transparent 17%, transparent 83%, rgba(127,44,168,0.18)),
+        repeating-linear-gradient(90deg, rgba(220,166,255,0.035) 0 1px, transparent 1px 8px);
+    mix-blend-mode: screen;
+    opacity: 0.62;
+}
+
+.multitaire-art-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.multitaire-art {
+    position: absolute;
+    display: block;
+    image-rendering: pixelated;
+    user-select: none;
+    opacity: 0.34;
+    filter: drop-shadow(0 0 10px rgba(127,44,168,0.55));
+}
+
+.multitaire-art-oath {
+    top: 34px;
+    left: 50%;
+    width: min(52%, 420px);
+    transform: translateX(-50%);
+    opacity: 0.46;
+}
+
+.multitaire-art-left {
+    left: -38px;
+    top: 78px;
+    width: min(24%, 180px);
+    opacity: 0.42;
+}
+
+.multitaire-art-right {
+    right: -38px;
+    top: 78px;
+    width: min(24%, 180px);
+    opacity: 0.42;
+}
+
+.multitaire-art-skull {
+    left: 50%;
+    top: 142px;
+    width: min(42%, 340px);
+    transform: translateX(-50%);
+    opacity: 0.16;
+    filter: blur(0.3px) drop-shadow(0 0 16px rgba(127,44,168,0.62));
+}
+
+.multitaire-art-luck {
+    left: 50%;
+    bottom: -15px;
+    width: min(48%, 390px);
+    transform: translateX(-50%);
+    opacity: 0.38;
+}
+
+.multitaire-player-rail {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: 12px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    z-index: 4;
+}
+
+.multitaire-player {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 7px;
+    background: rgba(0, 0, 0, 0.62);
+    border: 1px solid #2d8e35;
+    color: #b3ff00;
+    font-family: "Silkscreen", monospace;
+    font-size: 8px;
+}
+
+.multitaire-online {
+    width: 7px;
+    height: 7px;
+    background: #00ff55;
+    border: 1px solid #001f08;
+    box-shadow: 0 0 5px #00ff55;
+}
+
+.multitaire-deckbox {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    width: 300px;
+    height: 236px;
+    transform: translate(-50%, -50%);
+    border: 0;
+    padding: 0;
+    background: transparent;
+    perspective: 980px;
+    z-index: 8;
+    cursor: pointer;
+}
+
+.multitaire-opening-logo {
+    position: absolute;
+    left: 50%;
+    top: 76px;
+    width: min(78%, 610px);
+    transform: translateX(-50%);
+    z-index: 9;
+    pointer-events: none;
+    image-rendering: pixelated;
+    filter:
+        drop-shadow(0 0 8px rgba(203, 43, 255, 0.82))
+        drop-shadow(0 6px 0 rgba(0, 0, 0, 0.46));
+    animation: multitaireLogoBuzz 2.8s steps(7) infinite;
+}
+
+.multitaire-box-spin {
+    --box-w: 238px;
+    --box-h: 172px;
+    --box-d: 58px;
+    position: relative;
+    width: var(--box-w);
+    height: var(--box-h);
+    margin: 28px auto 0;
+    transform-style: preserve-3d;
+    transform: rotateX(63deg) rotateZ(-8deg) rotateY(var(--box-rot, 0deg));
+    transition: transform 520ms steps(7);
+    animation: multitaireBoxIdle 3.2s steps(18) infinite;
+}
+
+.multitaire-box-spin::before {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    transform: translateZ(33px);
+    background:
+        radial-gradient(circle at 32% 28%, rgba(255,255,255,0.18), transparent 18%),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.12) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(-45deg, rgba(0,0,0,0.28) 0 1px, transparent 1px 4px);
+    mix-blend-mode: overlay;
+    opacity: 0.72;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.multitaire-box-spin::after {
+    content: "";
+    position: absolute;
+    inset: -18px;
+    transform: translateZ(-38px);
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.48), transparent 66%);
+    filter: blur(5px);
+    pointer-events: none;
+}
+
+.multitaire-deckbox.is-open {
+    animation: multitaireBoxShrink 620ms steps(6) forwards;
+}
+
+.multitaire-deckbox.is-open .multitaire-box-spin {
+    animation-play-state: paused;
+}
+
+.multitaire-box-face,
+.multitaire-box-lid {
+    position: absolute;
+    background-image: url("/assets/multitaire-deckbox.png");
+    background-size: cover;
+    background-position: center;
+    image-rendering: pixelated;
+    border: 2px solid #7f2ca8;
+    box-shadow: inset 0 0 28px rgba(0,0,0,0.82), 0 0 0 1px rgba(220,166,255,0.2);
+    backface-visibility: hidden;
+}
+
+.multitaire-box-front {
+    inset: 0;
+    transform: translateZ(calc(var(--box-d) / 2));
+    background-position: center;
+}
+
+.multitaire-box-back {
+    inset: 0;
+    transform: rotateY(180deg) translateZ(calc(var(--box-d) / 2));
+    background-position: center;
+    filter: brightness(0.5) saturate(0.85);
+}
+
+.multitaire-box-side {
+    top: 0;
+    width: var(--box-d);
+    height: var(--box-h);
+    background-size: auto 100%;
+    background-position: 22% center;
+    filter: brightness(0.42) saturate(0.8);
+}
+
+.multitaire-box-left {
+    left: calc(var(--box-d) / -2);
+    transform: rotateY(-90deg);
+}
+
+.multitaire-box-right {
+    right: calc(var(--box-d) / -2);
+    transform: rotateY(90deg);
+    filter: brightness(0.34) saturate(0.74);
+}
+
+.multitaire-box-top,
+.multitaire-box-bottom {
+    left: 0;
+    width: var(--box-w);
+    height: var(--box-d);
+    background-size: 100% auto;
+    background-position: center 8%;
+    filter: brightness(0.62) saturate(0.85);
+}
+
+.multitaire-box-top {
+    top: calc(var(--box-d) / -2);
+    transform: rotateX(90deg);
+}
+
+.multitaire-box-bottom {
+    bottom: calc(var(--box-d) / -2);
+    transform: rotateX(-90deg);
+    filter: brightness(0.24) saturate(0.7);
+}
+
+.multitaire-box-lid {
+    inset: 0;
+    transform-origin: top center;
+    transform: translateZ(calc(var(--box-d) / 2 + 4px)) rotateX(0deg);
+    transition: transform 720ms steps(8);
+    clip-path: polygon(0 0, 100% 0, 91% 24%, 9% 24%);
+    filter: brightness(1.08) contrast(1.12);
+    z-index: 10;
+}
+
+.multitaire-deckbox.is-open .multitaire-box-lid {
+    transform: translateZ(calc(var(--box-d) / 2 + 8px)) rotateX(-124deg);
+}
+
+.multitaire-game {
+    position: absolute;
+    inset: 48px 16px 14px;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+}
+
+.multitaire-control-row {
+    display: grid;
+    grid-template-columns: 72px 72px minmax(280px, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+
+.multitaire-stock,
+.multitaire-card-button,
+.multitaire-empty-pile {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.multitaire-stock,
+.multitaire-empty-pile {
+    width: clamp(54px, 8vw, 72px);
+    height: clamp(76px, 11vw, 100px);
+    border: 2px dashed rgba(179,255,0,0.46);
+    display: grid;
+    place-items: center;
+    color: rgba(202,255,125,0.72);
+    background:
+        linear-gradient(135deg, rgba(127,44,168,0.15), transparent 42%),
+        rgba(0,0,0,0.34);
+    font-family: "Silkscreen", monospace;
+    font-size: 10px;
+    box-shadow: inset 0 0 18px rgba(0,0,0,0.45);
+}
+
+.multitaire-stock:hover,
+.multitaire-empty-pile:hover {
+    border-color: rgba(220,166,255,0.72);
+    color: #dca6ff;
+    box-shadow: inset 0 0 18px rgba(0,0,0,0.45), 0 0 10px rgba(127,44,168,0.62);
+}
+
+.multitaire-foundation-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    min-width: 0;
+}
+
+.multitaire-tableau-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(58px, 1fr));
+    gap: clamp(6px, 1.2vw, 14px);
+    align-items: start;
+}
+
+.multitaire-column {
+    min-width: 0;
+    min-height: 310px;
+    padding: 2px;
+    border-top: 1px solid rgba(220,166,255,0.18);
+    background: linear-gradient(180deg, rgba(0,0,0,0.18), transparent 52%);
+}
+
+.multitaire-column .multitaire-card-button + .multitaire-card-button {
+    margin-top: clamp(-63px, -7vw, -48px);
+}
+
+.multitaire-card-button {
+    position: relative;
+    display: block;
+    width: clamp(54px, 8vw, 72px);
+    height: clamp(76px, 11vw, 100px);
+    filter: drop-shadow(3px 5px 0 rgba(0,0,0,0.48));
+    transition: transform 120ms steps(3), filter 120ms steps(3);
+    z-index: calc(1 + var(--stack-index, 0));
+}
+
+.multitaire-card-button:hover,
+.multitaire-card-button.is-selected {
+    transform: translateY(-6px);
+    filter: drop-shadow(0 0 8px rgba(220,166,255,0.92)) drop-shadow(3px 5px 0 rgba(0,0,0,0.48));
+}
+
+.multitaire-card-button.is-selected::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border: 2px solid #dca6ff;
+    box-shadow: 0 0 12px #7f2ca8;
+    pointer-events: none;
+}
+
+.multitaire-card-img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    image-rendering: pixelated;
+    user-select: none;
+}
+
+.multitaire-status {
+    flex: 0 0 auto;
+    min-height: 22px;
+    padding: 5px 8px;
+    background:
+        linear-gradient(90deg, rgba(127,44,168,0.28), transparent 28%, transparent 72%, rgba(127,44,168,0.22)),
+        rgba(0,0,0,0.68);
+    border: 1px solid rgba(220,166,255,0.46);
+    color: #dca6ff;
+    font-family: "Silkscreen", monospace;
+    font-size: 9px;
+}
+
+@keyframes multitaireBoxIdle {
+    0% { filter: drop-shadow(0 0 8px rgba(127,44,168,0.6)); }
+    50% { filter: drop-shadow(0 0 18px rgba(127,44,168,0.92)); }
+    100% { filter: drop-shadow(0 0 8px rgba(127,44,168,0.6)); }
+}
+
+@keyframes multitaireLogoBuzz {
+    0%, 100% { opacity: 0.95; transform: translateX(-50%) translateY(0); }
+    45% { opacity: 1; transform: translateX(calc(-50% - 1px)) translateY(-1px); }
+    48% { opacity: 0.82; transform: translateX(calc(-50% + 1px)) translateY(0); }
+    52% { opacity: 1; transform: translateX(-50%) translateY(1px); }
+}
+
+@keyframes multitaireBoxShrink {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    100% { transform: translate(-50%, -50%) scale(0.34); }
+}
+
+@keyframes multitaireDeal {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+    }
+    18% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 1;
+        left: var(--deal-x);
+        top: var(--deal-y);
+        transform: translate(0, 0) scale(1) rotate(var(--deal-rot));
     }
 }
 
@@ -683,15 +1304,17 @@ a {
     }
 }
 .avatar-bob {
-    animation: avatarIdleBob 1.35s steps(4, end) infinite;
+    position: relative;
+    overflow: visible;
+    animation: avatarIdleBob 1.35s ease-in-out infinite;
     transform-origin: center bottom;
 }
 .avatar-bob.avatar-moving {
-    animation: avatarTravelBob var(--avatar-bob-ms, 560ms) steps(8, end) infinite;
+    animation: avatarTravelBob var(--avatar-bob-ms, 560ms) ease-in-out infinite;
 }
 .avatar-anchor {
     backface-visibility: hidden;
-    contain: layout style paint;
+    contain: layout style;
     transform-style: preserve-3d;
     will-change: transform;
 }
@@ -730,4 +1353,140 @@ a {
 /* Remove iOS scroll bounce on desktop */
 html {
     overscroll-behavior: none;
+}
+
+.enchanted-forest-v2,
+.enchanted-forest-v2 * {
+    image-rendering: auto;
+}
+
+.enchanted-forest-v2 {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 18% 8%, rgba(242, 255, 222, 0.24), transparent 28%),
+        linear-gradient(135deg, #dce9df 0%, #7aa0a5 38%, #1a2a34 100%);
+    user-select: none;
+    touch-action: none;
+}
+
+.forest-v2-camera {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: 0 0;
+    will-change: transform;
+}
+
+.forest-v2-base,
+.forest-v2-shadow-map,
+.forest-v2-depth-band {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    pointer-events: none;
+    user-select: none;
+}
+
+.forest-v2-base {
+    z-index: 10;
+}
+
+.forest-v2-shadow-map {
+    z-index: 24;
+    opacity: 0.2;
+    mix-blend-mode: multiply;
+    filter: contrast(1.08) saturate(0.74);
+}
+
+.forest-v2-depth-band {
+    mix-blend-mode: normal;
+    filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.16));
+}
+
+.forest-v2-avatar-anchor {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    transform-origin: center bottom;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.forest-v2-avatar-shadow {
+    position: absolute;
+    left: 0;
+    top: -3px;
+    width: 36px;
+    height: 12px;
+    border-radius: 50%;
+    background:
+        radial-gradient(ellipse at center, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0.32) 42%, rgba(0, 0, 0, 0) 74%);
+    filter: blur(1.4px);
+    transform-origin: center center;
+    will-change: transform, opacity;
+}
+
+.forest-v2-avatar-body {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--forest-avatar-width, 44px);
+    height: var(--forest-avatar-height, 52px);
+    transform:
+        translate3d(-50%, -100%, 0)
+        translateY(var(--forest-avatar-lift, -4px))
+        scale(var(--forest-avatar-scale, 1));
+    transform-origin: center bottom;
+    will-change: transform, filter;
+    animation: forestAvatarBreathe 1.55s ease-in-out infinite;
+}
+
+.forest-v2-avatar-body > img {
+    width: 100% !important;
+    min-width: 100%;
+    height: 100% !important;
+    object-fit: contain;
+    object-position: center bottom;
+}
+
+.forest-v2-avatar-body.is-moving {
+    animation: forestAvatarStep 540ms ease-in-out infinite;
+}
+
+@keyframes forestAvatarBreathe {
+    0%,
+    100% {
+        transform:
+            translate3d(-50%, -100%, 0)
+            translateY(var(--forest-avatar-lift, -4px))
+            scale(var(--forest-avatar-scale, 1));
+    }
+    50% {
+        transform:
+            translate3d(-50%, -100%, 0)
+            translateY(calc(var(--forest-avatar-lift, -4px) - 2px))
+            scale(var(--forest-avatar-scale, 1));
+    }
+}
+
+@keyframes forestAvatarStep {
+    0%,
+    100% {
+        transform:
+            translate3d(-50%, -100%, 0)
+            translateY(var(--forest-avatar-lift, -4px))
+            scale(var(--forest-avatar-scale, 1));
+    }
+    50% {
+        transform:
+            translate3d(-50%, -100%, 0)
+            translateY(calc(var(--forest-avatar-lift, -4px) - 8px))
+            scale(var(--forest-avatar-scale, 1));
+    }
 }

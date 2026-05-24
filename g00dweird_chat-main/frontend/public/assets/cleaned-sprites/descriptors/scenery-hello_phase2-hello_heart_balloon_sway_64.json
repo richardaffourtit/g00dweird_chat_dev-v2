@@ -1,0 +1,353 @@
+{
+  "id": "scenery-hello_phase2-hello_heart_balloon_sway_64",
+  "source": "frontend/public/scenery/hello_phase2/hello_heart_balloon_sway_64.png",
+  "outputSheet": "frontend/public/assets/cleaned-sprites/scenery-hello_phase2-hello_heart_balloon_sway_64.png",
+  "frameWidth": 31,
+  "frameHeight": 55,
+  "frameCount": 12,
+  "fps": 8,
+  "loop": true,
+  "pivot": {
+    "x": 0.5,
+    "y": 0.85
+  },
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 31,
+      "h": 55,
+      "bbox": {
+        "x": 19,
+        "y": 11,
+        "w": 27,
+        "h": 52
+      },
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "7a077f25c3204f159a2bb44ba0ce41c59a8c2ed7bf99dc92e883323a775dbb23",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 478,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 1,
+      "x": 31,
+      "y": 0,
+      "w": 31,
+      "h": 55,
+      "bbox": {
+        "x": 20,
+        "y": 11,
+        "w": 27,
+        "h": 52
+      },
+      "sourceRect": {
+        "x": 64,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "f6c5ea16860f43b3aa71173a2d818a39481ee18d58d6591adf88056bd77d4ef7",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 478,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 2,
+      "x": 62,
+      "y": 0,
+      "w": 31,
+      "h": 55,
+      "bbox": {
+        "x": 21,
+        "y": 11,
+        "w": 27,
+        "h": 52
+      },
+      "sourceRect": {
+        "x": 128,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "042bb95187f5eed173b8bdbc7295e0b62b5dae7eff4676a6786cf3c1cbdeed30",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 478,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 3,
+      "x": 93,
+      "y": 0,
+      "w": 31,
+      "h": 55,
+      "bbox": {
+        "x": 22,
+        "y": 11,
+        "w": 27,
+        "h": 52
+      },
+      "sourceRect": {
+        "x": 192,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "9bdd672b9bc5630f098f7e003a7c876bcbeb0fc944d1be4968ccf08880152c91",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 479,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 4,
+      "x": 124,
+      "y": 0,
+      "w": 31,
+      "h": 55,
+      "bbox": {
+        "x": 21,
+        "y": 11,
+        "w": 27,
+        "h": 52
+      },
+      "sourceRect": {
+        "x": 256,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "042bb95187f5eed173b8bdbc7295e0b62b5dae7eff4676a6786cf3c1cbdeed30",
+      "duplicateOf": 2,
+      "warnings": [
+        "duplicate-frame"
+      ],
+      "visiblePixels": 478,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 5,
+      "x": 155,
+      "y": 0,
+      "w": 31,
+      "h": 55,
+      "bbox": {
+        "x": 20,
+        "y": 11,
+        "w": 27,
+        "h": 52
+      },
+      "sourceRect": {
+        "x": 320,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "f6c5ea16860f43b3aa71173a2d818a39481ee18d58d6591adf88056bd77d4ef7",
+      "duplicateOf": 1,
+      "warnings": [
+        "duplicate-frame"
+      ],
+      "visiblePixels": 478,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 6,
+      "x": 186,
+      "y": 0,
+      "w": 31,
+      "h": 55,
+      "bbox": {
+        "x": 19,
+        "y": 11,
+        "w": 27,
+        "h": 52
+      },
+      "sourceRect": {
+        "x": 384,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "7a077f25c3204f159a2bb44ba0ce41c59a8c2ed7bf99dc92e883323a775dbb23",
+      "duplicateOf": 0,
+      "warnings": [
+        "duplicate-frame"
+      ],
+      "visiblePixels": 478,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 7,
+      "x": 217,
+      "y": 0,
+      "w": 31,
+      "h": 55,
+      "bbox": {
+        "x": 18,
+        "y": 11,
+        "w": 27,
+        "h": 52
+      },
+      "sourceRect": {
+        "x": 448,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "e44aab9022c632ae6fb02cddb0dcd19bdc4a6bc754d2db74ecadc3d39ff93170",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 478,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 8,
+      "x": 248,
+      "y": 0,
+      "w": 31,
+      "h": 55,
+      "bbox": {
+        "x": 17,
+        "y": 11,
+        "w": 27,
+        "h": 52
+      },
+      "sourceRect": {
+        "x": 512,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "b15d79faa6fca625a570ec9d19fdaedc34ccb3df78d10cb1ff12b5b597e6747c",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 478,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 9,
+      "x": 279,
+      "y": 0,
+      "w": 31,
+      "h": 55,
+      "bbox": {
+        "x": 16,
+        "y": 11,
+        "w": 27,
+        "h": 52
+      },
+      "sourceRect": {
+        "x": 576,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "fb160ed20109168b3b6e3d45ac4f60c06a47f6803bbf06fd1c9f04e4fb248a04",
+      "duplicateOf": null,
+      "warnings": [],
+      "visiblePixels": 479,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 10,
+      "x": 310,
+      "y": 0,
+      "w": 31,
+      "h": 55,
+      "bbox": {
+        "x": 17,
+        "y": 11,
+        "w": 27,
+        "h": 52
+      },
+      "sourceRect": {
+        "x": 640,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "b15d79faa6fca625a570ec9d19fdaedc34ccb3df78d10cb1ff12b5b597e6747c",
+      "duplicateOf": 8,
+      "warnings": [
+        "duplicate-frame"
+      ],
+      "visiblePixels": 478,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    {
+      "index": 11,
+      "x": 341,
+      "y": 0,
+      "w": 31,
+      "h": 55,
+      "bbox": {
+        "x": 18,
+        "y": 11,
+        "w": 27,
+        "h": 52
+      },
+      "sourceRect": {
+        "x": 704,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "hash": "e44aab9022c632ae6fb02cddb0dcd19bdc4a6bc754d2db74ecadc3d39ff93170",
+      "duplicateOf": 7,
+      "warnings": [
+        "duplicate-frame"
+      ],
+      "visiblePixels": 478,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    }
+  ],
+  "warnings": [
+    "duplicate-frame"
+  ]
+}
