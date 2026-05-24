@@ -4,36 +4,31 @@
 
 This project is **g00dweird chat**: a strange, living, multi-world interactive chat experience made of browser rooms, isometric spaces, autonomous sprites, retro UI, weird props, ambient creatures, and world-specific moods.
 
-Do not treat the app as only one world or one aesthetic. Neoclassick is one thread. The platform should support many distinct worlds without forcing them to behave or feel the same.
+Neoclassick is one world and one aesthetic thread. The platform should support many distinct worlds without forcing them to behave or feel the same.
 
 The app should feel playful, uncanny, lo-fi, reactive, nostalgic, alive, expressive, sometimes funny, sometimes eerie, and never bland or generic.
 
-## Current Repo Map
+## Repository Map
 
-Work from this project root unless explicitly told otherwise:
+The active app source is organized as:
 
 ```text
-g00dweird_chat_dev/
-  g00dweird_chat-main/             app source of truth
-    backend/                       backend services and APIs
-    frontend/                      frontend source of truth
-      src/                         React app code
-      public/                      runtime-served public assets
-      public/assets/               runtime-ready app assets
-      public/source-assets/        raw/imported/source art
-      public/tools/                standalone dev tools
-      public/assets/cleaned-sprites/ generated sprite outputs
-      scripts/                     frontend asset/tooling scripts
-    scripts/                       project-level tooling scripts
-    tests/                         project-level tests
-    docs/                          plans, specs, notes
-    reports/                       generated reports
-  viral-g00dweird-video/           separate video-production workspace, not app runtime
+backend/                       FastAPI backend services and APIs
+frontend/                      React/Vite frontend source of truth
+  src/                         React app code
+  public/                      runtime-served public assets
+  public/assets/               runtime-ready app assets
+  public/source-assets/        raw/imported/source art
+  public/tools/                standalone dev tools
+  public/assets/cleaned-sprites/ generated sprite outputs
+  scripts/                     frontend asset/tooling scripts
+scripts/                       project-level tooling scripts
+tests/                         project-level tests
+docs/                          plans, specs, notes
+reports/                       generated reports
 ```
 
-Do not recreate root-level `frontend/`, root-level `assets/`, or root-level `index.html` for the app. The active frontend lives at `g00dweird_chat-main/frontend`.
-
-The video workspace is separate. Do not include `viral-g00dweird-video/` in app work, commits, builds, asset paths, or runtime assumptions unless explicitly asked.
+Do not recreate root-level `frontend/`, root-level `assets/`, or root-level `index.html` outside this app directory. The active frontend lives at `frontend/`.
 
 ## Default Workflow
 
@@ -46,9 +41,7 @@ When given a task:
 5. Run the smallest validation that proves the change works.
 6. Summarize exactly what changed and what was verified.
 
-Prefer action over long explanation. Do not ask for constant clarification; make strong, reasonable decisions and continue. If a decision is risky, document the risk and choose the safest useful implementation.
-
-Do not commit or push unless explicitly asked. The repo may contain large generated assets and local production work nearby.
+Prefer action over long explanation. Make strong, reasonable decisions and continue. If a decision is risky, document the risk and choose the safest useful implementation.
 
 ## Creative Standard
 
@@ -121,7 +114,7 @@ Keep world-specific content close to the world:
 - cursor rules
 - sound/music hooks, when present
 
-Do not bury world-specific behavior inside shared engine code unless the current structure makes that unavoidable. Do not add global avatar/sprite assets into a world as ambient content unless explicitly requested; prefer elements that match the scene's visual language.
+Do not bury world-specific behavior inside shared engine code unless the current structure makes that unavoidable. Prefer world assets and entities that match the scene's visual language.
 
 ## World Contract
 
@@ -167,7 +160,7 @@ Keep runtime assets inside the project. Do not depend on external drive paths.
 Use the current structure:
 
 ```text
-g00dweird_chat-main/frontend/public/
+frontend/public/
   assets/                 runtime-ready public app assets
     cleaned-sprites/      generated cleaned sprite sheets and descriptors
     world-icons/          runtime world picker icons
@@ -183,7 +176,7 @@ g00dweird_chat-main/frontend/public/
 
 Preserve source filenames when practical. Do not rename files unnecessarily. Keep raw/imported, processed/generated, and runtime-ready assets distinguishable.
 
-When moving assets from uploaded, external, or local scratch locations, put them in the right app-local folder and note the move in docs or the final summary when it affects future work.
+When moving assets from uploaded, external, or local scratch locations, put them in the right app-local folder and note the move when it affects future work.
 
 Do not place app runtime assets in root-level `assets/`. Do not place app code in root-level `frontend/`.
 
@@ -215,25 +208,24 @@ Run the smallest check that proves the change.
 Frontend:
 
 ```bash
-cd g00dweird_chat-main/frontend
+cd frontend
 npm run build
 ```
 
 Sprite tooling:
 
 ```bash
-cd g00dweird_chat-main/frontend
+cd frontend
 npm run sprites
 ```
 
 Backend/project tests when relevant:
 
 ```bash
-cd g00dweird_chat-main
 pytest
 ```
 
-Use browser verification for visible frontend changes. The local dev server usually runs from:
+Use browser verification for visible frontend changes when available. The local frontend dev server usually runs from:
 
 ```text
 http://127.0.0.1:3000
@@ -247,7 +239,7 @@ If validation cannot be run, say why and name the remaining risk.
 - Prefer focused, reviewable changes.
 - Make visible improvements when the task is user-facing.
 - Improve foundations when the foundation clearly benefits multiple worlds.
-- Do not make huge rewrites unless the current structure is blocking progress.
+- Avoid huge rewrites unless the current structure is blocking progress.
 - Do not rely on external drive paths at runtime.
 - Do not introduce new top-level project folders without a clear reason.
-- Keep generated folders, dependencies, caches, and separated video work out of app commits unless explicitly requested.
+- Keep dependencies, caches, and local scratch work out of app commits.
