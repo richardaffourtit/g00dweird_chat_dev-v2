@@ -286,6 +286,33 @@ const WORLD_REACTION_HOTSPOTS = {
     ],
 };
 
+const THOUGHT_BUBBLE_BODY_BOUNDS = {
+    s1: { y: 0, h: 41 },
+    s2: { y: 0, h: 54 },
+    s3: { y: 0, h: 59 },
+    s4a: { y: 0, h: 62 },
+    s4b: { y: 0, h: 71 },
+    s5: { y: 0, h: 94 },
+    s6: { y: 0, h: 107 },
+    s7: { y: 0, h: 102 },
+    s8: { y: 0, h: 121 },
+    m1: { y: 0, h: 73 },
+    m2: { y: 0, h: 89 },
+    m3: { y: 0, h: 83 },
+    m4: { y: 0, h: 111 },
+    m5: { y: 0, h: 120 },
+    m7: { y: 0, h: 111 },
+    m8: { y: 0, h: 125 },
+    l1: { y: 0, h: 70 },
+    l2: { y: 0, h: 84 },
+    l3: { y: 0, h: 91 },
+    l4: { y: 0, h: 100 },
+    l5: { y: 0, h: 107 },
+    l6: { y: 0, h: 106 },
+    l7: { y: 0, h: 100 },
+    l8: { y: 0, h: 91 },
+};
+
 function thoughtBubbleVariant(entry) {
     const source = entry.source || entry;
     const scale = Number(entry.render?.scale) || (entry.tier === "long" ? 0.76 : entry.tier === "medium" ? 0.82 : 0.92);
@@ -307,6 +334,7 @@ function thoughtBubbleVariant(entry) {
         renderH: Math.round(source.h * scale),
         tailX: entry.tail?.x ?? Math.round(source.w * (entry.tier === "short" ? 0.24 : 0.18)),
         text,
+        body: entry.body || THOUGHT_BUBBLE_BODY_BOUNDS[entry.id] || { y: 0, h: source.h },
         fontSize: entry.fontSize || (entry.tier === "long" ? 12 : entry.rank > 4 ? 12 : 13),
     };
 }
@@ -2516,8 +2544,10 @@ function ThoughtBubbleSprite({ variant, text, fullfunk, placeBelow, cloudScale =
     const scaledTextOffsetX = Math.max(0, Math.round(textOffsetX * cloudScale));
     const renderedBubbleHeight = Math.round(variant.renderH * cloudScale);
     const baseTextTop = Math.round(textBox.y * scaleY * cloudScale);
+    const bodyBox = variant.body || { y: 0, h: variant.h };
+    const flippedBodyCenterY = (variant.h - (bodyBox.y + (bodyBox.h / 2))) * scaleY * cloudScale;
     const textTop = placeBelow
-        ? Math.max(0, Math.round((renderedBubbleHeight - scaledTextArea.height) / 2))
+        ? Math.round(clamp(flippedBodyCenterY - (scaledTextArea.height / 2), 0, Math.max(0, renderedBubbleHeight - scaledTextArea.height)))
         : Math.max(0, baseTextTop);
 
     useEffect(() => {
