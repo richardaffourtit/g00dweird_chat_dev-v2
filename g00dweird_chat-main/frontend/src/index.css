@@ -139,11 +139,26 @@ a {
 
 .font-pixel {
     font-family: "Silkscreen", "Press Start 2P", monospace;
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
 }
 
 .font-mono-retro {
     font-family: "VT323", "MS Sans Serif", monospace;
+}
+
+.font-pixel,
+.font-mono-retro,
+.w95-window-body {
+    min-width: 0;
+}
+
+.font-pixel,
+.font-mono-retro {
+    overflow-wrap: anywhere;
+}
+
+.w95-window-body :where(button, input, textarea, select, label, p, li, span, div) {
+    min-width: 0;
 }
 
 /* Win95 bevels — symmetric 2px bevel using inset shadows so top + bottom look identical */
@@ -169,6 +184,7 @@ a {
 .w95-button {
     font-family: "VT323", monospace;
     font-size: 18px;
+    line-height: 1.12;
     background: var(--w95-bg);
     color: #000;
     padding: 4px 12px;
@@ -180,6 +196,11 @@ a {
         inset -1px -1px 0 var(--w95-gray),
         inset 1px 1px 0 var(--w95-shadow);
     user-select: none;
+    min-width: 0;
+    white-space: normal;
+}
+.w95-button :where(span, div) {
+    min-width: 0;
 }
 .w95-button:active,
 .w95-button.active {
@@ -203,6 +224,7 @@ a {
 .w95-input {
     font-family: "VT323", monospace;
     font-size: 18px;
+    line-height: 1.15;
     padding: 3px 6px;
     background: #fff;
     color: #000;
@@ -230,6 +252,11 @@ a {
     user-select: none;
     cursor: move;
     height: 22px;
+    line-height: 1;
+    overflow: hidden;
+}
+.w95-titlebar > span:first-child {
+    min-width: 0;
 }
 .w95-titlebar.inactive {
     background: linear-gradient(90deg, #7b7b7b 0%, #b5b5b5 100%);
