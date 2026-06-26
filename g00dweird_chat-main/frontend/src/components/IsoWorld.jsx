@@ -2514,10 +2514,11 @@ function ThoughtBubbleSprite({ variant, text, fullfunk, placeBelow, cloudScale =
         height: Math.max(1, Math.round(textAreaHeight * cloudScale)),
     };
     const scaledTextOffsetX = Math.max(0, Math.round(textOffsetX * cloudScale));
-    const baseTextTop = placeBelow
-        ? Math.round(variant.renderH - ((textBox.y + textBox.h) * scaleY))
-        : Math.round(textBox.y * scaleY);
-    const textTop = Math.max(0, Math.round(baseTextTop * cloudScale));
+    const renderedBubbleHeight = Math.round(variant.renderH * cloudScale);
+    const baseTextTop = Math.round(textBox.y * scaleY * cloudScale);
+    const textTop = placeBelow
+        ? Math.max(0, Math.round((renderedBubbleHeight - scaledTextArea.height) / 2))
+        : Math.max(0, baseTextTop);
 
     useEffect(() => {
         let cancelled = false;
