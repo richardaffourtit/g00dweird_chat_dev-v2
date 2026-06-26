@@ -9,6 +9,7 @@ rtassh.pub
 
 # System and local tool output
 .DS_Store
+.worktrees/
 .playwright-mcp/
 pixel-mcp/
 
