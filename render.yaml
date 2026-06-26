@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: g00dweird-api
+    runtime: python
+    rootDir: g00dweird_chat-main/backend
+    plan: starter
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    domains:
+      - api.g00dweird.com
+    disk:
+      name: g00dweird-uploads
+      mountPath: /var/data/g00dweird
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: MONGO_URL
+        sync: false
+      - key: DB_NAME
+        value: g00dweird
+      - key: CORS_ORIGINS
+        value: https://g00dweird.com,https://www.g00dweird.com,https://chat.g00dweird.com
+      - key: OBJECT_STORAGE_PROVIDER
+        value: local
+      - key: LOCAL_STORAGE_DIR
+        value: /var/data/g00dweird/uploads
+
+  - type: web
+    name: g00dweird-chat
+    runtime: static
+    rootDir: g00dweird_chat-main/frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: g00dweird_chat-main/frontend/build
+    autoDeployTrigger: commit
+    domains:
+      - g00dweird.com
+      - www.g00dweird.com
+      - chat.g00dweird.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: REACT_APP_BACKEND_URL
+        value: https://api.g00dweird.com
+      - key: REACT_APP_PREVIEW_MOCK
+        value: "0"
+      - key: REACT_APP_USE_CLEANED_SPRITES
+        value: "1"

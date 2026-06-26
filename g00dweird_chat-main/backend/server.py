@@ -594,6 +594,16 @@ async def root():
     return {"message": "welcome to g00dweird", "rooms": [r.model_dump() for r in ROOMS]}
 
 
+@api_router.get("/health")
+async def health():
+    return {
+        "ok": True,
+        "service": "g00dweird-backend",
+        "rooms": len(ROOMS),
+        "storage": OBJECT_STORAGE_PROVIDER,
+    }
+
+
 @api_router.get("/rooms", response_model=List[RoomInfo])
 async def list_rooms():
     return ROOMS
