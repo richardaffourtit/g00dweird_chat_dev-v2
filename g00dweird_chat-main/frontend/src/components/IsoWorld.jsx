@@ -2394,15 +2394,28 @@ function QuoteBubble({ text, fullfunk, placeBelow = false }) {
                 width: "max-content",
                 maxWidth: fullfunk ? 260 : 220,
                 minWidth: 40,
+                minHeight: fullfunk ? 28 : 30,
                 whiteSpace: "pre-wrap",
                 wordBreak: "break-word",
                 textAlign: "center",
                 boxShadow: "2px 2px 0 #000",
                 pointerEvents: "none",
                 zIndex: 8,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxSizing: "border-box",
             }}
         >
-            {fullfunk ? <FullfunkText text={t} size={16} /> : t}
+            <span
+                style={{
+                    display: "block",
+                    width: "100%",
+                    transform: "translateY(-1px)",
+                }}
+            >
+                {fullfunk ? <FullfunkText text={t} size={16} /> : t}
+            </span>
             <span aria-hidden style={{
                 position: "absolute", [placeBelow ? "top" : "bottom"]: -7, left: "50%",
                 transform: "translateX(-50%)", width: 0, height: 0,
@@ -2543,12 +2556,13 @@ function ThoughtBubbleSprite({ variant, text, fullfunk, placeBelow, cloudScale =
     };
     const scaledTextOffsetX = Math.max(0, Math.round(textOffsetX * cloudScale));
     const renderedBubbleHeight = Math.round(variant.renderH * cloudScale);
-    const baseTextTop = Math.round(textBox.y * scaleY * cloudScale);
     const bodyBox = variant.body || { y: 0, h: variant.h };
-    const flippedBodyCenterY = (variant.h - (bodyBox.y + (bodyBox.h / 2))) * scaleY * cloudScale;
-    const textTop = placeBelow
-        ? Math.round(clamp(flippedBodyCenterY - (scaledTextArea.height / 2), 0, Math.max(0, renderedBubbleHeight - scaledTextArea.height)))
-        : Math.max(0, baseTextTop);
+    const bodyCenterY = (
+        placeBelow
+            ? variant.h - (bodyBox.y + (bodyBox.h / 2))
+            : bodyBox.y + (bodyBox.h / 2)
+    ) * scaleY * cloudScale;
+    const textTop = Math.round(clamp(bodyCenterY - (scaledTextArea.height / 2), 0, Math.max(0, renderedBubbleHeight - scaledTextArea.height)));
 
     useEffect(() => {
         let cancelled = false;
