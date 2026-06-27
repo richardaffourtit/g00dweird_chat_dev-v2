@@ -245,6 +245,13 @@ upload tests blocked by Universal Key 401 — refresh to fix)
 - Embeddable profile widget (iframe / HTML snippet) so users can drop their
   live "now in [room]" badge on tumblr/blogs (boosts alive-web flywheel)
 
+## Future Add-ons
+- **Neoclassick Back 9 / Hole 9**: keep the experimental back-nine assets and
+  interactive Hole 9 scene from the polish branch out of the current main
+  release until they have a clean world-runtime contract, production asset
+  manifest, and routing/picker behavior that does not replace the shipped
+  `neoclassick-world` room background.
+
 ## Environment
 - Backend: `MONGO_URL`, `DB_NAME`, `LOCAL_STORAGE_DIR`, `OBJECT_STORAGE_PROVIDER`, `OBJECT_STORAGE_BUCKET`, `OBJECT_STORAGE_ENDPOINT_URL`, `OBJECT_STORAGE_REGION`
 - Frontend: `REACT_APP_BACKEND_URL`
