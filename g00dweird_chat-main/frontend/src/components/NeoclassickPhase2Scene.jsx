@@ -469,8 +469,7 @@ function CosmicMotion() {
                         boxShadow: "0 0 8px #62f6ff, 0 0 14px #ff6ec7",
                         clipPath: "polygon(50% 0,60% 38%,100% 50%,60% 62%,50% 100%,40% 62%,0 50%,40% 38%)",
                         opacity: 0.5,
-                        animation: `neo-star-twinkle ${2.3 + index * 0.22}s steps(4, end) infinite`,
-                        animationDelay: `${index * -0.31}s`,
+                        animation: `neo-star-twinkle ${2.3 + index * 0.22}s steps(4, end) ${index * -0.31}s infinite`,
                     }}
                 />
             ))}
@@ -763,8 +762,7 @@ function EqualizerHolograms() {
                         mixBlendMode: "screen",
                         opacity: 0.7,
                         transformOrigin: "center bottom",
-                        animation: `neo-eq-pulse ${0.92 + index * 0.04}s steps(5, end) infinite`,
-                        animationDelay: `${bar.delay}ms`,
+                        animation: `neo-eq-pulse ${0.92 + index * 0.04}s steps(5, end) ${bar.delay}ms infinite`,
                     }}
                 >
                     <i
@@ -804,8 +802,7 @@ function HologramPanel({ panel }) {
                 boxShadow: `inset 0 0 8px ${panel.color}44, 0 0 9px ${panel.color}33`,
                 mixBlendMode: "screen",
                 opacity: 0.45,
-                animation: "neo-hologram-flicker 3.7s steps(5, end) infinite",
-                animationDelay: `${panel.delay}ms`,
+                animation: `neo-hologram-flicker 3.7s steps(5, end) ${panel.delay}ms infinite`,
                 ...skewStyle,
             }}
         >
@@ -817,8 +814,7 @@ function HologramPanel({ panel }) {
                     height: "38%",
                     top: 0,
                     background: `linear-gradient(180deg, rgba(255,255,255,0), ${panel.color}dd, rgba(255,255,255,0))`,
-                    animation: "neo-hologram-scan 1.8s steps(9, end) infinite",
-                    animationDelay: `${panel.delay}ms`,
+                    animation: `neo-hologram-scan 1.8s steps(9, end) ${panel.delay}ms infinite`,
                 }}
             />
             <span
@@ -867,8 +863,7 @@ function WaterfallFlow({ fall }) {
                                 height: segmentHeight,
                                 background:
                                     `linear-gradient(180deg, rgba(255,255,255,0) 0 12%, rgba(255,255,255,0.6) 24%, ${fall.hue}d8 40%, rgba(255,255,255,0.18) 58%, rgba(255,255,255,0) 82%)`,
-                                animation: "neo-waterfall-segment 760ms steps(5, end) infinite",
-                                animationDelay: `${stream.delay - streamIndex * 45 - segmentIndex * 34}ms`,
+                                animation: `neo-waterfall-segment 760ms steps(5, end) ${stream.delay - streamIndex * 45 - segmentIndex * 34}ms infinite`,
                             }}
                         />
                     ))}

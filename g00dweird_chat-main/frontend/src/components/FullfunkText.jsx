@@ -32,6 +32,7 @@ export default function FullfunkText({
     color,
     testId,
     vertical = false,
+    style,
 }) {
     if (!text) return null;
     const chars = [...text];
@@ -47,6 +48,7 @@ export default function FullfunkText({
                 gap,
                 lineHeight: 1,
                 verticalAlign: "middle",
+                ...style,
             }}
         >
             {chars.map((ch, i) => {

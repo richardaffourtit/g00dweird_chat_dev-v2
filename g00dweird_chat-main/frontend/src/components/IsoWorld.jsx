@@ -25,6 +25,32 @@ const MemoLiminalPhase4Scene = React.memo(LiminalPhase4Scene);
 const MemoNeoclassickPhase2Scene = React.memo(NeoclassickPhase2Scene);
 const MemoWWWorldScene = React.memo(WWWorldScene);
 
+function frameNow() {
+    if (typeof window !== "undefined" && typeof window.performance?.now === "function") {
+        return window.performance.now();
+    }
+    if (typeof globalThis !== "undefined" && typeof globalThis.performance?.now === "function") {
+        return globalThis.performance.now();
+    }
+    return Date.now();
+}
+
+function requestFrame(callback) {
+    if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
+        return { type: "raf", id: window.requestAnimationFrame(callback) };
+    }
+    return { type: "timeout", id: setTimeout(() => callback(frameNow()), 16) };
+}
+
+function cancelFrame(handle) {
+    if (!handle) return;
+    if (handle.type === "raf" && typeof window !== "undefined" && typeof window.cancelAnimationFrame === "function") {
+        window.cancelAnimationFrame(handle.id);
+        return;
+    }
+    clearTimeout(handle.id);
+}
+
 function JungleFog() {
     return (
         <div className="jungle-fog-layer" aria-hidden data-testid="jungle-fog">
@@ -76,12 +102,12 @@ function MarsRover({ stageRect }) {
         const step = (timestamp) => {
             if (startMs == null) startMs = timestamp;
             applyRoverPose(timestamp - startMs);
-            if (!reduceMotion) rafId = requestAnimationFrame(step);
+            if (!reduceMotion) rafId = requestFrame(step);
         };
 
-        rafId = requestAnimationFrame(step);
+        rafId = requestFrame(step);
         return () => {
-            if (rafId) cancelAnimationFrame(rafId);
+            if (rafId) cancelFrame(rafId);
         };
     }, []);
 
@@ -183,6 +209,13 @@ function basketballArtY(y) {
     return Math.round((y / BASKETBALL_ART_SIZE) * STAGE_H);
 }
 
+function basketballArtPoint(point) {
+    return {
+        x: basketballArtX(point.x),
+        y: basketballArtY(point.y),
+    };
+}
+
 function basketballArtRect({ x, y, w, h, ...rest }) {
     return {
         ...rest,
@@ -206,6 +239,22 @@ const BASKETBALL_HOOP = {
 const BASKETBALL_GRAVITY = 250;
 const BASKETBALL_FLOOR_Y = 486;
 const BASKETBALL_RADIUS = 12;
+const BASKETBALL_COURT_POLYGON = [
+    { x: 145, y: 618 },
+    { x: 392, y: 438 },
+    { x: 706, y: 340 },
+    { x: 1018, y: 432 },
+    { x: 1170, y: 610 },
+    { x: 1050, y: 752 },
+    { x: 860, y: 840 },
+    { x: 688, y: 1002 },
+    { x: 394, y: 1028 },
+    { x: 90, y: 823 },
+].map(basketballArtPoint);
+const BASKETBALL_COURT_CENTER = basketballArtPoint({ x: 612, y: 690 });
+const BASKETBALL_HOOP_FLOOR = basketballArtPoint({ x: 838, y: 430 });
+const BASKETBALL_COURT_MIN_X = Math.min(...BASKETBALL_COURT_POLYGON.map((point) => point.x));
+const BASKETBALL_COURT_MAX_X = Math.max(...BASKETBALL_COURT_POLYGON.map((point) => point.x));
 // Basketball court art is square, but the gameplay plane is 1000x500.
 // Keep collider coordinates in source-art pixels and convert once here so
 // the hit areas stay attached to the drawn hoop/backboard instead of screen guesswork.
@@ -227,7 +276,12 @@ const BASKETBALL_RIM_COLLIDER = {
     restitution: 0.72,
     tangentDamping: 0.78,
 };
-const MAX_BASKETBALLS = 10;
+const MAX_BASKETBALLS = 18;
+const BASKETBALL_CLICK_SHOT_GUARD_MS = 180;
+const BASKETBALL_FLIGHT_END_PROGRESS = 0.6;
+const BASKETBALL_FALL_END_PROGRESS = 0.78;
+const BASKETBALL_BOUNCE_END_PROGRESS = 0.9;
+const BASKETBALL_SHOT_SAMPLE_COUNT = 96;
 const WORLD_REACTION_TTL_MS = 2600;
 const THOUGHT_BUBBLE_SHEET_SRC = `${thoughtBubbleManifest.sourceImage}?v=thought-clouds-json-20260507b`;
 const MARS_ROVER_PATROL_MS = 28000;
@@ -364,16 +418,32 @@ function avatarRenderPoint(user) {
 }
 
 function buildBasketball(shot) {
+    const x = clamp(Number(shot?.x) || 500, BASKETBALL_RADIUS, STAGE_W - BASKETBALL_RADIUS);
+    const y = clamp(Number(shot?.y) || 250, BASKETBALL_RADIUS, STAGE_H - BASKETBALL_RADIUS);
+    const vx = clamp(Number(shot?.vx) || 220, -650, 650);
+    const vy = clamp(Number(shot?.vy) || -320, -760, 320);
+    const targetX = Number.isFinite(Number(shot?.target_x))
+        ? Number(shot.target_x)
+        : x + vx * 1.15;
+    const targetY = Number.isFinite(Number(shot?.target_y))
+        ? Number(shot.target_y)
+        : y + vy * 1.15 + 0.5 * BASKETBALL_GRAVITY * 1.15 * 1.15;
+    const target = {
+        x: clamp(targetX, BASKETBALL_RADIUS, STAGE_W - BASKETBALL_RADIUS),
+        y: clamp(targetY, BASKETBALL_RADIUS, STAGE_H - BASKETBALL_RADIUS),
+    };
     return {
         id: shot?.id || `hoop-${Date.now()}-${Math.random().toString(36).slice(2)}`,
         user_id: shot?.user_id || "",
         nickname: shot?.nickname || "",
-        x: clamp(Number(shot?.x) || 500, BASKETBALL_RADIUS, STAGE_W - BASKETBALL_RADIUS),
-        y: clamp(Number(shot?.y) || 250, BASKETBALL_RADIUS, STAGE_H - BASKETBALL_RADIUS),
-        vx: clamp(Number(shot?.vx) || 220, -650, 650),
-        vy: clamp(Number(shot?.vy) || -320, -760, 320),
+        x,
+        y,
+        vx,
+        vy,
+        target_x: target.x,
+        target_y: target.y,
         spin: 0,
-        scored: false,
+        scored: basketballTargetScores(target),
         bounces: 0,
         life: 0,
         r: BASKETBALL_RADIUS,
@@ -385,6 +455,246 @@ function basketballScored(prevY, ball) {
     const crossedRim = prevY <= BASKETBALL_HOOP.y && ball.y >= BASKETBALL_HOOP.y - BASKETBALL_HOOP.rimHeight * 0.35;
     const insideRim = Math.abs(ball.x - BASKETBALL_HOOP.x) <= BASKETBALL_HOOP.rimWidth / 2;
     return crossedRim && insideRim;
+}
+
+function basketballTargetScores(target) {
+    if (!target) return false;
+    const dx = Math.abs(target.x - BASKETBALL_HOOP.x);
+    const dy = Math.abs(target.y - BASKETBALL_HOOP.y);
+    return dx <= BASKETBALL_HOOP.rimWidth * 0.38 && dy <= Math.max(5, BASKETBALL_HOOP.rimHeight * 0.68);
+}
+
+function basketballCurvePoint(start, control, end, t) {
+    const inv = 1 - t;
+    return {
+        x: inv * inv * start.x + 2 * inv * t * control.x + t * t * end.x,
+        y: inv * inv * start.y + 2 * inv * t * control.y + t * t * end.y,
+    };
+}
+
+function easeOutCubic(t) {
+    return 1 - ((1 - t) ** 3);
+}
+
+function basketballCourtContains(point) {
+    let inside = false;
+    for (let i = 0, j = BASKETBALL_COURT_POLYGON.length - 1; i < BASKETBALL_COURT_POLYGON.length; j = i++) {
+        const a = BASKETBALL_COURT_POLYGON[i];
+        const b = BASKETBALL_COURT_POLYGON[j];
+        const crosses = (a.y > point.y) !== (b.y > point.y);
+        if (!crosses) continue;
+        const xAtY = ((b.x - a.x) * (point.y - a.y)) / (b.y - a.y) + a.x;
+        if (point.x < xAtY) inside = !inside;
+    }
+    return inside;
+}
+
+function basketballCourtYBoundsAtX(x) {
+    const intersections = [];
+    for (let i = 0; i < BASKETBALL_COURT_POLYGON.length; i++) {
+        const a = BASKETBALL_COURT_POLYGON[i];
+        const b = BASKETBALL_COURT_POLYGON[(i + 1) % BASKETBALL_COURT_POLYGON.length];
+        const minX = Math.min(a.x, b.x);
+        const maxX = Math.max(a.x, b.x);
+        if (x < minX || x > maxX) continue;
+        if (a.x === b.x) {
+            intersections.push(a.y, b.y);
+            continue;
+        }
+        const t = (x - a.x) / (b.x - a.x);
+        if (t >= 0 && t <= 1) intersections.push(a.y + (b.y - a.y) * t);
+    }
+
+    const unique = [...new Set(intersections.map((y) => Math.round(y * 100) / 100))]
+        .sort((a, b) => a - b);
+    if (unique.length < 2) return null;
+    const pad = BASKETBALL_RADIUS * 0.65;
+    const minY = unique[0] + pad;
+    const maxY = unique[unique.length - 1] - pad;
+    if (maxY < minY) {
+        const mid = (unique[0] + unique[unique.length - 1]) / 2;
+        return { minY: mid, maxY: mid };
+    }
+    return { minY, maxY };
+}
+
+function basketballClampToCourt(point) {
+    const x = clamp(point.x, BASKETBALL_COURT_MIN_X + BASKETBALL_RADIUS, BASKETBALL_COURT_MAX_X - BASKETBALL_RADIUS);
+    const bounds = basketballCourtYBoundsAtX(x);
+    if (!bounds) return { ...BASKETBALL_COURT_CENTER };
+    return {
+        x,
+        y: clamp(point.y, bounds.minY, bounds.maxY),
+    };
+}
+
+function basketballShotOriginGround(ball) {
+    return basketballClampToCourt({
+        x: ball.x,
+        y: ball.y + 58,
+    });
+}
+
+function basketballTargetGround(target, made) {
+    if (made) return basketballClampToCourt(BASKETBALL_HOOP_FLOOR);
+    if (basketballCourtContains(target)) return basketballClampToCourt(target);
+
+    const x = clamp(target.x, BASKETBALL_COURT_MIN_X + BASKETBALL_RADIUS, BASKETBALL_COURT_MAX_X - BASKETBALL_RADIUS);
+    const bounds = basketballCourtYBoundsAtX(x);
+    if (!bounds) return basketballClampToCourt(target);
+    const y = target.y < bounds.minY
+        ? bounds.minY + clamp((bounds.minY - target.y) * 0.42, 28, 88)
+        : target.y;
+    return basketballClampToCourt({ x, y });
+}
+
+function basketballNormalizeVector(vector, fallback = { x: 0, y: 1 }) {
+    const length = Math.hypot(vector.x, vector.y);
+    if (!Number.isFinite(length) || length < 0.001) return { ...fallback };
+    return {
+        x: vector.x / length,
+        y: vector.y / length,
+    };
+}
+
+function basketballRollVector(originGround, impactGround, made) {
+    const shotVector = {
+        x: impactGround.x - originGround.x,
+        y: impactGround.y - originGround.y,
+    };
+    const centerVector = {
+        x: BASKETBALL_COURT_CENTER.x - impactGround.x,
+        y: BASKETBALL_COURT_CENTER.y - impactGround.y,
+    };
+    if (made) {
+        return basketballNormalizeVector({
+            x: centerVector.x * 0.82 + shotVector.x * 0.1,
+            y: Math.max(32, centerVector.y) * 0.9 + Math.abs(centerVector.x) * 0.12,
+        });
+    }
+    return basketballNormalizeVector({
+        x: shotVector.x * 0.72 + centerVector.x * 0.18,
+        y: shotVector.y * 0.72 + Math.max(0, centerVector.y) * 0.22 + Math.abs(shotVector.x) * 0.08,
+    });
+}
+
+function basketballAdvanceOnCourt(point, vector, distance) {
+    const candidate = {
+        x: point.x + vector.x * distance,
+        y: point.y + vector.y * distance,
+    };
+    if (basketballCourtContains(candidate)) return basketballClampToCourt(candidate);
+
+    const slideX = basketballClampToCourt({ x: candidate.x, y: point.y });
+    if (basketballCourtContains(slideX)) return slideX;
+    const slideY = basketballClampToCourt({ x: point.x, y: candidate.y });
+    if (basketballCourtContains(slideY)) return slideY;
+    return basketballClampToCourt(candidate);
+}
+
+function basketballDisplayPoint(ground, height) {
+    const safeHeight = Math.max(0, height);
+    return {
+        x: ground.x,
+        y: ground.y - safeHeight,
+        groundX: ground.x,
+        groundY: ground.y,
+        height: safeHeight,
+    };
+}
+
+function basketballShotHeight(point) {
+    return clamp(Number(point?.height) || 0, 0, 220);
+}
+
+function basketballShotPlan(ball, target, made) {
+    const origin = { x: ball.x, y: ball.y };
+    const originGround = basketballShotOriginGround(ball);
+    const aimGround = basketballTargetGround(target, made);
+    const targetHeight = made
+        ? clamp(aimGround.y - BASKETBALL_HOOP.y, 52, 118)
+        : clamp(aimGround.y - target.y, 0, 118);
+    const startHeight = clamp(originGround.y - origin.y, 32, 86);
+    const travelDistance = Math.hypot(target.x - origin.x, target.y - origin.y);
+    const apexHeight = clamp(78 + travelDistance * 0.12 + Math.max(startHeight, targetHeight) * 0.25, 92, 182);
+    const rollVector = basketballRollVector(originGround, aimGround, made);
+    const groundControl = basketballClampToCourt({
+        x: originGround.x + (aimGround.x - originGround.x) * 0.54 + rollVector.x * 14,
+        y: originGround.y + (aimGround.y - originGround.y) * 0.54 - clamp(Math.abs(aimGround.x - originGround.x) * 0.045, 0, 24),
+    });
+    const hasFall = targetHeight > 8;
+    const firstImpact = hasFall ? basketballAdvanceOnCourt(aimGround, rollVector, made ? 30 : 44) : aimGround;
+    const fallMidGround = hasFall ? basketballAdvanceOnCourt(aimGround, rollVector, made ? 14 : 22) : aimGround;
+    const bounceDistance = hasFall ? (made ? 58 : 78) : 38;
+    const restDistance = hasFall
+        ? clamp(Math.abs(ball.vx) * (made ? 0.14 : 0.22) + 54, 72, made ? 126 : 164)
+        : clamp(Math.abs(ball.vx) * 0.12 + 30, 36, 88);
+    const secondImpact = basketballAdvanceOnCourt(firstImpact, rollVector, bounceDistance);
+    const bounceMidGround = basketballAdvanceOnCourt(firstImpact, rollVector, bounceDistance * 0.48);
+    const rest = basketballAdvanceOnCourt(secondImpact, rollVector, restDistance);
+    const bounceHeight = hasFall ? (made ? 30 : 42) : 24;
+
+    return {
+        aimGround,
+        apexHeight,
+        bounceHeight,
+        bounceMidGround,
+        fallMidGround,
+        firstImpact,
+        groundControl,
+        origin,
+        originGround,
+        rest,
+        rollVector,
+        secondImpact,
+        startHeight,
+        targetHeight,
+    };
+}
+
+function basketballShotPointAt(plan, progress) {
+    if (progress <= BASKETBALL_FLIGHT_END_PROGRESS) {
+        const t = clamp(progress / BASKETBALL_FLIGHT_END_PROGRESS, 0, 1);
+        const ground = basketballCurvePoint(plan.originGround, plan.groundControl, plan.aimGround, t);
+        const height = plan.startHeight + (plan.targetHeight - plan.startHeight) * t + Math.sin(t * Math.PI) * plan.apexHeight;
+        return basketballDisplayPoint(ground, height);
+    }
+    if (progress <= BASKETBALL_FALL_END_PROGRESS) {
+        const t = clamp((progress - BASKETBALL_FLIGHT_END_PROGRESS) / (BASKETBALL_FALL_END_PROGRESS - BASKETBALL_FLIGHT_END_PROGRESS), 0, 1);
+        const ground = basketballCurvePoint(plan.aimGround, plan.fallMidGround, plan.firstImpact, t * t);
+        const height = plan.targetHeight * ((1 - t) ** 2);
+        return basketballDisplayPoint(ground, height);
+    }
+    if (progress <= BASKETBALL_BOUNCE_END_PROGRESS) {
+        const t = clamp((progress - BASKETBALL_FALL_END_PROGRESS) / (BASKETBALL_BOUNCE_END_PROGRESS - BASKETBALL_FALL_END_PROGRESS), 0, 1);
+        const ground = basketballCurvePoint(plan.firstImpact, plan.bounceMidGround, plan.secondImpact, t);
+        const height = Math.sin(t * Math.PI) * plan.bounceHeight * (1 - t * 0.18);
+        return basketballDisplayPoint(ground, height);
+    }
+    const t = easeOutCubic(clamp((progress - BASKETBALL_BOUNCE_END_PROGRESS) / (1 - BASKETBALL_BOUNCE_END_PROGRESS), 0, 1));
+    const ground = {
+        x: plan.secondImpact.x + (plan.rest.x - plan.secondImpact.x) * t,
+        y: plan.secondImpact.y + (plan.rest.y - plan.secondImpact.y) * t,
+    };
+    return basketballDisplayPoint(ground, 0);
+}
+
+function basketballShotSamples(ball, target, made) {
+    const plan = basketballShotPlan(ball, target, made);
+    return Array.from({ length: BASKETBALL_SHOT_SAMPLE_COUNT }, (_, index) => {
+        const progress = index / (BASKETBALL_SHOT_SAMPLE_COUNT - 1);
+        return {
+            ...basketballShotPointAt(plan, progress),
+            progress,
+        };
+    });
+}
+
+function basketballShotDuration(ball, target) {
+    const dx = target.x - ball.x;
+    const dy = target.y - ball.y;
+    const flightMs = clamp(Math.sqrt(dx * dx + dy * dy) * 2.25, 900, 1650);
+    return Math.round(clamp(flightMs / BASKETBALL_FLIGHT_END_PROGRESS, 1700, 2850));
 }
 
 function basketballCircleTouchesRect(x, y, radius, rect) {
@@ -673,6 +983,7 @@ export default function IsoWorld({
     const sprayTimersRef = useRef([]);
     const attackTimersRef = useRef([]);
     const processedShotIdsRef = useRef(new Set());
+    const lastLocalHoopShotAtRef = useRef(0);
     const swishTimerRef = useRef(null);
     const worldReactionTimersRef = useRef([]);
     const smoothPositionsRef = useRef(new Map());
@@ -712,12 +1023,12 @@ export default function IsoWorld({
         }).join("|")
     ), [users]);
 
-    const getAvatarDisplayPoint = useCallback((u, nowMs = performance.now()) => {
+    const getAvatarDisplayPoint = useCallback((u, nowMs = frameNow()) => {
         const smoothEntry = u?.user_id ? smoothPositionsRef.current.get(u.user_id) : null;
         return smoothPointAt(smoothEntry, nowMs) || avatarRenderPoint(u);
     }, []);
 
-    const applyAvatarNodeTransform = useCallback((u, point, nowMs = performance.now()) => {
+    const applyAvatarNodeTransform = useCallback((u, point, nowMs = frameNow()) => {
         const node = u?.user_id ? avatarNodeRefs.current.get(u.user_id) : null;
         if (!node) return;
 
@@ -738,7 +1049,7 @@ export default function IsoWorld({
         node.style.transform = `translate3d(${safeCssPoint.x}px, ${safeCssPoint.y}px, 0)`;
     }, [getAvatarDisplayPoint, liminal, worldRect]);
 
-    const applyAvatarNodeTransforms = useCallback((items, nowMs = performance.now()) => {
+    const applyAvatarNodeTransforms = useCallback((items, nowMs = frameNow()) => {
         for (const u of items || []) {
             applyAvatarNodeTransform(u, getAvatarDisplayPoint(u, nowMs), nowMs);
         }
@@ -802,14 +1113,14 @@ export default function IsoWorld({
         sprayTimersRef.current = [];
         attackTimersRef.current.forEach((timerId) => clearTimeout(timerId));
         attackTimersRef.current = [];
-        if (smoothFrameRef.current) cancelAnimationFrame(smoothFrameRef.current);
+        if (smoothFrameRef.current) cancelFrame(smoothFrameRef.current);
         if (swishTimerRef.current) clearTimeout(swishTimerRef.current);
         worldReactionTimersRef.current.forEach((timerId) => clearTimeout(timerId));
         worldReactionTimersRef.current = [];
     }, []);
 
     useEffect(() => {
-        if (smoothFrameRef.current) cancelAnimationFrame(smoothFrameRef.current);
+        if (smoothFrameRef.current) cancelFrame(smoothFrameRef.current);
         smoothFrameRef.current = null;
         smoothPositionsRef.current.clear();
         processedShotIdsRef.current.clear();
@@ -826,7 +1137,7 @@ export default function IsoWorld({
     }, [room?.id]);
 
     useEffect(() => {
-        const nowMs = performance.now();
+        const nowMs = frameNow();
         const next = new Map(smoothPositionsRef.current);
         const seen = new Set();
         let shouldAnimate = false;
@@ -901,13 +1212,13 @@ export default function IsoWorld({
 
             applyAvatarNodeTransforms(users, ts);
             if (active) {
-                smoothFrameRef.current = requestAnimationFrame(step);
+                smoothFrameRef.current = requestFrame(step);
             } else {
                 smoothFrameRef.current = null;
             }
         };
 
-        smoothFrameRef.current = requestAnimationFrame(step);
+        smoothFrameRef.current = requestFrame(step);
         return undefined;
     }, [applyAvatarNodeTransforms, avatarTargetSignature, users]);
 
@@ -1148,12 +1459,16 @@ export default function IsoWorld({
             y: origin.y,
             vx,
             vy,
+            target_x: target.x,
+            target_y: target.y,
         };
-        if (sendWS) {
-            sendWS(shot);
-        } else {
-            setBasketballs((balls) => [...balls, buildBasketball({ ...shot, user_id: myId })].slice(-MAX_BASKETBALLS));
-        }
+        lastLocalHoopShotAtRef.current = Date.now();
+        processedShotIdsRef.current.add(shot.id);
+        setBasketballs((balls) => [
+            ...balls,
+            buildBasketball({ ...shot, user_id: myId, nickname: me?.nickname }),
+        ].slice(-MAX_BASKETBALLS));
+        if (sendWS) sendWS(shot);
         if (sendWS && me) {
             const pos = avatarRenderPoint(me);
             sendWS({ type: "move", x: pos.x, y: pos.y, facing: shotFacing });
@@ -1166,6 +1481,7 @@ export default function IsoWorld({
 
     const handleHoopPointerDown = (e) => {
         if (!isBasketballCourt || !hoopsMode || !stageRef.current) return;
+        if (e.pointerType === "touch") return;
         if (e.button != null && e.button !== 0) return;
         e.preventDefault();
         e.stopPropagation();
@@ -1176,6 +1492,7 @@ export default function IsoWorld({
 
     const handleHoopPointerMove = (e) => {
         if (!aimShot || aimShot.pointerId !== e.pointerId || !stageRef.current) return;
+        if (e.pointerType === "touch") return;
         e.preventDefault();
         const target = stagePoint(e.clientX, e.clientY);
         setAimShot((aim) => aim ? { ...aim, origin: basketballOrigin(shotFacingForTarget(target)), target } : aim);
@@ -1183,6 +1500,7 @@ export default function IsoWorld({
 
     const handleHoopPointerUp = (e) => {
         if (!aimShot || aimShot.pointerId !== e.pointerId || !stageRef.current) return;
+        if (e.pointerType === "touch") return;
         e.preventDefault();
         e.stopPropagation();
         stageRef.current.releasePointerCapture?.(e.pointerId);
@@ -1201,6 +1519,10 @@ export default function IsoWorld({
         const p = stagePoint(e.clientX, e.clientY);
         if (isBasketballCourt && hoopsMode) {
             e.preventDefault();
+            e.stopPropagation();
+            if (Date.now() - lastLocalHoopShotAtRef.current > BASKETBALL_CLICK_SHOT_GUARD_MS) {
+                launchBasketball(p);
+            }
             return;
         }
         if (spray?.active && onPlaceTag) {
@@ -1234,6 +1556,9 @@ export default function IsoWorld({
         if (!e.touches?.[0]) return;
         if (isBasketballCourt && hoopsMode) {
             e.preventDefault();
+            const p = stagePoint(e.touches[0].clientX, e.touches[0].clientY);
+            launchBasketball(p);
+            setAimShot(null);
             return;
         }
         const p = stagePoint(e.touches[0].clientX, e.touches[0].clientY);
@@ -1293,6 +1618,9 @@ export default function IsoWorld({
         if (room?.theme !== "wwworld") return [];
         return users.map((u) => ({
             id: u.user_id,
+            user_id: u.user_id,
+            nickname: u.nickname,
+            anim_id: u.anim_id,
             ...avatarRenderPoint(u),
         }));
     }, [room?.theme, users]);
@@ -1861,7 +2189,7 @@ function BasketballHud({ active, score, onToggle }) {
                 className="font-pixel"
                 onClick={onToggle}
                 data-testid="basketball-mode-toggle"
-                title="toggle hoop shots; drag from your avatar toward the hoop"
+                title="toggle hoop shots; click, tap, or drag toward the hoop"
                 style={{
                     padding: "4px 8px",
                     border: active ? "2px solid #fff" : "2px solid #3b2308",
@@ -2003,16 +2331,20 @@ function BasketballAim({ aim }) {
     );
 }
 
-const Basketball = React.memo(function Basketball({ ball, onScore, onDone }) {
+const Basketball = React.memo(function Basketball({ ball, onScore }) {
     const rootRef = useRef(null);
     const shadowRef = useRef(null);
     const bodyRef = useRef(null);
-    const rafRef = useRef(null);
-    const ballRef = useRef(null);
     const doneRef = useRef(false);
     const scoredRef = useRef(false);
-    const measureRef = useRef({ width: STAGE_W, height: STAGE_H });
+    const scoreTimerRef = useRef(null);
     const size = Math.max(15, Math.min(27, ball.r * 2));
+    const target = {
+        x: Number.isFinite(Number(ball.target_x)) ? Number(ball.target_x) : BASKETBALL_HOOP.x,
+        y: Number.isFinite(Number(ball.target_y)) ? Number(ball.target_y) : BASKETBALL_HOOP.y,
+    };
+    const made = !!ball.scored;
+    const durationMs = basketballShotDuration(ball, target);
 
     useLayoutEffect(() => {
         const root = rootRef.current;
@@ -2021,55 +2353,105 @@ const Basketball = React.memo(function Basketball({ ball, onScore, onDone }) {
         if (!root || !shadow || !body) return undefined;
 
         const parent = root.parentElement;
-        const measure = () => {
-            measureRef.current = {
-                width: Math.max(1, parent?.clientWidth || STAGE_W),
-                height: Math.max(1, parent?.clientHeight || STAGE_H),
+        let animations = [];
+        const cancelAnimations = () => {
+            animations.forEach((animation) => animation?.cancel?.());
+            animations = [];
+        };
+        const playFlight = () => {
+            const width = Math.max(1, parent?.clientWidth || STAGE_W);
+            const height = Math.max(1, parent?.clientHeight || STAGE_H);
+            const sx = width / STAGE_W;
+            const sy = height / STAGE_H;
+            const samples = basketballShotSamples(ball, target, made);
+            const scaleAt = (point) => {
+                const depthScale = clamp(0.82 + ((point.groundY || point.y) / 430) * 0.22, 0.82, 1.04);
+                const progress = point.progress;
+                if (progress <= BASKETBALL_FLIGHT_END_PROGRESS) {
+                    return depthScale + Math.sin((progress / BASKETBALL_FLIGHT_END_PROGRESS) * Math.PI) * 0.08;
+                }
+                if (progress <= BASKETBALL_FALL_END_PROGRESS) return depthScale;
+                if (progress <= BASKETBALL_BOUNCE_END_PROGRESS) {
+                    return depthScale - 0.04 + Math.sin(((progress - BASKETBALL_FALL_END_PROGRESS) / (BASKETBALL_BOUNCE_END_PROGRESS - BASKETBALL_FALL_END_PROGRESS)) * Math.PI) * 0.04;
+                }
+                return depthScale - 0.05;
             };
-        };
-        const applyVisuals = () => {
-            const current = ballRef.current;
-            if (!current) return;
-            const sx = measureRef.current.width / STAGE_W;
-            const sy = measureRef.current.height / STAGE_H;
-            const x = Math.round(current.x * sx);
-            const y = Math.round(current.y * sy);
-            const shadowDrop = Math.max(8, (BASKETBALL_FLOOR_Y - current.y) * sy);
-            const shadowScale = Math.max(0.35, 1 - Math.abs(BASKETBALL_FLOOR_Y - current.y) / 210);
-            const behindFence = !!current.behindFence;
+            const rootFrames = samples.map((point) => ({
+                offset: point.progress,
+                opacity: 1,
+                transform: `translate3d(${Math.round(point.x * sx)}px, ${Math.round(point.y * sy)}px, 0) translate(-50%, -50%) scale(${scaleAt(point).toFixed(3)})`,
+            }));
+            const shadowFrames = samples.map((point) => {
+                const heightAboveCourt = basketballShotHeight(point);
+                const heightRatio = clamp(heightAboveCourt / 130, 0, 1);
+                const shadowScale = clamp(1 - heightRatio * 0.58, 0.42, 1);
+                return {
+                    offset: point.progress,
+                    opacity: String(clamp(0.38 - heightRatio * 0.22, 0.16, 0.38)),
+                    top: `${Math.round(Math.max(8, heightAboveCourt * sy))}px`,
+                    transform: `translateX(-50%) scale(${shadowScale.toFixed(3)})`,
+                };
+            });
+            const spinDeg = Math.round(clamp(ball.vx * 3.1, -1260, 1260));
+            const spinFrames = [
+                { transform: "rotate(0deg)" },
+                { transform: `rotate(${spinDeg}deg)` },
+            ];
+            const finalRootFrame = rootFrames[rootFrames.length - 1];
+            const finalShadowFrame = shadowFrames[shadowFrames.length - 1];
+            const finalSpinFrame = spinFrames[spinFrames.length - 1];
 
-            root.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
-            root.style.zIndex = String(behindFence ? 61 : 84 + Math.round((current.y / STAGE_H) * 10));
-            root.style.opacity = behindFence ? "0.56" : "1";
-            shadow.style.top = `${shadowDrop}px`;
-            shadow.style.transform = `translateX(-50%) scale(${shadowScale})`;
-            shadow.style.opacity = behindFence ? "0" : "1";
-            body.style.transform = `rotate(${current.spin}deg)`;
-            body.style.filter = behindFence ? "saturate(0.72) brightness(0.68)" : "none";
-            body.style.boxShadow = current.scored
-                ? "0 0 9px #fff, 0 0 16px #b3ff00"
-                : "1px 2px 0 rgba(0,0,0,0.45)";
+            cancelAnimations();
+            root.dataset.shotSamples = String(samples.length);
+            root.dataset.shotAnimator = typeof root.animate === "function" ? "waapi" : "fallback";
+            root.dataset.courtPlane = "iso";
+            root.dataset.courtGeometry = "polygon";
+            root.style.zIndex = String(made ? 95 : 84 + Math.round(((samples[samples.length - 1].groundY || samples[samples.length - 1].y) / STAGE_H) * 10));
+            root.style.opacity = "1";
+
+            if (typeof root.animate === "function" && typeof shadow.animate === "function" && typeof body.animate === "function") {
+                const rootAnimation = root.animate(rootFrames, { duration: durationMs, easing: "linear", fill: "forwards" });
+                const shadowAnimation = shadow.animate(shadowFrames, { duration: durationMs, easing: "linear", fill: "forwards" });
+                const bodyAnimation = body.animate(spinFrames, { duration: durationMs, easing: "linear", fill: "forwards" });
+                rootAnimation.onfinish = () => {
+                    doneRef.current = true;
+                    root.style.transform = finalRootFrame.transform;
+                    root.style.opacity = String(finalRootFrame.opacity);
+                    shadow.style.top = finalShadowFrame.top;
+                    shadow.style.transform = finalShadowFrame.transform;
+                    shadow.style.opacity = finalShadowFrame.opacity;
+                    body.style.transform = finalSpinFrame.transform;
+                };
+                animations = [rootAnimation, shadowAnimation, bodyAnimation];
+                return;
+            }
+
+            root.style.transform = finalRootFrame.transform;
+            root.style.opacity = String(finalRootFrame.opacity);
+            shadow.style.top = finalShadowFrame.top;
+            shadow.style.transform = finalShadowFrame.transform;
+            shadow.style.opacity = finalShadowFrame.opacity;
+            body.style.transform = finalSpinFrame.transform;
+            doneRef.current = true;
         };
 
-        measure();
-        ballRef.current = {
-            ...ball,
-            spin: Number.isFinite(Number(ball.spin)) ? Number(ball.spin) : 0,
-            life: Number.isFinite(Number(ball.life)) ? Number(ball.life) : 0,
-            bounces: Number.isFinite(Number(ball.bounces)) ? Number(ball.bounces) : 0,
-            scored: !!ball.scored,
-            behindFence: !!ball.behindFence,
-        };
-        doneRef.current = false;
-        scoredRef.current = !!ball.scored;
         root.style.left = "0px";
         root.style.top = "0px";
-        applyVisuals();
+        doneRef.current = false;
+        scoredRef.current = false;
+        if (scoreTimerRef.current) clearTimeout(scoreTimerRef.current);
+        if (made) {
+            scoreTimerRef.current = setTimeout(() => {
+                if (scoredRef.current) return;
+                scoredRef.current = true;
+                onScore?.(ball.id);
+            }, Math.round(durationMs * BASKETBALL_FLIGHT_END_PROGRESS));
+        }
+        playFlight();
 
         let resizeObserver = null;
         const handleResize = () => {
-            measure();
-            applyVisuals();
+            playFlight();
         };
         if (parent && typeof ResizeObserver !== "undefined") {
             resizeObserver = new ResizeObserver(handleResize);
@@ -2078,128 +2460,22 @@ const Basketball = React.memo(function Basketball({ ball, onScore, onDone }) {
             window.addEventListener("resize", handleResize);
         }
 
-        let last = performance.now();
-        const step = (ts) => {
-            if (doneRef.current || !ballRef.current) return;
-            const dt = Math.min(0.034, Math.max(0.001, (ts - last) / 1000));
-            last = ts;
-
-            const current = ballRef.current;
-            const prevX = current.x;
-            const prevY = current.y;
-            let x = current.x + current.vx * dt;
-            let y = current.y + current.vy * dt;
-            let vx = current.vx * 0.998;
-            let vy = current.vy + BASKETBALL_GRAVITY * dt;
-            let bounces = current.bounces;
-            let scoredFlag = current.scored;
-
-            if (!scoredFlag && basketballScored(prevY, { ...current, x, y, vx, vy })) {
-                scoredFlag = true;
-                vx *= 0.45;
-                vy = Math.max(110, vy * 0.55);
-                if (!scoredRef.current) {
-                    scoredRef.current = true;
-                    onScore?.(current.id);
-                }
-            }
-
-            if (!scoredFlag) {
-                const boardHit = resolveBasketballRectCollision(
-                    prevX,
-                    prevY,
-                    x,
-                    y,
-                    vx,
-                    vy,
-                    BASKETBALL_RADIUS,
-                    BASKETBALL_BACKBOARD_COLLIDER
-                );
-                if (boardHit) {
-                    x = boardHit.x;
-                    y = boardHit.y;
-                    vx = boardHit.vx;
-                    vy = boardHit.vy;
-                    bounces += 1;
-                } else {
-                    const rimHit = resolveBasketballRectCollision(
-                        prevX,
-                        prevY,
-                        x,
-                        y,
-                        vx,
-                        vy,
-                        BASKETBALL_RADIUS,
-                        BASKETBALL_RIM_COLLIDER
-                    );
-                    if (rimHit) {
-                        x = rimHit.x;
-                        y = rimHit.y;
-                        vx = rimHit.vx;
-                        vy = rimHit.vy;
-                        bounces += 1;
-                    }
-                }
-            }
-
-            if (x < BASKETBALL_RADIUS || x > STAGE_W - BASKETBALL_RADIUS) {
-                x = clamp(x, BASKETBALL_RADIUS, STAGE_W - BASKETBALL_RADIUS);
-                vx *= -0.68;
-                bounces += 1;
-            }
-            if (y < BASKETBALL_RADIUS) {
-                y = BASKETBALL_RADIUS;
-                vy = Math.abs(vy) * 0.45;
-                bounces += 1;
-            }
-            if (y > BASKETBALL_FLOOR_Y - BASKETBALL_RADIUS) {
-                y = BASKETBALL_FLOOR_Y - BASKETBALL_RADIUS;
-                vy = -Math.abs(vy) * 0.62;
-                vx *= 0.9;
-                bounces += 1;
-                if (Math.abs(vy) < 42) vy = 0;
-            }
-
-            const life = current.life + dt;
-            const speed = Math.abs(vx) + Math.abs(vy);
-            const alive = life < 8 && (speed > 12 || y < BASKETBALL_FLOOR_Y - BASKETBALL_RADIUS - 2);
-            if (!alive) {
-                doneRef.current = true;
-                onDone?.(current.id);
-                return;
-            }
-
-            ballRef.current = {
-                ...current,
-                x,
-                y,
-                vx,
-                vy,
-                bounces,
-                life,
-                scored: scoredFlag,
-                behindFence,
-                spin: current.spin + vx * dt * 0.55,
-            };
-            applyVisuals();
-            rafRef.current = requestAnimationFrame(step);
-        };
-
-        rafRef.current = requestAnimationFrame(step);
         return () => {
             doneRef.current = true;
-            if (rafRef.current) cancelAnimationFrame(rafRef.current);
-            rafRef.current = null;
+            cancelAnimations();
+            if (scoreTimerRef.current) clearTimeout(scoreTimerRef.current);
+            scoreTimerRef.current = null;
             if (resizeObserver) resizeObserver.disconnect();
             else if (typeof window !== "undefined") window.removeEventListener("resize", handleResize);
         };
-    }, [ball, onDone, onScore]);
+    }, [ball, durationMs, made, onScore, target.x, target.y]);
 
     return (
         <div
             ref={rootRef}
             aria-hidden
             data-testid="basketball-ball"
+            data-made={made ? "true" : "false"}
             style={{
                 position: "absolute",
                 left: 0,
@@ -2218,7 +2494,7 @@ const Basketball = React.memo(function Basketball({ ball, onScore, onDone }) {
                 style={{
                     position: "absolute",
                     left: "50%",
-                    top: `${Math.max(8, BASKETBALL_FLOOR_Y - ball.y)}px`,
+                    top: "var(--hoop-shadow-y0, 80px)",
                     width: size * 1.25,
                     height: size * 0.28,
                     transform: "translateX(-50%) scale(1)",
@@ -2241,7 +2517,6 @@ const Basketball = React.memo(function Basketball({ ball, onScore, onDone }) {
                         "radial-gradient(circle at 45% 45%, #f7922e 0 52%, #a94112 78%, #5c1c04 100%)",
                     ].join(", "),
                     boxShadow: ball.scored ? "0 0 9px #fff, 0 0 16px #b3ff00" : "1px 2px 0 rgba(0,0,0,0.45)",
-                    transform: `rotate(${ball.spin}deg)`,
                     willChange: "transform",
                     imageRendering: "pixelated",
                 }}
@@ -2509,15 +2784,16 @@ function ThoughtBubbleSprite({ variant, text, fullfunk, placeBelow, cloudScale =
     const textAreaWidth = Math.max(1, Math.round(textBox.w * scaleX));
     const textAreaHeight = Math.max(1, Math.round(textBox.h * scaleY));
     const textOffsetX = Math.max(0, Math.round(textBox.x * scaleX));
+    const textOffsetY = placeBelow
+        ? Math.round(variant.renderH - ((textBox.y + textBox.h) * scaleY))
+        : Math.round(textBox.y * scaleY);
     const scaledTextArea = {
         width: Math.max(1, Math.round(textAreaWidth * cloudScale)),
         height: Math.max(1, Math.round(textAreaHeight * cloudScale)),
     };
     const scaledTextOffsetX = Math.max(0, Math.round(textOffsetX * cloudScale));
-    const baseTextTop = placeBelow
-        ? Math.round(variant.renderH - ((textBox.y + textBox.h) * scaleY))
-        : Math.round(textBox.y * scaleY);
-    const textTop = Math.max(0, Math.round(baseTextTop * cloudScale));
+    const scaledTextOffsetY = Math.max(0, Math.round(textOffsetY * cloudScale));
+    const fullfunkGlyphSize = Math.max(8, Math.min(variant.fontSize + 2, scaledTextArea.height - 2));
 
     useEffect(() => {
         let cancelled = false;
@@ -2583,29 +2859,34 @@ function ThoughtBubbleSprite({ variant, text, fullfunk, placeBelow, cloudScale =
                 style={{
                     position: "absolute",
                     left: `${scaledTextOffsetX}px`,
-                    top: textTop,
+                    top: `${scaledTextOffsetY}px`,
                     transform: "none",
                     width: scaledTextArea.width,
                     height: scaledTextArea.height,
                     color: "#111",
                     fontSize: variant.fontSize,
-                    lineHeight: 1.1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    paddingTop: 1,
-                    paddingLeft: 2,
-                    paddingRight: 2,
+                    lineHeight: fullfunk ? 1 : 1.1,
+                    display: "grid",
+                    placeItems: "center",
+                    padding: fullfunk ? "0 2px" : "1px 2px",
                     boxSizing: "border-box",
-                    overflow: "hidden",
+                    overflow: "visible",
                     textAlign: "center",
                     whiteSpace: "pre-wrap",
                     wordBreak: "break-word",
                     overflowWrap: "anywhere",
                     imageRendering: "pixelated",
                 }}
+                data-thought-text-box={`${variant.id}:${Math.round(scaledTextOffsetX)},${Math.round(scaledTextOffsetY)},${scaledTextArea.width},${scaledTextArea.height}`}
+                data-thought-text-direction={placeBelow ? "below" : "above"}
             >
-                {fullfunk ? <FullfunkText text={textSource} size={variant.fontSize + 2} /> : textSource}
+                {fullfunk ? (
+                    <FullfunkText
+                        text={textSource}
+                        size={fullfunkGlyphSize}
+                        style={{ maxWidth: "100%" }}
+                    />
+                ) : textSource}
             </div>
         </div>
     );

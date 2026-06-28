@@ -76,8 +76,7 @@ export default function CloudLayer({ heightFraction = 0.45, opacity = 0.85 }) {
                             width: `${baseW}px`,
                             height: "auto",
                             imageRendering: "pixelated",
-                            animation: `cloud-drift ${c.speed}s linear infinite`,
-                            animationDelay: `${c.delay}s`,
+                            animation: `cloud-drift ${c.speed}s linear ${c.delay}s infinite`,
                             willChange: "transform",
                             filter: "drop-shadow(0 2px 0 rgba(0,0,0,0.06))",
                         }}

@@ -15,6 +15,8 @@ import WallExeWindow from "./WallExeWindow";
 import YouTubeWindow from "./YouTubeWindow";
 import MultitaireWindow from "./MultitaireWindow";
 import { sanitizeAnimCreature } from "./AnimSprite";
+import AdminConsoleWindow from "./AdminConsoleWindow";
+import { isAdminUser } from "../lib/admin";
 
 function useIsMobile(bp = 640) {
     const [m, setM] = useState(typeof window !== "undefined" && window.innerWidth < bp);
@@ -90,6 +92,7 @@ export default function Desktop({ user, onLogout }) {
         wall: false,
         multitaire: false,
         youtube: false,
+        admin: false,
     });
     // Per-window focus nonce — incremented on every "open" request so that
     // clicking a desktop icon while the window is already open raises it
@@ -121,6 +124,7 @@ export default function Desktop({ user, onLogout }) {
 
     const navigate = useNavigate();
     const { roomId: urlRoomId } = useParams();
+    const adminUser = isAdminUser(user);
 
     useEffect(() => {
         listRooms()
@@ -346,6 +350,7 @@ export default function Desktop({ user, onLogout }) {
         if (openWindows.wall) entries.push({ key: "wall", label: "WALL" });
         if (openWindows.multitaire) entries.push({ key: "multitaire", label: "MULTITAIRE.exe" });
         if (openWindows.youtube) entries.push({ key: "youtube", label: "Theatre" });
+        if (openWindows.admin) entries.push({ key: "admin", label: "AdminConsole.exe" });
         return entries;
     }, [openWindows, activeRoom]);
 
@@ -373,6 +378,9 @@ export default function Desktop({ user, onLogout }) {
                 <DesktopIcon testId="icon-upload" label="UploadZone" glyph="⇪" color="#ff6ec7" onDoubleClick={() => toggle("upload", true)} />
                 <DesktopIcon testId="icon-profile" label="My Profile" glyph="☻" color="#ffffff" onDoubleClick={() => toggle("profile", true)} />
                 <DesktopIcon testId="icon-guestbook" label="Guestbook" glyph="✎" color="#ffee55" onDoubleClick={() => toggle("guestbook", true)} />
+                {adminUser && (
+                    <DesktopIcon testId="icon-admin" label="Admin" glyph="!" color="#ffdddd" onDoubleClick={() => toggle("admin", true)} />
+                )}
             </div>
 
             <div
@@ -536,6 +544,23 @@ export default function Desktop({ user, onLogout }) {
                 />
             )}
 
+            {adminUser && openWindows.admin && (
+                <AdminConsoleWindow
+                    user={user}
+                    rooms={rooms}
+                    activeRoomId={activeRoom?.id}
+                    onClose={() => toggle("admin", false)}
+                    onRoomCleared={(roomId) => {
+                        if (roomId === activeRoom?.id) {
+                            socket.send({ type: "tag_clear", room_id: roomId });
+                        }
+                    }}
+                    initialX={mobile ? 0 : 180}
+                    initialY={mobile ? 0 : 96}
+                    requestFocus={focusNonces.admin || 0}
+                />
+            )}
+
             {startOpen && (
                 <div
                     className="absolute w95-bevel"
@@ -568,6 +593,9 @@ export default function Desktop({ user, onLogout }) {
                         <StartItem label="Upload Zone" onClick={() => { toggle("upload", true); setStartOpen(false); }} testId="start-upload" />
                         <StartItem label="My Profile" onClick={() => { toggle("profile", true); setStartOpen(false); }} testId="start-profile" />
                         <StartItem label="Guestbook" onClick={() => { toggle("guestbook", true); setStartOpen(false); }} testId="start-guestbook" />
+                        {adminUser && (
+                            <StartItem label="Admin Console" onClick={() => { toggle("admin", true); setStartOpen(false); }} testId="start-admin" />
+                        )}
                         <div style={{ borderTop: "1px solid #808080", margin: "4px 0" }} />
                         <StartItem label="Log off..." onClick={onLogout} testId="start-logoff" />
                     </div>

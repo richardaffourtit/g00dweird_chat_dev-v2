@@ -183,6 +183,50 @@ describe("iso world avatar rendering styles", () => {
         expect(source).toMatch(/avatarHeight=\{thoughtBubbleHeight\}/);
     });
 
+    test("thought text is centered inside variant text boxes", () => {
+        const source = fs.readFileSync(path.join(__dirname, "IsoWorld.jsx"), "utf8");
+
+        expect(source).toMatch(/data-thought-text-box=\{`\$\{variant\.id\}:/);
+        expect(source).toMatch(/placeItems:\s*"center"/);
+        expect(source).not.toMatch(/fullfunkShortTextShift/);
+    });
+
+    test("basketball court launches local shots from click and tap input", () => {
+        const source = fs.readFileSync(path.join(__dirname, "IsoWorld.jsx"), "utf8");
+
+        expect(source).toMatch(/lastLocalHoopShotAtRef\.current = Date\.now\(\)/);
+        expect(source).toMatch(/processedShotIdsRef\.current\.add\(shot\.id\)/);
+        expect(source).toMatch(/setBasketballs\(\(balls\) => \[\s*\.\.\.balls,\s*buildBasketball\(\{ \.\.\.shot, user_id: myId, nickname: me\?\.nickname \}\),\s*\]\.slice\(-MAX_BASKETBALLS\)\)/);
+        expect(source).toMatch(/if \(Date\.now\(\) - lastLocalHoopShotAtRef\.current > BASKETBALL_CLICK_SHOT_GUARD_MS\) \{\s*launchBasketball\(p\);/);
+        expect(source).toMatch(/const p = stagePoint\(e\.touches\[0\]\.clientX, e\.touches\[0\]\.clientY\);\s*launchBasketball\(p\);\s*setAimShot\(null\);/);
+        expect(source).toMatch(/if \(e\.pointerType === "touch"\) return/);
+    });
+
+    test("basketballs use a smooth settling path and remain on the court", () => {
+        const source = fs.readFileSync(path.join(__dirname, "IsoWorld.jsx"), "utf8");
+        const css = fs.readFileSync(path.join(__dirname, "../index.css"), "utf8");
+
+        expect(source).toMatch(/BASKETBALL_SHOT_SAMPLE_COUNT = 96/);
+        expect(source).toMatch(/BASKETBALL_COURT_POLYGON = \[/);
+        expect(source).toMatch(/BASKETBALL_HOOP_FLOOR/);
+        expect(source).toMatch(/function basketballShotSamples\(ball, target, made\)/);
+        expect(source).toMatch(/function basketballCourtYBoundsAtX\(x\)/);
+        expect(source).toMatch(/function basketballClampToCourt\(point\)/);
+        expect(source).toMatch(/function basketballAdvanceOnCourt\(point, vector, distance\)/);
+        expect(source).toMatch(/groundY: ground\.y/);
+        expect(source).toMatch(/basketballShotHeight\(point\)/);
+        expect(source).toMatch(/root\.animate\(rootFrames, \{ duration: durationMs, easing: "linear", fill: "forwards" \}\)/);
+        expect(source).toMatch(/root\.dataset\.shotSamples = String\(samples\.length\)/);
+        expect(source).toMatch(/root\.dataset\.courtPlane = "iso"/);
+        expect(source).toMatch(/root\.dataset\.courtGeometry = "polygon"/);
+        expect(source).toMatch(/root\.style\.transform = finalRootFrame\.transform/);
+        expect(source).toMatch(/BASKETBALL_FLIGHT_END_PROGRESS/);
+        expect(source).toMatch(/scoreTimerRef\.current = setTimeout/);
+        expect(source).not.toMatch(/onDone\?\.\(ball\.id\)/);
+        expect(css).not.toMatch(/@keyframes\s+basketballShotFlight/);
+        expect(css).not.toMatch(/@keyframes\s+basketballShotShadow/);
+    });
+
     test("mars rover uses preloaded frames and transform-only patrol motion", () => {
         const css = fs.readFileSync(path.join(__dirname, "../index.css"), "utf8");
         const source = fs.readFileSync(path.join(__dirname, "IsoWorld.jsx"), "utf8");

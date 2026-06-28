@@ -23,8 +23,8 @@ import certifi
 from botocore.exceptions import BotoCoreError, ClientError
 from pymongo.errors import PyMongoError
 from fastapi import (
-    FastAPI, APIRouter, WebSocket, WebSocketDisconnect, UploadFile,
-    File, Form, HTTPException, Query
+    FastAPI, APIRouter, Depends, WebSocket, WebSocketDisconnect, UploadFile,
+    File, Form, Header, HTTPException, Query
 )
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
@@ -33,6 +33,8 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field
 from worlds.registry import load_worlds, RoomInfo
 from worlds.behaviors import behavior_for
+from admin import assert_admin_identity
+from config import build_health_payload, cors_origins_from_env
 
 from ws.handlers import WSContext, dispatch as ws_dispatch
 
@@ -159,6 +161,13 @@ class GuestbookEntry(BaseModel):
     nickname: str
     message: str
     created_at: str
+
+
+class AdminRoomSummary(BaseModel):
+    id: str
+    name: str
+    tag_count: int
+    live_users: int
 
 
 # ---------- Static Rooms ----------
@@ -596,17 +605,43 @@ async def root():
 
 @api_router.get("/health")
 async def health():
-    return {
-        "ok": True,
-        "service": "g00dweird-backend",
-        "rooms": len(ROOMS),
-        "storage": OBJECT_STORAGE_PROVIDER,
-    }
+    return build_health_payload(
+        rooms_count=len(ROOMS),
+        storage_provider=OBJECT_STORAGE_PROVIDER,
+        realtime_mode=os.environ.get("REALTIME_MODE", "single-instance"),
+    )
 
 
 @api_router.get("/rooms", response_model=List[RoomInfo])
 async def list_rooms():
     return ROOMS
+
+
+async def require_admin(
+    x_g00d_admin_user_id: str = Header(default=""),
+    x_g00d_admin_nickname: str = Header(default=""),
+) -> dict:
+    try:
+        return await assert_admin_identity(db, x_g00d_admin_user_id, x_g00d_admin_nickname)
+    except PermissionError:
+        raise HTTPException(403, "admin access required")
+
+
+@api_router.get("/admin/rooms")
+async def admin_rooms(_admin: dict = Depends(require_admin)):
+    summaries = []
+    for room in ROOMS:
+        live_users = [
+            conn for conn in ROOM_STATES[room.id].connections.values()
+            if not str(conn.user_id).startswith("weirdbot-")
+        ]
+        summaries.append(AdminRoomSummary(
+            id=room.id,
+            name=room.name,
+            tag_count=await db.tags.count_documents({"room_id": room.id}),
+            live_users=len(live_users),
+        ).model_dump())
+    return {"rooms": summaries}
 
 
 # ---------- Sprite Lab dev endpoints ----------
@@ -1056,6 +1091,15 @@ async def clear_tags(room_id: str):
     return {"cleared": True}
 
 
+@api_router.delete("/admin/rooms/{room_id}/tags")
+async def admin_clear_tags(room_id: str, _admin: dict = Depends(require_admin)):
+    if room_id not in ROOM_BY_ID:
+        raise HTTPException(404, "room not found")
+    result = await db.tags.delete_many({"room_id": room_id})
+    await broadcast(ROOM_STATES[room_id], {"type": "tag_clear"})
+    return {"cleared": True, "room_id": room_id, "deleted_count": result.deleted_count}
+
+
 # ---------- Guestbook ----------
 @api_router.get("/guestbook", response_model=List[GuestbookEntry])
 async def get_guestbook(limit: int = 100):
@@ -1262,7 +1306,7 @@ app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_origins=cors_origins_from_env(os.environ.get("CORS_ORIGINS")),
     allow_methods=["*"],
     allow_headers=["*"],
 )

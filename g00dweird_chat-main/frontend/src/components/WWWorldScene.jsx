@@ -177,6 +177,13 @@ function canRepeatKeyZone(keyId) {
     return slug === "backspace" || Boolean(textForKeyZone(keyId));
 }
 
+function isWeirdbotAvatarPoint(point) {
+    const id = String(point?.id || point?.user_id || "").toLowerCase();
+    const nickname = String(point?.nickname || "").toLowerCase();
+    const animId = String(point?.anim_id || "").toLowerCase();
+    return id.startsWith("weirdbot") || nickname.includes("weirdbot") || animId === "weirdbot";
+}
+
 export default function WWWorldScene({ avatarPoints = [] }) {
     const iframeRef = useRef(null);
     const draftUrlRef = useRef(defaultWWWorldUrl());
@@ -233,6 +240,7 @@ export default function WWWorldScene({ avatarPoints = [] }) {
     const activeKeyHits = useMemo(() => {
         const hits = [];
         for (const point of avatarPoints) {
+            if (isWeirdbotAvatarPoint(point)) continue;
             const avatarId = point?.id || point?.user_id || "anon";
             const pct = stagePointToPct(point || { x: 0, y: 0 });
             const zone = KEY_ZONES.find((candidate) => pointInRect(pct, candidate));

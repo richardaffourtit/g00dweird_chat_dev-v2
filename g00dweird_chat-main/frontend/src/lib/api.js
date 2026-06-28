@@ -1,6 +1,14 @@
 import axios from "axios";
 
-const PREVIEW_MOCK = process.env.REACT_APP_PREVIEW_MOCK === "1";
+function readClientEnv(name) {
+    return (
+        process.env[`VITE_${name}`] ||
+        process.env[`REACT_APP_${name}`] ||
+        ""
+    ).trim();
+}
+
+const PREVIEW_MOCK = readClientEnv("PREVIEW_MOCK") === "1";
 
 const PREVIEW_ROOMS = [
     { id: "hello", name: "HELLO WORLD", tagline: "good weird starts here", theme: "hello", bg_url: "/worlds/hello.png", icon_url: "/world_icons/hello.png" },
@@ -20,7 +28,7 @@ const PREVIEW_ROOMS = [
 ];
 
 function getBackendUrl() {
-    const configured = process.env.REACT_APP_BACKEND_URL?.trim();
+    const configured = readClientEnv("BACKEND_URL");
     if (configured) return configured.replace(/\/+$/, "");
     if (typeof window === "undefined") return "http://localhost:8001";
     const { protocol, hostname, port, origin } = window.location;

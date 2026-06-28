@@ -229,6 +229,8 @@ export function useChatSocket({ user, room, avatarUrl, spriteId, animId }) {
                     y: Number.isFinite(obj.y) ? Math.max(0, Math.min(500, obj.y)) : 250,
                     vx: Number.isFinite(obj.vx) ? Math.max(-650, Math.min(650, obj.vx)) : 220,
                     vy: Number.isFinite(obj.vy) ? Math.max(-760, Math.min(320, obj.vy)) : -320,
+                    target_x: Number.isFinite(obj.target_x) ? Math.max(0, Math.min(1000, obj.target_x)) : 500,
+                    target_y: Number.isFinite(obj.target_y) ? Math.max(0, Math.min(500, obj.target_y)) : 250,
                     ts: new Date().toISOString(),
                 }]);
             } else if (obj.type === "attack" && obj.target_id) {

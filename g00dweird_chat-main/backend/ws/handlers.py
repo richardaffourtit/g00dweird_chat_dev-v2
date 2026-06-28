@@ -524,6 +524,8 @@ async def handle_basketball_shot(ctx: WSContext, conn, room, msg: dict) -> None:
         "y": _bounded_float(msg, "y", conn.y - 60, 0, 500),
         "vx": _bounded_float(msg, "vx", 220, -650, 650),
         "vy": _bounded_float(msg, "vy", -320, -760, 320),
+        "target_x": _bounded_float(msg, "target_x", conn.x, 0, 1000),
+        "target_y": _bounded_float(msg, "target_y", conn.y - 60, 0, 500),
         "ts": datetime.now(timezone.utc).isoformat(),
     })
 

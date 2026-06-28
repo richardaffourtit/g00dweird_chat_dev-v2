@@ -412,8 +412,7 @@ function SpriteStrip({ object, duration }) {
                     height: "100%",
                     maxWidth: "none",
                     imageRendering: "pixelated",
-                    animation: `spiderweb-phase2-strip ${duration}ms steps(${object.frames - 1}) infinite`,
-                    animationDelay: object.delayMs ? `-${object.delayMs}ms` : undefined,
+                    animation: `spiderweb-phase2-strip ${duration}ms steps(${object.frames - 1}) ${object.delayMs ? `-${object.delayMs}ms` : "0ms"} infinite`,
                     "--spiderweb-frame-shift": `${(-100 * (object.frames - 1)) / object.frames}%`,
                 }}
             />
@@ -439,8 +438,7 @@ function SpiderCrawler({ spider, sheet }) {
                 zIndex: spider.z,
                 opacity: spider.opacity ?? 1,
                 pointerEvents: "none",
-                animation: `spiderweb-spider-crawl ${spider.motion.durationSec}s ease-in-out infinite`,
-                animationDelay: spider.delayMs ? `-${spider.delayMs}ms` : undefined,
+                animation: `spiderweb-spider-crawl ${spider.motion.durationSec}s ease-in-out ${spider.delayMs ? `-${spider.delayMs}ms` : "0ms"} infinite`,
                 "--spiderweb-spider-dx": pctX(spider.motion.dx),
                 "--spiderweb-spider-dy": pctY(spider.motion.dy),
                 filter: "drop-shadow(1px 2px 0 rgba(0,0,0,0.45))",
@@ -510,8 +508,7 @@ function SpriteSheetActor({ actor, sheet }) {
                     height: `${rows * 100}%`,
                     maxWidth: "none",
                     imageRendering: "pixelated",
-                    animation: `spiderweb-phase2-strip ${durationMs}ms steps(${stepCount}) ${sheet.loop === false ? 1 : "infinite"}`,
-                    animationDelay: actor.delayMs ? `-${actor.delayMs}ms` : undefined,
+                    animation: `spiderweb-phase2-strip ${durationMs}ms steps(${stepCount}) ${actor.delayMs ? `-${actor.delayMs}ms` : "0ms"} ${sheet.loop === false ? 1 : "infinite"}`,
                     "--spiderweb-frame-shift": frameShift,
                 }}
             />

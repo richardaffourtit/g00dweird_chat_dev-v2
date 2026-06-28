@@ -63,6 +63,14 @@ def include_pixel(r: int, g: int, b: int, a: int) -> bool:
     return True
 
 
+def white_fill_pixel(r: int, g: int, b: int, a: int) -> bool:
+    if a < 8:
+        return False
+    # The writable area is the light cloud fill only. Exclude black outlines,
+    # purple shadows, red matte, and the detached tail puffs.
+    return r > 165 and g > 160 and b > 155 and max(r, g, b) - min(r, g, b) < 70
+
+
 def tight_bbox(img: Image.Image, box: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
     x1, y1, x2, y2 = box
     pixels = img.load()
@@ -119,6 +127,46 @@ def component_bboxes(img: Image.Image, box: tuple[int, int, int, int]) -> list[d
                 "count": len(points),
                 "bbox": (min(xs) + x1, min(ys) + y1, max(xs) + x1 + 1, max(ys) + y1 + 1),
                 "touchesSide": min(xs) == 0 or max(xs) == crop.width - 1,
+            })
+
+    return sorted(components, key=lambda component: int(component["count"]), reverse=True)
+
+
+def white_component_bboxes(img: Image.Image, source: dict[str, int]) -> list[dict[str, object]]:
+    crop = img.crop((source["x"], source["y"], source["x"] + source["w"], source["y"] + source["h"]))
+    pixels = crop.load()
+    seen: set[tuple[int, int]] = set()
+    components: list[dict[str, object]] = []
+
+    for y in range(crop.height):
+        for x in range(crop.width):
+            if (x, y) in seen:
+                continue
+            r, g, b, a = pixels[x, y]
+            if not white_fill_pixel(r, g, b, a):
+                continue
+
+            stack = [(x, y)]
+            seen.add((x, y))
+            points: list[tuple[int, int]] = []
+            while stack:
+                px, py = stack.pop()
+                points.append((px, py))
+                for nx, ny in ((px - 1, py), (px + 1, py), (px, py - 1), (px, py + 1)):
+                    if not (0 <= nx < crop.width and 0 <= ny < crop.height):
+                        continue
+                    if (nx, ny) in seen:
+                        continue
+                    r, g, b, a = pixels[nx, ny]
+                    if white_fill_pixel(r, g, b, a):
+                        seen.add((nx, ny))
+                        stack.append((nx, ny))
+
+            xs = [point[0] for point in points]
+            ys = [point[1] for point in points]
+            components.append({
+                "count": len(points),
+                "bbox": (min(xs), min(ys), max(xs) + 1, max(ys) + 1),
             })
 
     return sorted(components, key=lambda component: int(component["count"]), reverse=True)
@@ -187,16 +235,20 @@ def cloud_body_bbox(img: Image.Image, source: dict[str, int]) -> tuple[int, int,
 
 def main_body_text_box(img: Image.Image, source: dict[str, int], tier: str) -> dict[str, int]:
     crop = img.crop((source["x"], source["y"], source["x"] + source["w"], source["y"] + source["h"]))
-    left, top, right, bottom = cloud_body_bbox(img, source)
+    white_components = white_component_bboxes(img, source)
+    if white_components:
+        left, top, right, bottom = white_components[0]["bbox"]
+    else:
+        left, top, right, bottom = cloud_body_bbox(img, source)
 
     inset_x = 0.18 if tier == "short" else 0.13 if tier == "medium" else 0.10
-    fill_y = 0.46 if tier == "short" else 0.48 if tier == "medium" else 0.46
+    inset_y = 0.18 if tier == "short" else 0.16 if tier == "medium" else 0.14
     body_w = max(1, right - left)
     body_h = max(1, bottom - top)
     text_x = round(left + body_w * inset_x)
-    text_h = round(body_h * fill_y)
-    text_y = round(top + (body_h - text_h) / 2)
+    text_y = round(top + body_h * inset_y)
     text_w = round(body_w * (1 - inset_x * 2))
+    text_h = round(body_h * (1 - inset_y * 2))
     return {
         "x": max(0, text_x),
         "y": max(0, text_y),

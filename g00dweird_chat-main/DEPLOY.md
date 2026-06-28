@@ -1,49 +1,85 @@
 # Deploying g00dweird chat
 
-This repo is configured for a Render Blueprint deploy with two services:
+First launch target:
 
-- `g00dweird-chat`: the Vite static frontend at `chat.g00dweird.com`
-- `g00dweird-api`: the FastAPI/WebSocket backend at `api.g00dweird.com`
+- Frontend app: `chat.g00dweird.com`
+- Backend API and WebSockets: `api.g00dweird.com`
+- Current Framer site stays on: `g00dweird.com` and `www.g00dweird.com`
 
-The chat desktop is configured to own `g00dweird.com` and `www.g00dweird.com`.
-The previous Framer site can be disconnected.
+Later promotion path:
 
-## 1. Create the Blueprint
+- Move the Framer site to `legacy.g00dweird.com`
+- Point `g00dweird.com` and `www.g00dweird.com` to the app once the chat is stable
+
+## Why This Launch Shape
+
+The chat app is not Framer-static-only. It needs:
+
+- React/Vite static assets
+- FastAPI HTTP routes under `/api`
+- WebSockets under `/api/ws`
+- MongoDB
+- Upload storage
+- One backend instance for now, because live room presence and realtime state are in memory
+
+`render.yaml` defines a Render Blueprint with:
+
+- `g00dweird-chat`: Vite static frontend
+- `g00dweird-api`: FastAPI/WebSocket backend
+- `numInstances: 1` on the backend to keep live room state coherent
+- a persistent disk for local upload storage
+
+## Render Setup
 
 1. In Render, create a new Blueprint from the GitHub repo.
 2. Use the repo root so Render finds `render.yaml`.
-3. When prompted for secrets, set:
+3. Keep the backend at one instance for launch.
+4. Set this required secret when prompted:
 
 ```text
-MONGO_URL=<your MongoDB connection string>
+MONGO_URL=<your production MongoDB connection string>
 ```
 
-`DB_NAME` defaults to `g00dweird`. Change it in Render only if the existing database uses a different name.
+`DB_NAME` defaults to `g00dweird`.
 
-## 2. Connect Domains
+## DNS Setup For First Launch
 
-Render will create custom-domain records for:
+At Hover, add only the records Render gives you for:
 
 ```text
-g00dweird.com
-www.g00dweird.com
 chat.g00dweird.com
 api.g00dweird.com
 ```
 
-Add the DNS records Render gives you at the DNS host for `g00dweird.com`.
-Replace the current Framer DNS records for `g00dweird.com` and `www.g00dweird.com`
-with Render's records.
+Do not remove or edit Hover mail records such as the existing MX record.
 
-## 3. Storage
+Do not move these yet during first launch:
 
-The backend is configured with a 1 GB persistent disk mounted at:
+```text
+g00dweird.com
+www.g00dweird.com
+```
+
+Those currently point to Framer and should stay there until the chat app is proven live.
+
+## Later Framer Legacy Move
+
+When the chat app is ready to own the root domain:
+
+1. Add `legacy.g00dweird.com` to the Framer project.
+2. Add the Framer DNS record for `legacy`.
+3. Confirm `https://legacy.g00dweird.com` works.
+4. Change root/app DNS so `g00dweird.com` and `www.g00dweird.com` point to the app host.
+
+## Upload Storage
+
+The launch Blueprint uses a Render persistent disk:
 
 ```text
 /var/data/g00dweird/uploads
 ```
 
-That keeps user uploads stable across deploys. If you later switch to Cloudflare R2 or S3, set these backend env vars in Render and remove the disk if it is no longer needed:
+If we switch to Cloudflare R2 or S3-compatible storage, set these backend env vars and remove the disk only after upload/download QA passes:
 
 ```text
 OBJECT_STORAGE_PROVIDER=r2
@@ -52,21 +88,30 @@ OBJECT_STORAGE_ENDPOINT_URL=<endpoint>
 OBJECT_STORAGE_REGION=auto
 ```
 
-## 4. Local Verification
+## Local Verification
 
-Before pushing deploy changes:
+Backend:
 
 ```bash
-cd g00dweird_chat-main/frontend
-npm run build
-
-cd ../backend
-python3 -m pip install -r requirements.txt
-python3 -m uvicorn server:app --host 0.0.0.0 --port 8001
+python3 -m pytest backend/tests/test_launch_config.py backend/tests/test_admin.py backend/tests/test_basketball.py
 ```
 
-Then check:
+Frontend:
+
+```bash
+cd frontend
+CI=true npm test -- --watchAll=false src/lib/api.test.js src/lib/admin.test.js src/components/IsoWorld.test.js
+npm run build
+```
+
+Blueprint parse check:
+
+```bash
+ruby -ryaml -e 'data = YAML.load_file("render.yaml"); services = data.fetch("services"); raise "bad service count" unless services.length == 2; raise "backend not single instance" unless services[0].fetch("numInstances") == 1; raise "static site shape changed" unless services[1].fetch("type") == "web" && services[1].fetch("runtime") == "static"; puts "render.yaml ok"'
+```
+
+Health check after backend deploy:
 
 ```text
-http://localhost:8001/api/health
+https://api.g00dweird.com/api/health
 ```

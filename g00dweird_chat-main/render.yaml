@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: g00dweird-api
+    runtime: python
+    plan: starter
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    numInstances: 1
+    domains:
+      - api.g00dweird.com
+    envVars:
+      - key: DB_NAME
+        value: g00dweird
+      - key: CORS_ORIGINS
+        value: https://chat.g00dweird.com,https://g00dweird.com,https://www.g00dweird.com
+      - key: REALTIME_MODE
+        value: single-instance
+      - key: OBJECT_STORAGE_PROVIDER
+        value: local
+      - key: LOCAL_STORAGE_DIR
+        value: /var/data/g00dweird/uploads
+      - key: MONGO_URL
+        sync: false
+    disk:
+      name: g00dweird-uploads
+      mountPath: /var/data/g00dweird/uploads
+      sizeGB: 1
+
+  - type: web
+    name: g00dweird-chat
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: frontend/build
+    domains:
+      - chat.g00dweird.com
+    envVars:
+      - key: VITE_BACKEND_URL
+        value: https://api.g00dweird.com
+      - key: VITE_PREVIEW_MOCK
+        value: "0"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

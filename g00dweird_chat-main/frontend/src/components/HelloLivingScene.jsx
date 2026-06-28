@@ -597,8 +597,9 @@ function SpriteView({ object, duration, delayMs = 0 }) {
                     height: "100%",
                     maxWidth: "none",
                     imageRendering: "pixelated",
-                    animation: object.frames > 1 ? `hello-phase2-strip ${duration}ms steps(${steps}) infinite` : undefined,
-                    animationDelay: delayMs ? `-${delayMs}ms` : undefined,
+                    animation: object.frames > 1
+                        ? `hello-phase2-strip ${duration}ms steps(${steps}) ${delayMs ? `-${delayMs}ms` : "0ms"} infinite`
+                        : undefined,
                     "--hello-frame-shift": `${(-100 * (object.frames - 1)) / object.frames}%`,
                 }}
             />
