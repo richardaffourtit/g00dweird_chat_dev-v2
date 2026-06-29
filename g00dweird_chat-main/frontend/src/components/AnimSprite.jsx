@@ -18,7 +18,7 @@ import React, { useEffect, useRef } from "react";
  * STATE_ALIASES maps requested-but-missing states onto sensible existing frames.
  */
 
-export const ANIM_VERSION = 23;
+export const ANIM_VERSION = 24;
 
 // Frame counts per creature/state — mirrors slicer v3 / unified output.
 export const FRAMES = {
@@ -176,6 +176,17 @@ export function spriteFrameBox(creature, state, size) {
     return null;
 }
 
+export function spriteVisualEffect(creature) {
+    if (creature === "slime") {
+        return {
+            filter: "hue-rotate(0deg) saturate(1.45) contrast(1.08) drop-shadow(0 1px 0 rgba(0,0,0,0.55))",
+            animation: "slime-chroma-cycle 5.6s steps(7, end) infinite",
+            willChange: "filter, transform",
+        };
+    }
+    return {};
+}
+
 // ---- Locomotion mapping (per spec) ----
 // SLOW: walk | float | hop | wiggle
 // FAST: run | dash | hop | walk (fallback)
@@ -292,6 +303,8 @@ export default function AnimSprite({
     const ghostGlow = isGhost
         ? "drop-shadow(0 0 2px rgba(190,255,232,0.95)) drop-shadow(0 0 7px rgba(86,255,214,0.78)) drop-shadow(0 0 14px rgba(112,192,255,0.55))"
         : undefined;
+    const visualEffect = spriteVisualEffect(renderCreature);
+    const filter = [ghostGlow, visualEffect.filter].filter(Boolean).join(" ") || undefined;
     const fixedFrame = Number.isFinite(frameWidth) && Number.isFinite(frameHeight);
     const frameBox = fixedFrame
         ? { width: frameWidth, height: frameHeight }
@@ -313,9 +326,10 @@ export default function AnimSprite({
                 display: "block",
                 position: "relative",
                 zIndex: 1,
-                filter: ghostGlow,
+                filter,
+                animation: visualEffect.animation,
                 transform: flip ? "scaleX(-1)" : "none",
-                willChange: isGhost ? "filter, transform" : "transform",
+                willChange: visualEffect.willChange || (isGhost ? "filter, transform" : "transform"),
             }}
         />
     );

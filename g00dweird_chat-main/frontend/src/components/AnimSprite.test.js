@@ -5,6 +5,7 @@ import {
     resolveState,
     sanitizeAnimCreature,
     shouldUseCleanedSprites,
+    spriteVisualEffect,
     spriteFrameBox,
 } from "./AnimSprite";
 
@@ -36,5 +37,13 @@ describe("animated sprite registry", () => {
         expect(spriteFrameBox("weirdbot", "walk", 88)).toEqual({ width: 109, height: 88 });
         expect(spriteFrameBox("weirdbot", "idle", 88)).toBeNull();
         expect(spriteFrameBox("ghost", "float", 88)).toBeNull();
+    });
+
+    test("gives slime a color-cycle treatment without affecting cat", () => {
+        expect(spriteVisualEffect("slime")).toEqual(expect.objectContaining({
+            animation: expect.stringContaining("slime-chroma-cycle"),
+            filter: expect.stringContaining("saturate"),
+        }));
+        expect(spriteVisualEffect("cat")).toEqual({});
     });
 });
