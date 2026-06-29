@@ -40,10 +40,13 @@ describe("animated sprite registry", () => {
     });
 
     test("gives slime a color-cycle treatment without affecting cat", () => {
-        expect(spriteVisualEffect("slime")).toEqual(expect.objectContaining({
+        const slimeEffect = spriteVisualEffect("slime");
+        expect(slimeEffect).toEqual(expect.objectContaining({
             animation: expect.stringContaining("slime-chroma-cycle"),
             filter: expect.stringContaining("saturate"),
         }));
+        expect(slimeEffect.animation).toContain("linear");
+        expect(slimeEffect.animation).not.toContain("steps");
         expect(spriteVisualEffect("cat")).toEqual({});
     });
 });

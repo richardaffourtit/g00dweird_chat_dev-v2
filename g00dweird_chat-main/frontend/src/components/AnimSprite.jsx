@@ -18,7 +18,7 @@ import React, { useEffect, useRef } from "react";
  * STATE_ALIASES maps requested-but-missing states onto sensible existing frames.
  */
 
-export const ANIM_VERSION = 25;
+export const ANIM_VERSION = 26;
 
 // Frame counts per creature/state — mirrors slicer v3 / unified output.
 export const FRAMES = {
@@ -180,7 +180,7 @@ export function spriteVisualEffect(creature) {
     if (creature === "slime") {
         return {
             filter: "hue-rotate(0deg) saturate(1.45) contrast(1.08) drop-shadow(0 1px 0 rgba(0,0,0,0.55))",
-            animation: "slime-chroma-cycle 5.6s steps(7, end) infinite",
+            animation: "slime-chroma-cycle 8s linear infinite",
             willChange: "filter, transform",
         };
     }

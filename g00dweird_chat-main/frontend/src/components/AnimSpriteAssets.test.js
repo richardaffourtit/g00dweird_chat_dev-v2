@@ -102,6 +102,20 @@ function enclosedTransparentPinholes({ width, height, alpha }, maxArea = 80) {
     return pinholes;
 }
 
+function opaquePixelCount({ width, height, alpha }) {
+    let opaque = 0;
+    for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+            if (alpha[y][x] > 0) opaque += 1;
+        }
+    }
+    return opaque;
+}
+
+function animationStateName(frameName) {
+    return frameName.replace(/_\d+\.png$/, "");
+}
+
 describe("animated sprite asset alpha", () => {
     test("cat frames have no enclosed transparent pinholes", () => {
         const badFrames = fs.readdirSync(CAT_DIR)
@@ -125,5 +139,28 @@ describe("animated sprite asset alpha", () => {
             .filter(Boolean);
 
         expect(transparentBodyFrames).toEqual([]);
+    });
+
+    test("slime animated states do not include sparse transparent flash frames", () => {
+        const statesToStabilize = new Set(["attack", "hop", "idle", "split", "wiggle"]);
+        const framesByState = fs.readdirSync(SLIME_DIR)
+            .filter((name) => name.endsWith(".png"))
+            .reduce((groups, name) => {
+                const state = animationStateName(name);
+                if (!statesToStabilize.has(state)) return groups;
+                const decoded = decodePngAlpha(path.join(SLIME_DIR, name));
+                groups[state] = groups[state] || [];
+                groups[state].push({ name, opaque: opaquePixelCount(decoded) });
+                return groups;
+            }, {});
+
+        const sparseFrames = Object.entries(framesByState).flatMap(([state, frames]) => {
+            const maxOpaque = Math.max(...frames.map((frame) => frame.opaque));
+            return frames
+                .filter((frame) => frame.opaque < maxOpaque * 0.62)
+                .map((frame) => ({ state, name: frame.name, opaque: frame.opaque, maxOpaque }));
+        });
+
+        expect(sparseFrames).toEqual([]);
     });
 });

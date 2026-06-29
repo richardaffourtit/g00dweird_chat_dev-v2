@@ -138,13 +138,11 @@ a {
 }
 
 @keyframes slime-chroma-cycle {
-    0%, 100% { filter: hue-rotate(0deg) saturate(1.45) contrast(1.08) drop-shadow(0 1px 0 rgba(0,0,0,0.55)); }
-    14% { filter: hue-rotate(22deg) saturate(1.55) contrast(1.08) drop-shadow(0 1px 0 rgba(0,0,0,0.55)); }
-    28% { filter: hue-rotate(52deg) saturate(1.5) contrast(1.1) drop-shadow(0 1px 0 rgba(0,0,0,0.55)); }
-    42% { filter: hue-rotate(88deg) saturate(1.38) contrast(1.12) drop-shadow(0 1px 0 rgba(0,0,0,0.55)); }
-    56% { filter: hue-rotate(152deg) saturate(1.42) contrast(1.08) drop-shadow(0 1px 0 rgba(0,0,0,0.55)); }
-    70% { filter: hue-rotate(236deg) saturate(1.34) contrast(1.1) drop-shadow(0 1px 0 rgba(0,0,0,0.55)); }
-    84% { filter: hue-rotate(302deg) saturate(1.48) contrast(1.08) drop-shadow(0 1px 0 rgba(0,0,0,0.55)); }
+    0%, 100% { filter: hue-rotate(0deg) saturate(1.42) contrast(1.08) drop-shadow(0 1px 0 rgba(0,0,0,0.55)); }
+    20% { filter: hue-rotate(34deg) saturate(1.5) contrast(1.09) drop-shadow(0 1px 0 rgba(0,0,0,0.55)); }
+    40% { filter: hue-rotate(78deg) saturate(1.44) contrast(1.1) drop-shadow(0 1px 0 rgba(0,0,0,0.55)); }
+    60% { filter: hue-rotate(128deg) saturate(1.46) contrast(1.08) drop-shadow(0 1px 0 rgba(0,0,0,0.55)); }
+    80% { filter: hue-rotate(58deg) saturate(1.5) contrast(1.09) drop-shadow(0 1px 0 rgba(0,0,0,0.55)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
