@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Win95Window from "./Win95Window";
 import { getUserMedia, fileUrl, getUserBio, setUserBio, uploadFile } from "../lib/api";
 import { toast } from "sonner";
+import AvatarCardSquare from "./AvatarCardSquare";
 
 const BANNER_TARGET_HEIGHT = 78;
 const BANNER_TARGET_WIDTH = 560;
@@ -35,6 +36,8 @@ function readImageDimensions(file) {
 export default function ProfileWindow({
     user,
     currentAvatar,
+    spriteId,
+    animId,
     onPickAvatar,
     onClose,
     onOpenUpload,
@@ -306,22 +309,14 @@ export default function ProfileWindow({
                     </div>
 
                     <div className="flex gap-3 items-center">
-                        {currentAvatar ? (
-                            <img
-                                src={fileUrl(currentAvatar.storage_path)}
-                                alt="avatar"
-                                className="pixel-avatar"
-                                style={{ width: 64, height: 64, objectFit: "cover" }}
-                                data-testid="profile-avatar"
-                            />
-                        ) : (
-                            <div
-                                className="pixel-avatar flex items-center justify-center font-pixel"
-                                style={{ width: 64, height: 64, background: "#ff00ff", fontSize: 28 }}
-                            >
-                                {user.nickname[0]?.toUpperCase()}
-                            </div>
-                        )}
+                        <AvatarCardSquare
+                            nickname={user.nickname}
+                            avatarUrl={currentAvatar ? fileUrl(currentAvatar.storage_path) : null}
+                            animId={animId}
+                            spriteId={spriteId}
+                            size={64}
+                            testId="profile-avatar-card"
+                        />
                         <div className="flex-1">
                             <div className="font-pixel" style={{ fontSize: 14 }}>
                                 {user.nickname}

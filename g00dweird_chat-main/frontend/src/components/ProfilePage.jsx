@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { getPublicProfile, fileUrl } from "../lib/api";
-import AnimSprite, { ANIM_CREATURES } from "./AnimSprite";
-import { Sprite, SPRITES } from "../lib/sprites";
+import AvatarCardSquare from "./AvatarCardSquare";
 
 const ALIVE_BG = `linear-gradient(180deg,#1d0c2c 0%,#2c1148 22%,#3b1660 44%,#1f0834 100%)`;
 
@@ -36,58 +35,6 @@ function LiveDot() {
                 verticalAlign: "middle",
             }}
         />
-    );
-}
-
-function pickAvatarRender(profile) {
-    if (profile.avatar_path) {
-        return (
-            <img
-                src={fileUrl(profile.avatar_path)}
-                alt={`${profile.nickname} avatar`}
-                style={{ width: 128, height: 128, imageRendering: "pixelated", objectFit: "contain" }}
-                onError={(e) => { e.currentTarget.style.display = "none"; }}
-                data-testid="profile-page-avatar-img"
-            />
-        );
-    }
-    if (profile.anim_id && ANIM_CREATURES.includes(profile.anim_id)) {
-        return (
-            <AnimSprite
-                creature={profile.anim_id}
-                state="idle"
-                size={128}
-                fps={6}
-                testId="profile-page-avatar-anim"
-            />
-        );
-    }
-    if (profile.sprite_id && SPRITES[profile.sprite_id]) {
-        return (
-            <div
-                style={{
-                    width: 128, height: 128, display: "flex",
-                    alignItems: "center", justifyContent: "center",
-                    background: "#1a0a30",
-                }}
-                data-testid="profile-page-avatar-static"
-            >
-                <Sprite id={profile.sprite_id} size={96} title={profile.nickname} />
-            </div>
-        );
-    }
-    return (
-        <div
-            style={{
-                width: 128, height: 128,
-                background: "#222", color: "#888",
-                fontFamily: "Silkscreen, monospace",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 14,
-            }}
-        >
-            no body
-        </div>
     );
 }
 
@@ -373,10 +320,19 @@ export default function ProfilePage() {
                             background: "#000",
                             display: "flex", alignItems: "center", justifyContent: "center",
                             border: isLive ? undefined : "2px solid #444",
+                            boxSizing: "border-box",
                         }}
                         data-testid="profile-page-avatar-frame"
                     >
-                        {pickAvatarRender(profile)}
+                        <AvatarCardSquare
+                            nickname={profile.nickname}
+                            avatarUrl={profile.avatar_path ? fileUrl(profile.avatar_path) : null}
+                            animId={profile.anim_id}
+                            spriteId={profile.sprite_id}
+                            size={144}
+                            testId="profile-page-avatar-card"
+                            style={{ border: isLive ? "0" : undefined }}
+                        />
                     </div>
                     {isLive ? (
                         <Link

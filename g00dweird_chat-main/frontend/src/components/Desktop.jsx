@@ -460,6 +460,8 @@ export default function Desktop({ user, onLogout }) {
 
             {openWindows.profile && (
                 <ProfileWindow user={user} currentAvatar={currentAvatar}
+                    spriteId={spriteId}
+                    animId={animId}
                     onPickAvatar={pickAvatar}
                     onClose={() => toggle("profile", false)}
                     onOpenUpload={() => toggle("upload", true)}
