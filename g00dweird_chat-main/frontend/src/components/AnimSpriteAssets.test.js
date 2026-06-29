@@ -153,6 +153,10 @@ function brightness([r, g, b]) {
     return (r + g + b) / 3;
 }
 
+function colorDistance(a, b) {
+    return (Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2])) / 3;
+}
+
 function verticalSlimeBodyBands(decoded) {
     const bounds = opaqueBounds(decoded);
     if (!bounds) return [];
@@ -175,6 +179,49 @@ function verticalSlimeBodyBands(decoded) {
     }
 
     return bands;
+}
+
+function directionalBodyDiffRatio(decoded) {
+    const bounds = opaqueBounds(decoded);
+    if (!bounds) return 0;
+    const horizontalDiffs = [];
+    const verticalDiffs = [];
+
+    for (let y = bounds.top; y <= bounds.bottom; y += 1) {
+        for (let x = bounds.left; x <= bounds.right; x += 1) {
+            const pixel = decoded.rgba[y][x];
+            if (!isSlimeBodyPixel(pixel)) continue;
+
+            if (x + 1 <= bounds.right && isSlimeBodyPixel(decoded.rgba[y][x + 1])) {
+                horizontalDiffs.push(colorDistance(pixel, decoded.rgba[y][x + 1]));
+            }
+            if (y + 1 <= bounds.bottom && isSlimeBodyPixel(decoded.rgba[y + 1][x])) {
+                verticalDiffs.push(colorDistance(pixel, decoded.rgba[y + 1][x]));
+            }
+        }
+    }
+
+    const horizontal = horizontalDiffs.reduce((sum, value) => sum + value, 0) / horizontalDiffs.length;
+    const vertical = verticalDiffs.reduce((sum, value) => sum + value, 0) / verticalDiffs.length;
+    return vertical / horizontal;
+}
+
+function outlineAlphaChips({ width, height, alpha }, minNeighbors = 7) {
+    const chips = [];
+    for (let y = 1; y < height - 1; y += 1) {
+        for (let x = 1; x < width - 1; x += 1) {
+            if (alpha[y][x] !== 0) continue;
+            let opaqueNeighbors = 0;
+            for (let dy = -1; dy <= 1; dy += 1) {
+                for (let dx = -1; dx <= 1; dx += 1) {
+                    if (dx === 0 && dy === 0) continue;
+                    if (alpha[y + dy][x + dx] > 0) opaqueNeighbors += 1;
+                }
+            }
+            if (opaqueNeighbors >= minNeighbors) chips.push({ x, y, opaqueNeighbors });
+        }
+    }
+    return chips;
 }
 
 describe("animated sprite asset alpha", () => {
@@ -235,5 +282,34 @@ describe("animated sprite asset alpha", () => {
             .filter(Boolean);
 
         expect(stripedFrames).toEqual([]);
+    });
+
+    test("slime body texture is not dominated by horizontal bands", () => {
+        const rowBandedFrames = fs.readdirSync(SLIME_DIR)
+            .filter((name) => name.endsWith(".png"))
+            .map((name) => {
+                const ratio = directionalBodyDiffRatio(decodePngAlpha(path.join(SLIME_DIR, name)));
+                return ratio > 1.55 ? { name, ratio: Number(ratio.toFixed(2)) } : null;
+            })
+            .filter(Boolean);
+
+        expect(rowBandedFrames).toEqual([]);
+    });
+
+    test("slime outlines have no surrounded transparent cutout chips", () => {
+        const chippedFrames = fs.readdirSync(SLIME_DIR)
+            .filter((name) => name.endsWith(".png"))
+            .map((name) => {
+                const chips = outlineAlphaChips(decodePngAlpha(path.join(SLIME_DIR, name)));
+                return chips.length ? { name, chips } : null;
+            })
+            .filter(Boolean);
+
+        expect(chippedFrames).toEqual([]);
+    });
+
+    test("slime sleep pose keeps a visible slime body", () => {
+        const sleepFrame = decodePngAlpha(path.join(SLIME_DIR, "emote_d_0.png"));
+        expect(opaquePixelCount(sleepFrame)).toBeGreaterThanOrEqual(5600);
     });
 });
