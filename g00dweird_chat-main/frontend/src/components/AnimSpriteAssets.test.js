@@ -3,6 +3,7 @@ import path from "path";
 import zlib from "zlib";
 
 const CAT_DIR = path.resolve(process.cwd(), "public/anim/cat");
+const SLIME_DIR = path.resolve(process.cwd(), "public/anim/slime");
 
 function paeth(left, up, upLeft) {
     const p = left + up - upLeft;
@@ -68,7 +69,7 @@ function decodePngAlpha(filePath) {
     return { width, height, alpha };
 }
 
-function enclosedTransparentPinholes({ width, height, alpha }) {
+function enclosedTransparentPinholes({ width, height, alpha }, maxArea = 80) {
     const seen = Array.from({ length: height }, () => new Uint8Array(width));
     const pinholes = [];
 
@@ -94,7 +95,7 @@ function enclosedTransparentPinholes({ width, height, alpha }) {
                 });
             }
 
-            if (!touchesBorder && area <= 80) pinholes.push(area);
+            if (!touchesBorder && area <= maxArea) pinholes.push(area);
         }
     }
 
@@ -112,5 +113,17 @@ describe("animated sprite asset alpha", () => {
             .filter(Boolean);
 
         expect(badFrames).toEqual([]);
+    });
+
+    test("slime frames have opaque body interiors", () => {
+        const transparentBodyFrames = fs.readdirSync(SLIME_DIR)
+            .filter((name) => name.endsWith(".png"))
+            .map((name) => {
+                const pinholes = enclosedTransparentPinholes(decodePngAlpha(path.join(SLIME_DIR, name)), Infinity);
+                return pinholes.length ? { name, pinholes } : null;
+            })
+            .filter(Boolean);
+
+        expect(transparentBodyFrames).toEqual([]);
     });
 });

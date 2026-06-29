@@ -18,7 +18,7 @@ import React, { useEffect, useRef } from "react";
  * STATE_ALIASES maps requested-but-missing states onto sensible existing frames.
  */
 
-export const ANIM_VERSION = 24;
+export const ANIM_VERSION = 25;
 
 // Frame counts per creature/state — mirrors slicer v3 / unified output.
 export const FRAMES = {
