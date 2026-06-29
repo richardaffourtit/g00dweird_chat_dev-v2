@@ -155,8 +155,8 @@ function readGlyphManifest(raw) {
             id: entry.id,
             label: entry.label || entry.id,
             url: entry.url,
-            w: Number(entry.crop?.w) || 205,
-            h: Number(entry.crop?.h) || 192,
+            w: Number(entry.w) || Number(entry.crop?.w) || 205,
+            h: Number(entry.h) || Number(entry.crop?.h) || 192,
         }));
 }
 
@@ -167,6 +167,21 @@ function preloadGlyphImages(glyphs) {
         img.onerror = () => resolve({ id: glyph.id, img: null, ok: false });
         img.src = glyph.url;
     })));
+}
+
+function drawTintedGlyphImage(ctx, img, x, y, w, h, color) {
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(w));
+    canvas.height = Math.max(1, Math.round(h));
+    const tintCtx = canvas.getContext("2d");
+    if (!tintCtx) return;
+
+    tintCtx.imageSmoothingEnabled = false;
+    tintCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    tintCtx.globalCompositeOperation = "source-in";
+    tintCtx.fillStyle = color;
+    tintCtx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(canvas, x, y, w, h);
 }
 
 function drawStencilTextMask(ctx, text, box, size) {
@@ -939,7 +954,7 @@ export default function WallExeWindow({
             if (img) {
                 ctx.globalAlpha = Math.max(0.12, Math.min(0.78, opacity / 100));
                 ctx.imageSmoothingEnabled = false;
-                ctx.drawImage(img, -placement.box.w / 2, -placement.box.h / 2, placement.box.w, placement.box.h);
+                drawTintedGlyphImage(ctx, img, -placement.box.w / 2, -placement.box.h / 2, placement.box.w, placement.box.h, paintColor);
             }
             ctx.restore();
             return;
@@ -1000,7 +1015,7 @@ export default function WallExeWindow({
         ctx.translate(placement.cx, placement.cy);
         ctx.rotate((placementRotation * Math.PI) / 180);
         ctx.globalAlpha = opacity / 100;
-        ctx.drawImage(img, -placement.box.w / 2, -placement.box.h / 2, placement.box.w, placement.box.h);
+        drawTintedGlyphImage(ctx, img, -placement.box.w / 2, -placement.box.h / 2, placement.box.w, placement.box.h, paintColor);
         ctx.restore();
         setMarks((m) => m + 1);
         setStatus(`DINGBAT ${glyph.label}`);
@@ -1998,21 +2013,22 @@ export default function WallExeWindow({
                                                     display: "flex",
                                                     alignItems: "center",
                                                     justifyContent: "center",
-                                                    background: "#fff",
+                                                    background: selected ? "#111" : "#d4d0c8",
                                                 }}
                                             >
-                                                <img
-                                                    src={glyph.url}
-                                                    alt={glyph.label}
+                                                <span
+                                                    role="img"
+                                                    aria-label={glyph.label}
                                                     style={{
+                                                        display: "block",
                                                         width: "100%",
                                                         height: "100%",
                                                         maxWidth: 62,
                                                         maxHeight: 52,
-                                                        objectFit: "contain",
-                                                        imageRendering: "pixelated",
+                                                        background: paintColor,
+                                                        WebkitMask: `url(${glyph.url}) center / contain no-repeat`,
+                                                        mask: `url(${glyph.url}) center / contain no-repeat`,
                                                     }}
-                                                    draggable={false}
                                                 />
                                             </button>
                                         );
@@ -2026,7 +2042,7 @@ export default function WallExeWindow({
                             )}
                             {glyphLoadState === "LOADING" && !glyphLoadError && (
                                 <div className="font-mono-retro mt-1" style={{ fontSize: 10, color: "#444", lineHeight: 1.2 }}>
-                                    loading 120 glyphs...
+                                    loading dingbats...
                                 </div>
                             )}
                         </div>

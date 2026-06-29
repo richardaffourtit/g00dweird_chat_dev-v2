@@ -1,12 +1,13 @@
 {
-  "schema": "g00dweird.wallGlyphs.v1",
-  "generatedAt": "2026-05-02T06:12:26.675Z",
+  "schema": "g00dweird.wallGlyphs.v2",
+  "generatedAt": "manual-asset-cleanup",
   "extraction": {
-    "method": "fixed-grid",
+    "method": "nearest-slot-components-transparent-mask",
     "cols": 5,
     "rows": 8,
-    "sourceWidth": 1024,
-    "sourceHeight": 1536
+    "maxSpriteSize": 256,
+    "inkThreshold": 218,
+    "skippedFragments": 3
   },
   "sheets": [
     {
@@ -28,1923 +29,1407 @@
   "glyphs": [
     {
       "id": "wall-glyph-001",
-      "label": "Glyph 1",
+      "label": "Dingbat 1",
       "url": "/wall/glyphs/wall-glyph-001.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 0,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 210,
+      "h": 181,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-002",
-      "label": "Glyph 2",
+      "label": "Dingbat 2",
       "url": "/wall/glyphs/wall-glyph-002.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 0,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 0,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 155,
+      "h": 255,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-003",
-      "label": "Glyph 3",
+      "label": "Dingbat 3",
       "url": "/wall/glyphs/wall-glyph-003.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 0,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 0,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 152,
+      "h": 217,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-004",
-      "label": "Glyph 4",
+      "label": "Dingbat 4",
       "url": "/wall/glyphs/wall-glyph-004.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 0,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 0,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 184,
+      "h": 242,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-005",
-      "label": "Glyph 5",
+      "label": "Dingbat 5",
       "url": "/wall/glyphs/wall-glyph-005.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 0,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 0,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 149,
+      "h": 216,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-006",
-      "label": "Glyph 6",
+      "label": "Dingbat 6",
       "url": "/wall/glyphs/wall-glyph-006.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 1,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 192,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 208,
+      "h": 180,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-007",
-      "label": "Glyph 7",
+      "label": "Dingbat 7",
       "url": "/wall/glyphs/wall-glyph-007.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 1,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 192,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 163,
+      "h": 205,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-008",
-      "label": "Glyph 8",
+      "label": "Dingbat 8",
       "url": "/wall/glyphs/wall-glyph-008.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 1,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 192,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 53,
+      "h": 38,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-009",
-      "label": "Glyph 9",
+      "label": "Dingbat 9",
       "url": "/wall/glyphs/wall-glyph-009.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 1,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 192,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 256,
+      "h": 234,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-010",
-      "label": "Glyph 10",
+      "label": "Dingbat 10",
       "url": "/wall/glyphs/wall-glyph-010.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 1,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 192,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 133,
+      "h": 208,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-011",
-      "label": "Glyph 11",
+      "label": "Dingbat 11",
       "url": "/wall/glyphs/wall-glyph-011.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 2,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 384,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 154,
+      "h": 206,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-012",
-      "label": "Glyph 12",
+      "label": "Dingbat 12",
       "url": "/wall/glyphs/wall-glyph-012.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 2,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 384,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 142,
+      "h": 219,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-013",
-      "label": "Glyph 13",
+      "label": "Dingbat 13",
       "url": "/wall/glyphs/wall-glyph-013.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 2,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 384,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 167,
+      "h": 216,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-014",
-      "label": "Glyph 14",
+      "label": "Dingbat 14",
       "url": "/wall/glyphs/wall-glyph-014.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 2,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 384,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 127,
+      "h": 146,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-015",
-      "label": "Glyph 15",
+      "label": "Dingbat 15",
       "url": "/wall/glyphs/wall-glyph-015.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 2,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 384,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 159,
+      "h": 186,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-016",
-      "label": "Glyph 16",
+      "label": "Dingbat 16",
       "url": "/wall/glyphs/wall-glyph-016.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 3,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 576,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 256,
+      "h": 157,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-017",
-      "label": "Glyph 17",
+      "label": "Dingbat 17",
       "url": "/wall/glyphs/wall-glyph-017.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 3,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 576,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 39,
+      "h": 59,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-018",
-      "label": "Glyph 18",
+      "label": "Dingbat 18",
       "url": "/wall/glyphs/wall-glyph-018.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 3,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 576,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 211,
+      "h": 187,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-019",
-      "label": "Glyph 19",
+      "label": "Dingbat 19",
       "url": "/wall/glyphs/wall-glyph-019.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 3,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 576,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 136,
+      "h": 211,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-020",
-      "label": "Glyph 20",
+      "label": "Dingbat 20",
       "url": "/wall/glyphs/wall-glyph-020.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 3,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 576,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 227,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-021",
-      "label": "Glyph 21",
+      "label": "Dingbat 21",
       "url": "/wall/glyphs/wall-glyph-021.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 4,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 768,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 152,
+      "h": 120,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-022",
-      "label": "Glyph 22",
+      "label": "Dingbat 22",
       "url": "/wall/glyphs/wall-glyph-022.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 4,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 768,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 157,
+      "h": 164,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-023",
-      "label": "Glyph 23",
+      "label": "Dingbat 23",
       "url": "/wall/glyphs/wall-glyph-023.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 4,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 768,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 140,
+      "h": 169,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-024",
-      "label": "Glyph 24",
+      "label": "Dingbat 24",
       "url": "/wall/glyphs/wall-glyph-024.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 4,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 768,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 256,
+      "h": 191,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-025",
-      "label": "Glyph 25",
+      "label": "Dingbat 25",
       "url": "/wall/glyphs/wall-glyph-025.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 4,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 768,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 52,
+      "h": 63,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-026",
-      "label": "Glyph 26",
+      "label": "Dingbat 26",
       "url": "/wall/glyphs/wall-glyph-026.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 5,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 960,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 186,
+      "h": 170,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-027",
-      "label": "Glyph 27",
+      "label": "Dingbat 27",
       "url": "/wall/glyphs/wall-glyph-027.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 5,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 960,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 186,
+      "h": 151,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-028",
-      "label": "Glyph 28",
+      "label": "Dingbat 28",
       "url": "/wall/glyphs/wall-glyph-028.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 5,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 960,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 121,
+      "h": 184,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-029",
-      "label": "Glyph 29",
+      "label": "Dingbat 29",
       "url": "/wall/glyphs/wall-glyph-029.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 5,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 960,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 146,
+      "h": 190,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-030",
-      "label": "Glyph 30",
+      "label": "Dingbat 30",
       "url": "/wall/glyphs/wall-glyph-030.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 5,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 960,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 175,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-031",
-      "label": "Glyph 31",
+      "label": "Dingbat 31",
       "url": "/wall/glyphs/wall-glyph-031.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 6,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 1152,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 149,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-032",
-      "label": "Glyph 32",
+      "label": "Dingbat 32",
       "url": "/wall/glyphs/wall-glyph-032.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 6,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 1152,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 187,
+      "h": 176,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-033",
-      "label": "Glyph 33",
+      "label": "Dingbat 33",
       "url": "/wall/glyphs/wall-glyph-033.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 6,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 1152,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 148,
+      "h": 189,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-034",
-      "label": "Glyph 34",
+      "label": "Dingbat 34",
       "url": "/wall/glyphs/wall-glyph-034.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 6,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 1152,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 140,
+      "h": 201,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-035",
-      "label": "Glyph 35",
+      "label": "Dingbat 35",
       "url": "/wall/glyphs/wall-glyph-035.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 6,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 1152,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 79,
+      "h": 73,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-036",
-      "label": "Glyph 36",
+      "label": "Dingbat 36",
       "url": "/wall/glyphs/wall-glyph-036.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 7,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 1344,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 184,
+      "h": 212,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-037",
-      "label": "Glyph 37",
+      "label": "Dingbat 37",
       "url": "/wall/glyphs/wall-glyph-037.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 7,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 1344,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 133,
+      "h": 191,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-038",
-      "label": "Glyph 38",
+      "label": "Dingbat 38",
       "url": "/wall/glyphs/wall-glyph-038.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 7,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 1344,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 144,
+      "h": 204,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-039",
-      "label": "Glyph 39",
+      "label": "Dingbat 39",
       "url": "/wall/glyphs/wall-glyph-039.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 7,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 1344,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 119,
+      "h": 157,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-040",
-      "label": "Glyph 40",
+      "label": "Dingbat 40",
       "url": "/wall/glyphs/wall-glyph-040.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs1.png",
       "sheet": "sheet1",
       "row": 7,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 1344,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 128,
+      "h": 201,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-041",
-      "label": "Glyph 41",
+      "label": "Dingbat 41",
       "url": "/wall/glyphs/wall-glyph-041.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 0,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 208,
+      "h": 204,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-042",
-      "label": "Glyph 42",
+      "label": "Dingbat 42",
       "url": "/wall/glyphs/wall-glyph-042.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 0,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 0,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
-    },
-    {
-      "id": "wall-glyph-043",
-      "label": "Glyph 43",
-      "url": "/wall/glyphs/wall-glyph-043.png",
-      "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
-      "sheet": "sheet2",
-      "row": 0,
-      "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 0,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 165,
+      "h": 216,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-044",
-      "label": "Glyph 44",
+      "label": "Dingbat 44",
       "url": "/wall/glyphs/wall-glyph-044.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 0,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 0,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 246,
+      "h": 210,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-045",
-      "label": "Glyph 45",
+      "label": "Dingbat 45",
       "url": "/wall/glyphs/wall-glyph-045.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 0,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 0,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 152,
+      "h": 115,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-046",
-      "label": "Glyph 46",
+      "label": "Dingbat 46",
       "url": "/wall/glyphs/wall-glyph-046.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 1,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 192,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 168,
+      "h": 159,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-047",
-      "label": "Glyph 47",
+      "label": "Dingbat 47",
       "url": "/wall/glyphs/wall-glyph-047.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 1,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 192,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 205,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-048",
-      "label": "Glyph 48",
+      "label": "Dingbat 48",
       "url": "/wall/glyphs/wall-glyph-048.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 1,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 192,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 211,
+      "h": 155,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-049",
-      "label": "Glyph 49",
+      "label": "Dingbat 49",
       "url": "/wall/glyphs/wall-glyph-049.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 1,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 192,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 67,
+      "h": 103,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-050",
-      "label": "Glyph 50",
+      "label": "Dingbat 50",
       "url": "/wall/glyphs/wall-glyph-050.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 1,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 192,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 193,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-051",
-      "label": "Glyph 51",
+      "label": "Dingbat 51",
       "url": "/wall/glyphs/wall-glyph-051.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 2,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 384,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 170,
+      "h": 224,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-052",
-      "label": "Glyph 52",
+      "label": "Dingbat 52",
       "url": "/wall/glyphs/wall-glyph-052.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 2,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 384,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 250,
+      "h": 205,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-053",
-      "label": "Glyph 53",
+      "label": "Dingbat 53",
       "url": "/wall/glyphs/wall-glyph-053.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 2,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 384,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 135,
+      "h": 170,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-054",
-      "label": "Glyph 54",
+      "label": "Dingbat 54",
       "url": "/wall/glyphs/wall-glyph-054.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 2,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 384,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 195,
+      "h": 181,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-055",
-      "label": "Glyph 55",
+      "label": "Dingbat 55",
       "url": "/wall/glyphs/wall-glyph-055.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 2,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 384,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 152,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-056",
-      "label": "Glyph 56",
+      "label": "Dingbat 56",
       "url": "/wall/glyphs/wall-glyph-056.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 3,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 576,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 207,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-057",
-      "label": "Glyph 57",
+      "label": "Dingbat 57",
       "url": "/wall/glyphs/wall-glyph-057.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 3,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 576,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 181,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-058",
-      "label": "Glyph 58",
+      "label": "Dingbat 58",
       "url": "/wall/glyphs/wall-glyph-058.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 3,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 576,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 252,
+      "h": 122,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-059",
-      "label": "Glyph 59",
+      "label": "Dingbat 59",
       "url": "/wall/glyphs/wall-glyph-059.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 3,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 576,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 176,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-060",
-      "label": "Glyph 60",
+      "label": "Dingbat 60",
       "url": "/wall/glyphs/wall-glyph-060.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 3,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 576,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 26,
+      "h": 26,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-061",
-      "label": "Glyph 61",
+      "label": "Dingbat 61",
       "url": "/wall/glyphs/wall-glyph-061.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 4,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 768,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 199,
+      "h": 224,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-062",
-      "label": "Glyph 62",
+      "label": "Dingbat 62",
       "url": "/wall/glyphs/wall-glyph-062.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 4,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 768,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 138,
+      "h": 170,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-063",
-      "label": "Glyph 63",
+      "label": "Dingbat 63",
       "url": "/wall/glyphs/wall-glyph-063.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 4,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 768,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 113,
+      "h": 202,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-064",
-      "label": "Glyph 64",
+      "label": "Dingbat 64",
       "url": "/wall/glyphs/wall-glyph-064.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 4,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 768,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 256,
+      "h": 193,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-065",
-      "label": "Glyph 65",
+      "label": "Dingbat 65",
       "url": "/wall/glyphs/wall-glyph-065.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 4,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 768,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 172,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-066",
-      "label": "Glyph 66",
+      "label": "Dingbat 66",
       "url": "/wall/glyphs/wall-glyph-066.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 5,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 960,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 217,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-067",
-      "label": "Glyph 67",
+      "label": "Dingbat 67",
       "url": "/wall/glyphs/wall-glyph-067.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 5,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 960,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 137,
+      "h": 208,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-068",
-      "label": "Glyph 68",
+      "label": "Dingbat 68",
       "url": "/wall/glyphs/wall-glyph-068.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 5,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 960,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 142,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-069",
-      "label": "Glyph 69",
+      "label": "Dingbat 69",
       "url": "/wall/glyphs/wall-glyph-069.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 5,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 960,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 210,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-070",
-      "label": "Glyph 70",
+      "label": "Dingbat 70",
       "url": "/wall/glyphs/wall-glyph-070.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 5,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 960,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 178,
+      "h": 117,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-071",
-      "label": "Glyph 71",
+      "label": "Dingbat 71",
       "url": "/wall/glyphs/wall-glyph-071.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 6,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 1152,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 44,
+      "h": 42,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-072",
-      "label": "Glyph 72",
+      "label": "Dingbat 72",
       "url": "/wall/glyphs/wall-glyph-072.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 6,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 1152,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 82,
+      "h": 169,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-073",
-      "label": "Glyph 73",
+      "label": "Dingbat 73",
       "url": "/wall/glyphs/wall-glyph-073.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 6,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 1152,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
-    },
-    {
-      "id": "wall-glyph-074",
-      "label": "Glyph 74",
-      "url": "/wall/glyphs/wall-glyph-074.png",
-      "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
-      "sheet": "sheet2",
-      "row": 6,
-      "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 1152,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 111,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-075",
-      "label": "Glyph 75",
+      "label": "Dingbat 75",
       "url": "/wall/glyphs/wall-glyph-075.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 6,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 1152,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 140,
+      "h": 159,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-076",
-      "label": "Glyph 76",
+      "label": "Dingbat 76",
       "url": "/wall/glyphs/wall-glyph-076.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 7,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 1344,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 152,
+      "h": 198,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-077",
-      "label": "Glyph 77",
+      "label": "Dingbat 77",
       "url": "/wall/glyphs/wall-glyph-077.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 7,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 1344,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 148,
+      "h": 146,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-078",
-      "label": "Glyph 78",
+      "label": "Dingbat 78",
       "url": "/wall/glyphs/wall-glyph-078.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 7,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 1344,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 161,
+      "h": 206,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-079",
-      "label": "Glyph 79",
+      "label": "Dingbat 79",
       "url": "/wall/glyphs/wall-glyph-079.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 7,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 1344,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 156,
+      "h": 178,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-080",
-      "label": "Glyph 80",
+      "label": "Dingbat 80",
       "url": "/wall/glyphs/wall-glyph-080.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs2.png",
       "sheet": "sheet2",
       "row": 7,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 1344,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 220,
+      "h": 217,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-081",
-      "label": "Glyph 81",
+      "label": "Dingbat 81",
       "url": "/wall/glyphs/wall-glyph-081.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 0,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 212,
+      "h": 209,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-082",
-      "label": "Glyph 82",
+      "label": "Dingbat 82",
       "url": "/wall/glyphs/wall-glyph-082.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 0,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 0,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
-    },
-    {
-      "id": "wall-glyph-083",
-      "label": "Glyph 83",
-      "url": "/wall/glyphs/wall-glyph-083.png",
-      "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
-      "sheet": "sheet3",
-      "row": 0,
-      "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 0,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 232,
+      "h": 236,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-084",
-      "label": "Glyph 84",
+      "label": "Dingbat 84",
       "url": "/wall/glyphs/wall-glyph-084.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 0,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 0,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 256,
+      "h": 157,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-085",
-      "label": "Glyph 85",
+      "label": "Dingbat 85",
       "url": "/wall/glyphs/wall-glyph-085.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 0,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 0,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 173,
+      "h": 192,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-086",
-      "label": "Glyph 86",
+      "label": "Dingbat 86",
       "url": "/wall/glyphs/wall-glyph-086.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 1,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 192,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 147,
+      "h": 239,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-087",
-      "label": "Glyph 87",
+      "label": "Dingbat 87",
       "url": "/wall/glyphs/wall-glyph-087.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 1,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 192,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 156,
+      "h": 200,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-088",
-      "label": "Glyph 88",
+      "label": "Dingbat 88",
       "url": "/wall/glyphs/wall-glyph-088.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 1,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 192,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 205,
+      "h": 237,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-089",
-      "label": "Glyph 89",
+      "label": "Dingbat 89",
       "url": "/wall/glyphs/wall-glyph-089.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 1,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 192,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 150,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-090",
-      "label": "Glyph 90",
+      "label": "Dingbat 90",
       "url": "/wall/glyphs/wall-glyph-090.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 1,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 192,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 219,
+      "h": 196,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-091",
-      "label": "Glyph 91",
+      "label": "Dingbat 91",
       "url": "/wall/glyphs/wall-glyph-091.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 2,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 384,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 218,
+      "h": 194,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-092",
-      "label": "Glyph 92",
+      "label": "Dingbat 92",
       "url": "/wall/glyphs/wall-glyph-092.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 2,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 384,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 209,
+      "h": 213,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-093",
-      "label": "Glyph 93",
+      "label": "Dingbat 93",
       "url": "/wall/glyphs/wall-glyph-093.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 2,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 384,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 144,
+      "h": 178,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-094",
-      "label": "Glyph 94",
+      "label": "Dingbat 94",
       "url": "/wall/glyphs/wall-glyph-094.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 2,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 384,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 171,
+      "h": 198,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-095",
-      "label": "Glyph 95",
+      "label": "Dingbat 95",
       "url": "/wall/glyphs/wall-glyph-095.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 2,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 384,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 246,
+      "h": 209,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-096",
-      "label": "Glyph 96",
+      "label": "Dingbat 96",
       "url": "/wall/glyphs/wall-glyph-096.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 3,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 576,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 83,
+      "h": 65,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-097",
-      "label": "Glyph 97",
+      "label": "Dingbat 97",
       "url": "/wall/glyphs/wall-glyph-097.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 3,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 576,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 154,
+      "h": 228,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-098",
-      "label": "Glyph 98",
+      "label": "Dingbat 98",
       "url": "/wall/glyphs/wall-glyph-098.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 3,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 576,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 149,
+      "h": 228,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-099",
-      "label": "Glyph 99",
+      "label": "Dingbat 99",
       "url": "/wall/glyphs/wall-glyph-099.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 3,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 576,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 256,
+      "h": 236,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-100",
-      "label": "Glyph 100",
+      "label": "Dingbat 100",
       "url": "/wall/glyphs/wall-glyph-100.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 3,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 576,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 117,
+      "h": 170,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-101",
-      "label": "Glyph 101",
+      "label": "Dingbat 101",
       "url": "/wall/glyphs/wall-glyph-101.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 4,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 768,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 107,
+      "h": 256,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-102",
-      "label": "Glyph 102",
+      "label": "Dingbat 102",
       "url": "/wall/glyphs/wall-glyph-102.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 4,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 768,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 187,
+      "h": 182,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-103",
-      "label": "Glyph 103",
+      "label": "Dingbat 103",
       "url": "/wall/glyphs/wall-glyph-103.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 4,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 768,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 207,
+      "h": 172,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-104",
-      "label": "Glyph 104",
+      "label": "Dingbat 104",
       "url": "/wall/glyphs/wall-glyph-104.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 4,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 768,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 146,
+      "h": 215,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-105",
-      "label": "Glyph 105",
+      "label": "Dingbat 105",
       "url": "/wall/glyphs/wall-glyph-105.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 4,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 768,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 158,
+      "h": 203,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-106",
-      "label": "Glyph 106",
+      "label": "Dingbat 106",
       "url": "/wall/glyphs/wall-glyph-106.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 5,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 960,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 175,
+      "h": 191,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-107",
-      "label": "Glyph 107",
+      "label": "Dingbat 107",
       "url": "/wall/glyphs/wall-glyph-107.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 5,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 960,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 150,
+      "h": 170,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-108",
-      "label": "Glyph 108",
+      "label": "Dingbat 108",
       "url": "/wall/glyphs/wall-glyph-108.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 5,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 960,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 160,
+      "h": 174,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-109",
-      "label": "Glyph 109",
+      "label": "Dingbat 109",
       "url": "/wall/glyphs/wall-glyph-109.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 5,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 960,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 165,
+      "h": 193,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-110",
-      "label": "Glyph 110",
+      "label": "Dingbat 110",
       "url": "/wall/glyphs/wall-glyph-110.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 5,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 960,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 177,
+      "h": 189,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-111",
-      "label": "Glyph 111",
+      "label": "Dingbat 111",
       "url": "/wall/glyphs/wall-glyph-111.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 6,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 1152,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 157,
+      "h": 197,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-112",
-      "label": "Glyph 112",
+      "label": "Dingbat 112",
       "url": "/wall/glyphs/wall-glyph-112.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 6,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 1152,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 111,
+      "h": 206,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-113",
-      "label": "Glyph 113",
+      "label": "Dingbat 113",
       "url": "/wall/glyphs/wall-glyph-113.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 6,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 1152,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 184,
+      "h": 190,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-114",
-      "label": "Glyph 114",
+      "label": "Dingbat 114",
       "url": "/wall/glyphs/wall-glyph-114.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 6,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 1152,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 180,
+      "h": 200,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-115",
-      "label": "Glyph 115",
+      "label": "Dingbat 115",
       "url": "/wall/glyphs/wall-glyph-115.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 6,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 1152,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 159,
+      "h": 185,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-116",
-      "label": "Glyph 116",
+      "label": "Dingbat 116",
       "url": "/wall/glyphs/wall-glyph-116.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 7,
       "col": 0,
-      "crop": {
-        "x": 0,
-        "y": 1344,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 176,
+      "h": 205,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-117",
-      "label": "Glyph 117",
+      "label": "Dingbat 117",
       "url": "/wall/glyphs/wall-glyph-117.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 7,
       "col": 1,
-      "crop": {
-        "x": 205,
-        "y": 1344,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 176,
+      "h": 159,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-118",
-      "label": "Glyph 118",
+      "label": "Dingbat 118",
       "url": "/wall/glyphs/wall-glyph-118.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 7,
       "col": 2,
-      "crop": {
-        "x": 410,
-        "y": 1344,
-        "w": 204,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 256,
+      "h": 183,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-119",
-      "label": "Glyph 119",
+      "label": "Dingbat 119",
       "url": "/wall/glyphs/wall-glyph-119.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 7,
       "col": 3,
-      "crop": {
-        "x": 614,
-        "y": 1344,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 162,
+      "h": 164,
+      "kind": "dingbat-mask"
     },
     {
       "id": "wall-glyph-120",
-      "label": "Glyph 120",
+      "label": "Dingbat 120",
       "url": "/wall/glyphs/wall-glyph-120.png",
       "source": "/wall/glyph-sheets/wall-exe-glyphs3.png",
       "sheet": "sheet3",
       "row": 7,
       "col": 4,
-      "crop": {
-        "x": 819,
-        "y": 1344,
-        "w": 205,
-        "h": 192
-      },
-      "kind": "graffiti-glyph"
+      "w": 141,
+      "h": 199,
+      "kind": "dingbat-mask"
     }
   ]
 }
