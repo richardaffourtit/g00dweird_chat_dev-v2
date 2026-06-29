@@ -10,6 +10,7 @@ from pathlib import Path
 from PIL import Image
 
 from fix_slime_sprite_transparency import fix_frame
+from smooth_slime_body_texture import smooth_all
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,6 +41,7 @@ def main() -> None:
         filled = fix_frame(SLIME_DIR / target_name)
         suffix = f"; filled {filled} interior pixels" if filled else ""
         print(f"repaired {target_name} with {donor_name}{suffix}")
+    smooth_all()
 
 
 if __name__ == "__main__":

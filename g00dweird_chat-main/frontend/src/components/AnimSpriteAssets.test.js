@@ -39,6 +39,7 @@ function decodePngAlpha(filePath) {
     const scanlineLength = width * bytesPerPixel;
     const inflated = zlib.inflateSync(Buffer.concat(idatChunks));
     const alpha = Array.from({ length: height }, () => new Uint8Array(width));
+    const rgba = Array.from({ length: height }, () => Array(width));
     let sourceOffset = 0;
     let previous = Buffer.alloc(scanlineLength);
 
@@ -61,12 +62,19 @@ function decodePngAlpha(filePath) {
         }
 
         for (let x = 0; x < width; x += 1) {
-            alpha[y][x] = row[x * bytesPerPixel + 3];
+            const pixelOffset = x * bytesPerPixel;
+            rgba[y][x] = [
+                row[pixelOffset],
+                row[pixelOffset + 1],
+                row[pixelOffset + 2],
+                row[pixelOffset + 3],
+            ];
+            alpha[y][x] = row[pixelOffset + 3];
         }
         previous = row;
     }
 
-    return { width, height, alpha };
+    return { width, height, alpha, rgba };
 }
 
 function enclosedTransparentPinholes({ width, height, alpha }, maxArea = 80) {
@@ -116,6 +124,59 @@ function animationStateName(frameName) {
     return frameName.replace(/_\d+\.png$/, "");
 }
 
+function opaqueBounds({ width, height, alpha }) {
+    let left = width;
+    let top = height;
+    let right = -1;
+    let bottom = -1;
+
+    for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+            if (alpha[y][x] === 0) continue;
+            left = Math.min(left, x);
+            top = Math.min(top, y);
+            right = Math.max(right, x);
+            bottom = Math.max(bottom, y);
+        }
+    }
+
+    return right >= left ? { left, top, right, bottom } : null;
+}
+
+function isSlimeBodyPixel([r, g, b, a]) {
+    if (a === 0) return false;
+    if (r > 190 && g > 190 && b > 185) return false;
+    return g > 40 && g >= r + 5 && g >= b + 8;
+}
+
+function brightness([r, g, b]) {
+    return (r + g + b) / 3;
+}
+
+function verticalSlimeBodyBands(decoded) {
+    const bounds = opaqueBounds(decoded);
+    if (!bounds) return [];
+    const bands = [];
+
+    for (let x = bounds.left + 8; x <= bounds.right - 8; x += 1) {
+        let darkContrastPixels = 0;
+
+        for (let y = bounds.top + 5; y <= bounds.bottom - 5; y += 1) {
+            const pixel = decoded.rgba[y][x];
+            const left = decoded.rgba[y][x - 1];
+            const right = decoded.rgba[y][x + 1];
+            if (!isSlimeBodyPixel(pixel) || !isSlimeBodyPixel(left) || !isSlimeBodyPixel(right)) continue;
+            if (brightness(pixel) + 28 < Math.min(brightness(left), brightness(right))) {
+                darkContrastPixels += 1;
+            }
+        }
+
+        if (darkContrastPixels >= 22) bands.push({ x, darkContrastPixels });
+    }
+
+    return bands;
+}
+
 describe("animated sprite asset alpha", () => {
     test("cat frames have no enclosed transparent pinholes", () => {
         const badFrames = fs.readdirSync(CAT_DIR)
@@ -162,5 +223,17 @@ describe("animated sprite asset alpha", () => {
         });
 
         expect(sparseFrames).toEqual([]);
+    });
+
+    test("slime body frames do not contain hard vertical stripe bands", () => {
+        const stripedFrames = fs.readdirSync(SLIME_DIR)
+            .filter((name) => name.endsWith(".png"))
+            .map((name) => {
+                const bands = verticalSlimeBodyBands(decodePngAlpha(path.join(SLIME_DIR, name)));
+                return bands.length ? { name, bands } : null;
+            })
+            .filter(Boolean);
+
+        expect(stripedFrames).toEqual([]);
     });
 });
