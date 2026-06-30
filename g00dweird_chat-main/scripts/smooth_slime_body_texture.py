@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Repaint slime body pixels without banding and close tiny alpha chips."""
+"""Repaint slime body pixels without banding, flicker, or interior leaks."""
 from __future__ import annotations
 
 from collections import deque
 from pathlib import Path
-from statistics import median
 
 from PIL import Image
 
@@ -13,6 +12,7 @@ from fix_slime_sprite_transparency import fix_frame
 
 ROOT = Path(__file__).resolve().parents[1]
 SLIME_DIR = ROOT / "frontend" / "public" / "anim" / "slime"
+SLIME_BASE = (73, 132, 16)
 
 
 def is_slime_body_color(color: tuple[int, int, int, int]) -> bool:
@@ -22,15 +22,6 @@ def is_slime_body_color(color: tuple[int, int, int, int]) -> bool:
     if r > 190 and g > 190 and b > 185:
         return False
     return g > 28 and g >= r + 2 and g >= b + 6
-
-
-def is_near_transparency(alpha, x: int, y: int, radius: int = 2) -> bool:
-    width, height = alpha.size
-    for ny in range(max(0, y - radius), min(height, y + radius + 1)):
-        for nx in range(max(0, x - radius), min(width, x + radius + 1)):
-            if alpha.getpixel((nx, ny)) == 0:
-                return True
-    return False
 
 
 def is_sleep_symbol_color(color: tuple[int, int, int, int]) -> bool:
@@ -46,12 +37,36 @@ def body_bounds(body_points: set[tuple[int, int]]) -> tuple[int, int, int, int]:
     return min(xs), min(ys), max(xs), max(ys)
 
 
-def dominant_body_color(image: Image.Image, body_points: set[tuple[int, int]]) -> tuple[float, float, float]:
+def largest_body_component(image: Image.Image) -> set[tuple[int, int]]:
     pixels = image.load()
-    colors = [pixels[x, y][:3] for x, y in body_points]
-    if not colors:
-        return (85, 142, 22)
-    return tuple(median(channel) for channel in zip(*colors))
+    width, height = image.size
+    seen: set[tuple[int, int]] = set()
+    largest: set[tuple[int, int]] = set()
+
+    for y in range(height):
+        for x in range(width):
+            if (x, y) in seen or not is_slime_body_color(pixels[x, y]):
+                continue
+
+            queue = deque([(x, y)])
+            seen.add((x, y))
+            component: set[tuple[int, int]] = set()
+
+            while queue:
+                px, py = queue.popleft()
+                component.add((px, py))
+                for nx, ny in ((px - 1, py), (px + 1, py), (px, py - 1), (px, py + 1)):
+                    if nx < 0 or ny < 0 or nx >= width or ny >= height:
+                        continue
+                    if (nx, ny) in seen or not is_slime_body_color(pixels[nx, ny]):
+                        continue
+                    seen.add((nx, ny))
+                    queue.append((nx, ny))
+
+            if len(component) > len(largest):
+                largest = component
+
+    return largest
 
 
 def clamp_channel(value: float) -> int:
@@ -76,8 +91,7 @@ def target_body_color(
     crown_lift = 9 * max(0, 1 - y_norm)
     belly_lift = 6 * max(0, 1 - ((nx * 1.3) ** 2 + ((y_norm - 0.52) * 2.0) ** 2))
     lower_shadow = -10 * max(0, y_norm - 0.68) / 0.32
-    texture = (((x * 17 + y * 11) % 7) - 3) * 0.75
-    shade = side_shadow + center_lift + crown_lift + belly_lift + lower_shadow + texture
+    shade = side_shadow + center_lift + crown_lift + belly_lift + lower_shadow
 
     return (
         clamp_channel(base[0] + shade * 0.48),
@@ -134,6 +148,149 @@ def close_alpha_chips(image: Image.Image, min_neighbors: int = 7) -> int:
     return total
 
 
+def nearby_body_count(body_points: set[tuple[int, int]], x: int, y: int, radius: int = 3) -> int:
+    count = 0
+    for ny in range(y - radius, y + radius + 1):
+        for nx in range(x - radius, x + radius + 1):
+            if (nx, ny) in body_points:
+                count += 1
+    return count
+
+
+def transparent_row_interior_leaks(image: Image.Image, body_points: set[tuple[int, int]]) -> set[tuple[int, int]]:
+    pixels = image.load()
+    width, height = image.size
+    leaks: set[tuple[int, int]] = set()
+
+    for y in range(height):
+        body_xs = [x for x in range(width) if (x, y) in body_points]
+        if len(body_xs) < 8:
+            continue
+        left, right = min(body_xs), max(body_xs)
+        for x in range(left, right + 1):
+            if pixels[x, y][3] != 0:
+                continue
+            if nearby_body_count(body_points, x, y) >= 10:
+                leaks.add((x, y))
+
+    return leaks
+
+
+def is_dark_pixel(color: tuple[int, int, int, int]) -> bool:
+    r, g, b, a = color
+    return a > 0 and r < 42 and g < 52 and b < 42
+
+
+def is_white_feature(color: tuple[int, int, int, int]) -> bool:
+    r, g, b, a = color
+    return a > 0 and r > 180 and g > 180 and b > 165
+
+
+def is_sleep_preserved_pixel(color: tuple[int, int, int, int]) -> bool:
+    r, g, b, a = color
+    if a == 0:
+        return False
+    return is_sleep_symbol_color(color) or is_dark_pixel(color) or (r > 70 and g < 80 and b < 70)
+
+
+def near_white_feature(image: Image.Image, x: int, y: int, radius: int = 2) -> bool:
+    pixels = image.load()
+    width, height = image.size
+    for ny in range(max(0, y - radius), min(height, y + radius + 1)):
+        for nx in range(max(0, x - radius), min(width, x + radius + 1)):
+            if is_white_feature(pixels[nx, ny]):
+                return True
+    return False
+
+
+def removable_dark_specks(image: Image.Image, body_points: set[tuple[int, int]]) -> set[tuple[int, int]]:
+    pixels = image.load()
+    width, height = image.size
+    seen: set[tuple[int, int]] = set()
+    removable: set[tuple[int, int]] = set()
+
+    for y in range(height):
+        for x in range(width):
+            if (x, y) in seen or not is_dark_pixel(pixels[x, y]):
+                continue
+
+            queue = deque([(x, y)])
+            seen.add((x, y))
+            component: list[tuple[int, int]] = []
+            touches_transparency = False
+            touches_white = False
+            body_neighbors = 0
+
+            while queue:
+                px, py = queue.popleft()
+                component.append((px, py))
+                if near_white_feature(image, px, py):
+                    touches_white = True
+
+                for ny in range(max(0, py - 2), min(height, py + 3)):
+                    for nx in range(max(0, px - 2), min(width, px + 3)):
+                        if (nx, ny) in body_points:
+                            body_neighbors += 1
+                        if pixels[nx, ny][3] == 0:
+                            touches_transparency = True
+
+                for nx, ny in (
+                    (px - 1, py),
+                    (px + 1, py),
+                    (px, py - 1),
+                    (px, py + 1),
+                    (px - 1, py - 1),
+                    (px + 1, py - 1),
+                    (px - 1, py + 1),
+                    (px + 1, py + 1),
+                ):
+                    if nx < 0 or ny < 0 or nx >= width or ny >= height:
+                        continue
+                    if (nx, ny) in seen or not is_dark_pixel(pixels[nx, ny]):
+                        continue
+                    seen.add((nx, ny))
+                    queue.append((nx, ny))
+
+            if len(component) <= 24 and body_neighbors >= len(component) * 2 and not touches_transparency and not touches_white:
+                removable.update(component)
+
+    return removable
+
+
+def sleep_pose_body_points(image: Image.Image) -> set[tuple[int, int]]:
+    pixels = image.load()
+    width, height = image.size
+    points: set[tuple[int, int]] = set()
+    body_top = None
+
+    for y in range(height):
+        row_body_pixels = [
+            x
+            for x in range(width)
+            if pixels[x, y][3] > 0 and not is_sleep_symbol_color(pixels[x, y]) and not is_sleep_preserved_pixel(pixels[x, y])
+        ]
+        if y > 35 and len(row_body_pixels) >= 16:
+            body_top = y
+            break
+
+    if body_top is None:
+        return largest_body_component(image)
+
+    for y in range(body_top, height):
+        row_silhouette = [x for x in range(width) if pixels[x, y][3] > 0 and not is_sleep_symbol_color(pixels[x, y])]
+        if len(row_silhouette) < 8:
+            continue
+        left, right = min(row_silhouette), max(row_silhouette)
+        if right - left < 14:
+            continue
+        for x in range(left, right + 1):
+            if is_sleep_preserved_pixel(pixels[x, y]):
+                continue
+            points.add((x, y))
+
+    return points
+
+
 def sleep_symbol_components(image: Image.Image) -> list[list[tuple[int, int]]]:
     pixels = image.load()
     width, height = image.size
@@ -172,59 +329,50 @@ def sleep_symbol_components(image: Image.Image) -> list[list[tuple[int, int]]]:
 
 
 def repair_sleep_pose() -> int:
-    sleep_path = SLIME_DIR / "emote_d_0.png"
-    donor_path = SLIME_DIR / "idle_1.png"
-    sleep = Image.open(sleep_path).convert("RGBA")
-    donor = Image.open(donor_path).convert("RGBA")
-    repaired = donor.copy()
-    sleep_pixels = sleep.load()
-    repaired_pixels = repaired.load()
-    changed = 0
-
-    for component in sleep_symbol_components(sleep):
-        for x, y in component:
-            repaired_pixels[x, y] = sleep_pixels[x, y]
-            changed += 1
-
-    if changed:
-        repaired.save(sleep_path, optimize=True)
-    return changed
+    # The sleep frame has its own lower, wider pose. Keep that pose intact;
+    # repainting happens in smooth_frame like the other states.
+    return 0
 
 
 def smooth_frame(path: Path) -> int:
-    image = Image.open(path).convert("RGBA")
-    alpha = image.getchannel("A")
-    pixels = image.load()
-    width, height = image.size
-    body_points = {
-        (x, y)
-        for y in range(height)
-        for x in range(width)
-        if is_slime_body_color(pixels[x, y]) and not is_near_transparency(alpha, x, y, radius=1)
-    }
-    if not body_points:
-        return 0
+    total_changed = 0
 
-    changed = 0
-    bounds = body_bounds(body_points)
-    base = dominant_body_color(image, body_points)
-
-    for x, y in body_points:
-        _r, _g, _b, a = pixels[x, y]
-        target_r, target_g, target_b = target_body_color(base, x, y, bounds)
-        pixels[x, y] = (
-            target_r,
-            target_g,
-            target_b,
-            a,
-        )
-        changed += 1
-    changed += close_alpha_chips(image)
-
-    if changed:
-        image.save(path, optimize=True)
+    for _iteration in range(2):
         fix_frame(path)
-    return changed
+        image = Image.open(path).convert("RGBA")
+        pixels = image.load()
+        body_points = sleep_pose_body_points(image) if path.name == "emote_d_0.png" else largest_body_component(image)
+        if not body_points:
+            continue
+
+        for _pass in range(8):
+            before = len(body_points)
+            body_points.update(transparent_row_interior_leaks(image, body_points))
+            if len(body_points) == before:
+                break
+        body_points.update(removable_dark_specks(image, body_points))
+
+        changed = 0
+        bounds = body_bounds(body_points)
+        base = SLIME_BASE
+
+        for x, y in body_points:
+            target_r, target_g, target_b = target_body_color(base, x, y, bounds)
+            pixels[x, y] = (
+                target_r,
+                target_g,
+                target_b,
+                255,
+            )
+            changed += 1
+        changed += close_alpha_chips(image)
+
+        if changed:
+            image.save(path, optimize=True)
+            fix_frame(path)
+        total_changed += changed
+
+    return total_changed
 
 
 def smooth_all() -> int:

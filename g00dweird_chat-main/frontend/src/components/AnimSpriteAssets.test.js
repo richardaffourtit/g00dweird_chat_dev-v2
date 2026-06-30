@@ -206,6 +206,75 @@ function directionalBodyDiffRatio(decoded) {
     return vertical / horizontal;
 }
 
+function bodyBrightnessMedian(decoded) {
+    const values = largestSlimeBodyPoints(decoded).map(({ x, y }) => brightness(decoded.rgba[y][x]));
+    values.sort((a, b) => a - b);
+    return values.length ? values[Math.floor(values.length / 2)] : 0;
+}
+
+function largestSlimeBodyPoints(decoded) {
+    const seen = Array.from({ length: decoded.height }, () => new Uint8Array(decoded.width));
+    const components = [];
+
+    for (let y = 0; y < decoded.height; y += 1) {
+        for (let x = 0; x < decoded.width; x += 1) {
+            if (seen[y][x] || !isSlimeBodyPixel(decoded.rgba[y][x])) continue;
+            const queue = [{ x, y }];
+            seen[y][x] = 1;
+            const points = [];
+
+            while (queue.length) {
+                const point = queue.shift();
+                points.push(point);
+                [[point.x - 1, point.y], [point.x + 1, point.y], [point.x, point.y - 1], [point.x, point.y + 1]].forEach(([nx, ny]) => {
+                    if (nx < 0 || ny < 0 || nx >= decoded.width || ny >= decoded.height) return;
+                    if (seen[ny][nx] || !isSlimeBodyPixel(decoded.rgba[ny][nx])) return;
+                    seen[ny][nx] = 1;
+                    queue.push({ x: nx, y: ny });
+                });
+            }
+
+            components.push(points);
+        }
+    }
+
+    components.sort((a, b) => b.length - a.length);
+    return components[0] || [];
+}
+
+function transparentRowInteriorLeaks(decoded) {
+    const leaks = [];
+    const bodyPoints = largestSlimeBodyPoints(decoded);
+    const bodyByRow = bodyPoints.reduce((rows, point) => {
+        rows[point.y] = rows[point.y] || [];
+        rows[point.y].push(point.x);
+        return rows;
+    }, {});
+
+    for (let y = 0; y < decoded.height; y += 1) {
+        const bodyXs = bodyByRow[y] || [];
+        if (bodyXs.length < 8) continue;
+
+        const left = Math.min(...bodyXs);
+        const right = Math.max(...bodyXs);
+        for (let x = left; x <= right; x += 1) {
+            if (decoded.alpha[y][x] !== 0) continue;
+
+            let nearbyBody = 0;
+            for (let dy = -3; dy <= 3; dy += 1) {
+                for (let dx = -3; dx <= 3; dx += 1) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    if (nx < 0 || ny < 0 || nx >= decoded.width || ny >= decoded.height) continue;
+                    if (isSlimeBodyPixel(decoded.rgba[ny][nx])) nearbyBody += 1;
+                }
+            }
+            if (nearbyBody >= 10) leaks.push({ x, y });
+        }
+    }
+    return leaks;
+}
+
 function outlineAlphaChips({ width, height, alpha }, minNeighbors = 7) {
     const chips = [];
     for (let y = 1; y < height - 1; y += 1) {
@@ -308,8 +377,40 @@ describe("animated sprite asset alpha", () => {
         expect(chippedFrames).toEqual([]);
     });
 
+    test("slime body row interiors do not leak transparent pixels", () => {
+        const leakingFrames = fs.readdirSync(SLIME_DIR)
+            .filter((name) => name.endsWith(".png"))
+            .map((name) => {
+                const leaks = transparentRowInteriorLeaks(decodePngAlpha(path.join(SLIME_DIR, name)));
+                return leaks.length ? { name, leaks: leaks.slice(0, 12), leakCount: leaks.length } : null;
+            })
+            .filter(Boolean);
+
+        expect(leakingFrames).toEqual([]);
+    });
+
+    test("slime idle frames keep consistent body brightness", () => {
+        const medians = ["idle_0.png", "idle_1.png", "idle_2.png"].map((name) => ({
+            name,
+            median: bodyBrightnessMedian(decodePngAlpha(path.join(SLIME_DIR, name))),
+        }));
+        const spread = Math.max(...medians.map((frame) => frame.median)) - Math.min(...medians.map((frame) => frame.median));
+
+        expect({ medians, spread: Number(spread.toFixed(2)) }).toMatchObject({ spread: expect.any(Number) });
+        expect(spread).toBeLessThanOrEqual(3);
+    });
+
+    test("slime sleep frame keeps the sleeping pose instead of the standing idle pose", () => {
+        const sleepFrame = decodePngAlpha(path.join(SLIME_DIR, "emote_d_0.png"));
+        const bounds = opaqueBounds(sleepFrame);
+
+        expect(bounds).toEqual(expect.objectContaining({ left: expect.any(Number), right: expect.any(Number) }));
+        expect(bounds.left).toBeLessThanOrEqual(30);
+        expect(bounds.right - bounds.left).toBeGreaterThanOrEqual(110);
+    });
+
     test("slime sleep pose keeps a visible slime body", () => {
         const sleepFrame = decodePngAlpha(path.join(SLIME_DIR, "emote_d_0.png"));
-        expect(opaquePixelCount(sleepFrame)).toBeGreaterThanOrEqual(5600);
+        expect(opaquePixelCount(sleepFrame)).toBeGreaterThanOrEqual(3900);
     });
 });
