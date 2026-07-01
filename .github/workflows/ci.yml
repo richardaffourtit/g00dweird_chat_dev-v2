@@ -1,0 +1,44 @@
+name: g00dweird checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  launch-and-app-checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: g00dweird_chat-main
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.9"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: g00dweird_chat-main/frontend/package-lock.json
+
+      - name: Install backend dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -r backend/requirements.txt
+
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+
+      - name: Launch preflight
+        run: make launch-check
+
+      - name: Backend launch tests
+        run: make backend-test
+
+      - name: Frontend focused tests
+        run: make frontend-test
+
+      - name: Frontend build
+        run: make frontend-build

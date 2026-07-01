@@ -86,7 +86,15 @@ android-sdk/-e
 .env
 .env.*
 *.env
+!.env.example
+!backend/.env.example
+!frontend/.env.example
 credentials.json
 *.pem
 *.key
 .credentials
+
+# Local Mongo/runtime data should never be committed.
+backend/.mongo-data/
+backend/.mongo-logs/
+backend/local_storage/

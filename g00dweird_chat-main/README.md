@@ -52,6 +52,33 @@ python3 server.py
 
 Some older backend tests expect `REACT_APP_BACKEND_URL` to be set or an Emergent-style `/app/frontend/.env` file to exist.
 
+## Fast Fix / Launch Check
+
+From this folder, run the focused pre-push check:
+
+```bash
+make quick
+```
+
+That validates the repo-root `render.yaml`, runs launch-critical backend tests,
+runs focused frontend tests, and builds the Vite app. The same checks run in
+GitHub Actions on pushes and pull requests to `main`.
+
+Safe env templates live at:
+
+```text
+backend/.env.example
+frontend/.env.example
+```
+
+Copy those to local `.env` files when needed; real `.env` files stay out of git.
+
+Live deploy notes are in `DEPLOY.md`. The first launch shape is:
+
+- `chat.g00dweird.com` for the frontend
+- `api.g00dweird.com` for the backend/WebSockets
+- `g00dweird.com` and `www.g00dweird.com` stay on Framer until promotion
+
 ## Assets
 
 Runtime assets are kept under:

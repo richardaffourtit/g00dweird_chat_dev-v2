@@ -8,11 +8,12 @@ services:
     startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/health
     autoDeployTrigger: commit
+    numInstances: 1
     domains:
       - api.g00dweird.com
     disk:
       name: g00dweird-uploads
-      mountPath: /var/data/g00dweird
+      mountPath: /var/data/g00dweird/uploads
       sizeGB: 1
     envVars:
       - key: PYTHON_VERSION
@@ -23,6 +24,8 @@ services:
         value: g00dweird
       - key: CORS_ORIGINS
         value: https://g00dweird.com,https://www.g00dweird.com,https://chat.g00dweird.com
+      - key: REALTIME_MODE
+        value: single-instance
       - key: OBJECT_STORAGE_PROVIDER
         value: local
       - key: LOCAL_STORAGE_DIR
@@ -33,11 +36,9 @@ services:
     runtime: static
     rootDir: g00dweird_chat-main/frontend
     buildCommand: npm ci && npm run build
-    staticPublishPath: g00dweird_chat-main/frontend/build
+    staticPublishPath: build
     autoDeployTrigger: commit
     domains:
-      - g00dweird.com
-      - www.g00dweird.com
       - chat.g00dweird.com
     routes:
       - type: rewrite
@@ -46,9 +47,9 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22
-      - key: REACT_APP_BACKEND_URL
+      - key: VITE_BACKEND_URL
         value: https://api.g00dweird.com
-      - key: REACT_APP_PREVIEW_MOCK
+      - key: VITE_PREVIEW_MOCK
         value: "0"
-      - key: REACT_APP_USE_CLEANED_SPRITES
+      - key: VITE_USE_CLEANED_SPRITES
         value: "1"

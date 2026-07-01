@@ -29,6 +29,9 @@ The chat app is not Framer-static-only. It needs:
 - `numInstances: 1` on the backend to keep live room state coherent
 - a persistent disk for local upload storage
 
+The only live Blueprint file is the repo-root `render.yaml`. Do not use a nested
+`g00dweird_chat-main/render.yaml`; keeping one file avoids split-brain deploys.
+
 ## Render Setup
 
 1. In Render, create a new Blueprint from the GitHub repo.
@@ -62,6 +65,23 @@ www.g00dweird.com
 
 Those currently point to Framer and should stay there until the chat app is proven live.
 
+## Git Fix Rhythm
+
+For small fixes before launch:
+
+```bash
+cd g00dweird_chat-main
+make quick
+git status --short
+git add <changed files>
+git commit -m "Describe the fix"
+git push origin main
+```
+
+`make quick` checks the Render Blueprint, runs the focused backend launch tests,
+runs focused frontend tests, and builds the frontend. GitHub Actions runs the
+same checks on pushes and pull requests to `main`.
+
 ## Later Framer Legacy Move
 
 When the chat app is ready to own the root domain:
@@ -90,24 +110,19 @@ OBJECT_STORAGE_REGION=auto
 
 ## Local Verification
 
-Backend:
+From `g00dweird_chat-main/`:
 
 ```bash
-python3 -m pytest backend/tests/test_launch_config.py backend/tests/test_admin.py backend/tests/test_basketball.py
+make quick
 ```
 
-Frontend:
+Or run individual pieces:
 
 ```bash
-cd frontend
-CI=true npm test -- --watchAll=false src/lib/api.test.js src/lib/admin.test.js src/components/IsoWorld.test.js
-npm run build
-```
-
-Blueprint parse check:
-
-```bash
-ruby -ryaml -e 'data = YAML.load_file("render.yaml"); services = data.fetch("services"); raise "bad service count" unless services.length == 2; raise "backend not single instance" unless services[0].fetch("numInstances") == 1; raise "static site shape changed" unless services[1].fetch("type") == "web" && services[1].fetch("runtime") == "static"; puts "render.yaml ok"'
+make launch-check
+make backend-test
+make frontend-test
+make frontend-build
 ```
 
 Health check after backend deploy:

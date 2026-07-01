@@ -13,6 +13,9 @@ export default defineConfig(({ mode }) => {
   const useCleanedSprites = readEnvValue(env, "USE_CLEANED_SPRITES", "");
   const processEnv = {
     NODE_ENV: mode,
+    VITE_PREVIEW_MOCK: previewMock,
+    VITE_BACKEND_URL: backendUrl,
+    VITE_USE_CLEANED_SPRITES: useCleanedSprites,
     REACT_APP_PREVIEW_MOCK: previewMock,
     REACT_APP_BACKEND_URL: backendUrl,
     REACT_APP_USE_CLEANED_SPRITES: useCleanedSprites,
