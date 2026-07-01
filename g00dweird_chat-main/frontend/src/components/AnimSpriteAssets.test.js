@@ -336,6 +336,66 @@ function outlineAlphaChips({ width, height, alpha }, minNeighbors = 7) {
     return chips;
 }
 
+function isWhiteFeaturePixel([r, g, b, a]) {
+    return a > 0 && r > 180 && g > 180 && b > 165;
+}
+
+function isCleanDarkOutlinePixel([r, g, b, a]) {
+    return a > 0 && r < 45 && g < 55 && b < 45;
+}
+
+function isSlimeOutlineMudPixel(pixel) {
+    const [r, g, b, a] = pixel;
+    if (a === 0 || isSlimeBodyPixel(pixel) || isWhiteFeaturePixel(pixel)) return false;
+    return (r < 95 && g < 90 && b < 65) || (r > 55 && g < 85 && b < 70);
+}
+
+function hasNearbyPixel(decoded, x, y, radius, predicate) {
+    for (let ny = Math.max(0, y - radius); ny <= Math.min(decoded.height - 1, y + radius); ny += 1) {
+        for (let nx = Math.max(0, x - radius); nx <= Math.min(decoded.width - 1, x + radius); nx += 1) {
+            if (predicate(decoded.rgba[ny][nx], nx, ny)) return true;
+        }
+    }
+    return false;
+}
+
+function nearbySlimeBodyCount(decoded, x, y, radius) {
+    let count = 0;
+    for (let ny = Math.max(0, y - radius); ny <= Math.min(decoded.height - 1, y + radius); ny += 1) {
+        for (let nx = Math.max(0, x - radius); nx <= Math.min(decoded.width - 1, x + radius); nx += 1) {
+            if (isSlimeBodyPixel(decoded.rgba[ny][nx])) count += 1;
+        }
+    }
+    return count;
+}
+
+function slimeOutlineIntrusions(decoded) {
+    const intrusions = [];
+    for (let y = 0; y < decoded.height; y += 1) {
+        for (let x = 0; x < decoded.width; x += 1) {
+            if (!isSlimeOutlineMudPixel(decoded.rgba[y][x])) continue;
+            if (hasNearbyPixel(decoded, x, y, 5, (pixel) => pixel[3] === 0)) continue;
+            if (hasNearbyPixel(decoded, x, y, 7, isWhiteFeaturePixel)) continue;
+            if (nearbySlimeBodyCount(decoded, x, y, 3) >= 24) intrusions.push({ x, y });
+        }
+    }
+    return intrusions;
+}
+
+function whiteEyeEdgeGaps(decoded) {
+    const gaps = [];
+    for (let y = 1; y < decoded.height - 1; y += 1) {
+        for (let x = 1; x < decoded.width - 1; x += 1) {
+            if (!isWhiteFeaturePixel(decoded.rgba[y][x])) continue;
+            const touchesBody = hasNearbyPixel(decoded, x, y, 1, (pixel) => isSlimeBodyPixel(pixel));
+            if (!touchesBody) continue;
+            const hasDarkSeparator = hasNearbyPixel(decoded, x, y, 1, isCleanDarkOutlinePixel);
+            if (!hasDarkSeparator) gaps.push({ x, y });
+        }
+    }
+    return gaps;
+}
+
 describe("animated sprite asset alpha", () => {
     test("cat frames have no enclosed transparent pinholes", () => {
         const badFrames = fs.readdirSync(CAT_DIR)
@@ -418,6 +478,28 @@ describe("animated sprite asset alpha", () => {
             .filter(Boolean);
 
         expect(chippedFrames).toEqual([]);
+    });
+
+    test("slime hop frames keep outline debris outside the body fill", () => {
+        const muddyHopFrames = ["hop_0.png", "hop_1.png", "hop_2.png", "hop_3.png"]
+            .map((name) => {
+                const intrusions = slimeOutlineIntrusions(decodePngAlpha(path.join(SLIME_DIR, name)));
+                return intrusions.length ? { name, intrusions: intrusions.slice(0, 12), intrusionCount: intrusions.length } : null;
+            })
+            .filter(Boolean);
+
+        expect(muddyHopFrames).toEqual([]);
+    });
+
+    test("slime eye whites keep a clean dark outline against body fill", () => {
+        const gappyEyeFrames = ["idle_0.png", "idle_1.png", "idle_2.png", "hop_0.png", "hop_1.png", "hop_2.png", "hop_3.png"]
+            .map((name) => {
+                const gaps = whiteEyeEdgeGaps(decodePngAlpha(path.join(SLIME_DIR, name)));
+                return gaps.length ? { name, gaps: gaps.slice(0, 12), gapCount: gaps.length } : null;
+            })
+            .filter(Boolean);
+
+        expect(gappyEyeFrames).toEqual([]);
     });
 
     test("slime body row interiors do not leak transparent pixels", () => {

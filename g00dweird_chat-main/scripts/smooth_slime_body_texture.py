@@ -15,6 +15,8 @@ SLIME_DIR = ROOT / "frontend" / "public" / "anim" / "slime"
 SLIME_BASE = (73, 132, 16)
 IDLE_TARGET_BODY_HEIGHT = 78
 MAX_DEBRIS_PIXELS = 20
+AGGRESSIVE_BODY_STATES = {"hop", "idle", "wiggle", "split", "hurt"}
+CLEAN_EYE_OUTLINE = (8, 10, 7, 255)
 
 
 def is_slime_body_color(color: tuple[int, int, int, int]) -> bool:
@@ -252,9 +254,23 @@ def is_dark_pixel(color: tuple[int, int, int, int]) -> bool:
     return a > 0 and r < 42 and g < 52 and b < 42
 
 
+def is_outline_mud_pixel(color: tuple[int, int, int, int]) -> bool:
+    r, g, b, a = color
+    if a == 0 or is_slime_body_color(color) or is_white_feature(color):
+        return False
+    return (r < 95 and g < 90 and b < 65) or (r > 55 and g < 85 and b < 70)
+
+
 def is_white_feature(color: tuple[int, int, int, int]) -> bool:
     r, g, b, a = color
     return a > 0 and r > 180 and g > 180 and b > 165
+
+
+def is_soft_eye_feature(color: tuple[int, int, int, int]) -> bool:
+    r, g, b, a = color
+    if a == 0:
+        return False
+    return r > 130 and g > 130 and b > 110 and not is_slime_body_color(color)
 
 
 def is_sleep_preserved_pixel(color: tuple[int, int, int, int]) -> bool:
@@ -272,6 +288,215 @@ def near_white_feature(image: Image.Image, x: int, y: int, radius: int = 2) -> b
             if is_white_feature(pixels[nx, ny]):
                 return True
     return False
+
+
+def near_transparency(image: Image.Image, x: int, y: int, radius: int = 5) -> bool:
+    pixels = image.load()
+    width, height = image.size
+    for ny in range(max(0, y - radius), min(height, y + radius + 1)):
+        for nx in range(max(0, x - radius), min(width, x + radius + 1)):
+            if pixels[nx, ny][3] == 0:
+                return True
+    return False
+
+
+def nearby_point_count(points: set[tuple[int, int]], x: int, y: int, radius: int = 2) -> int:
+    count = 0
+    for ny in range(y - radius, y + radius + 1):
+        for nx in range(x - radius, x + radius + 1):
+            if (nx, ny) in points:
+                count += 1
+    return count
+
+
+def largest_feature_component(image: Image.Image, predicate) -> set[tuple[int, int]]:
+    pixels = image.load()
+    width, height = image.size
+    seen: set[tuple[int, int]] = set()
+    largest: set[tuple[int, int]] = set()
+
+    for y in range(height):
+        for x in range(width):
+            if (x, y) in seen or not predicate(pixels[x, y]):
+                continue
+
+            queue = deque([(x, y)])
+            seen.add((x, y))
+            component: set[tuple[int, int]] = set()
+
+            while queue:
+                px, py = queue.popleft()
+                component.add((px, py))
+                for nx in (px - 1, px, px + 1):
+                    for ny in (py - 1, py, py + 1):
+                        if nx == px and ny == py:
+                            continue
+                        if nx < 0 or ny < 0 or nx >= width or ny >= height:
+                            continue
+                        if (nx, ny) in seen or not predicate(pixels[nx, ny]):
+                            continue
+                        seen.add((nx, ny))
+                        queue.append((nx, ny))
+
+            if len(component) > len(largest):
+                largest = component
+
+    return largest
+
+
+def slime_eye_points(image: Image.Image) -> set[tuple[int, int]]:
+    white_core = largest_feature_component(image, is_white_feature)
+    if not white_core:
+        return set()
+
+    pixels = image.load()
+    width, height = image.size
+    left, top, right, bottom = body_bounds(white_core)
+    eye_points = set(white_core)
+
+    for y in range(max(0, top - 3), min(height, bottom + 4)):
+        for x in range(max(0, left - 3), min(width, right + 4)):
+            if not is_soft_eye_feature(pixels[x, y]):
+                continue
+            if nearby_point_count(white_core, x, y, 3):
+                eye_points.add((x, y))
+
+    return eye_points
+
+
+def eye_preserve_points(image: Image.Image, eye_points: set[tuple[int, int]]) -> set[tuple[int, int]]:
+    if not eye_points:
+        return set()
+
+    pixels = image.load()
+    width, height = image.size
+    left, top, right, bottom = body_bounds(eye_points)
+    preserve = set(eye_points)
+
+    for y in range(max(0, top - 2), min(height, bottom + 3)):
+        for x in range(max(0, left - 2), min(width, right + 3)):
+            if is_dark_pixel(pixels[x, y]) and nearby_point_count(eye_points, x, y, 2):
+                preserve.add((x, y))
+
+    return preserve
+
+
+def removable_body_intrusions(
+    image: Image.Image,
+    body_points: set[tuple[int, int]],
+    preserve_points: set[tuple[int, int]],
+) -> set[tuple[int, int]]:
+    pixels = image.load()
+    width, height = image.size
+    removable: set[tuple[int, int]] = set()
+
+    for y in range(height):
+        body_xs = [x for x in range(width) if (x, y) in body_points]
+        if len(body_xs) < 8:
+            continue
+
+        left, right = min(body_xs), max(body_xs)
+        for x in range(left, right + 1):
+            if (x, y) in preserve_points or is_sleep_symbol_color(pixels[x, y]):
+                continue
+            body_count = nearby_body_count(body_points, x, y)
+            if pixels[x, y][3] == 0 and body_count >= 10:
+                removable.add((x, y))
+            elif (is_outline_mud_pixel(pixels[x, y]) or is_soft_eye_feature(pixels[x, y])) and body_count >= 8:
+                removable.add((x, y))
+
+    for y in range(height):
+        for x in range(width):
+            if (x, y) in removable or (x, y) in preserve_points:
+                continue
+            if not (is_outline_mud_pixel(pixels[x, y]) or is_soft_eye_feature(pixels[x, y])):
+                continue
+            if is_sleep_symbol_color(pixels[x, y]):
+                continue
+            if nearby_body_count(body_points, x, y) >= 24 and not near_transparency(image, x, y):
+                removable.add((x, y))
+
+    return removable
+
+
+def draw_eye_outline(image: Image.Image, eye_points: set[tuple[int, int]]) -> int:
+    if not eye_points:
+        return 0
+
+    pixels = image.load()
+    width, height = image.size
+    outline_points: set[tuple[int, int]] = set()
+
+    for x, y in eye_points:
+        for ny in range(y - 1, y + 2):
+            for nx in range(x - 1, x + 2):
+                if nx < 0 or ny < 0 or nx >= width or ny >= height:
+                    continue
+                if (nx, ny) in eye_points or is_sleep_symbol_color(pixels[nx, ny]):
+                    continue
+                if pixels[nx, ny][3] > 0:
+                    outline_points.add((nx, ny))
+
+    changed = 0
+    for x, y in outline_points:
+        if pixels[x, y] != CLEAN_EYE_OUTLINE:
+            pixels[x, y] = CLEAN_EYE_OUTLINE
+            changed += 1
+
+    return changed
+
+
+def final_interior_intrusions(
+    image: Image.Image,
+    body_points: set[tuple[int, int]],
+    preserve_points: set[tuple[int, int]],
+) -> set[tuple[int, int]]:
+    pixels = image.load()
+    width, height = image.size
+    intrusions: set[tuple[int, int]] = set()
+
+    for y in range(height):
+        for x in range(width):
+            if (x, y) in preserve_points or is_sleep_symbol_color(pixels[x, y]):
+                continue
+
+            outline_mud = is_outline_mud_pixel(pixels[x, y])
+            stray_light = is_soft_eye_feature(pixels[x, y])
+            if not outline_mud and not stray_light:
+                continue
+            if outline_mud and near_white_feature(image, x, y, 7):
+                continue
+            if near_transparency(image, x, y):
+                continue
+            if nearby_body_count(body_points, x, y) >= 16:
+                intrusions.add((x, y))
+
+    return intrusions
+
+
+def fill_final_interior_intrusions(
+    image: Image.Image,
+    preserve_points: set[tuple[int, int]],
+    max_passes: int = 8,
+) -> int:
+    pixels = image.load()
+    changed = 0
+
+    for _pass in range(max_passes):
+        body_points = largest_body_component(image)
+        if not body_points:
+            break
+
+        intrusions = final_interior_intrusions(image, body_points, preserve_points)
+        if not intrusions:
+            break
+
+        bounds = body_bounds(body_points | intrusions)
+        for x, y in intrusions:
+            pixels[x, y] = (*target_body_color(SLIME_BASE, x, y, bounds), 255)
+        changed += len(intrusions)
+
+    return changed
 
 
 def removable_dark_specks(image: Image.Image, body_points: set[tuple[int, int]]) -> set[tuple[int, int]]:
@@ -407,6 +632,7 @@ def repair_sleep_pose() -> int:
 
 def smooth_frame(path: Path) -> int:
     total_changed = normalize_idle_pose_height(path) if path.name.startswith("idle_") else 0
+    state = path.name.split("_")[0]
 
     for _iteration in range(2):
         fix_frame(path)
@@ -425,21 +651,37 @@ def smooth_frame(path: Path) -> int:
             body_points.update(transparent_row_interior_leaks(image, body_points))
             if len(body_points) == before:
                 break
+        eye_points = slime_eye_points(image) if path.name != "emote_d_0.png" else set()
+        preserve_points = eye_preserve_points(image, eye_points)
+        if state in AGGRESSIVE_BODY_STATES:
+            for _intrusion_pass in range(4):
+                intrusions = removable_body_intrusions(image, body_points, preserve_points)
+                if not intrusions:
+                    break
+                before = len(body_points)
+                body_points.update(intrusions)
+                if len(body_points) == before:
+                    break
         body_points.update(removable_dark_specks(image, body_points))
 
         bounds = body_bounds(body_points)
         base = SLIME_BASE
 
         for x, y in body_points:
+            if (x, y) in preserve_points:
+                continue
             target_r, target_g, target_b = target_body_color(base, x, y, bounds)
             pixels[x, y] = (
                 target_r,
                 target_g,
                 target_b,
                 255,
-        )
+            )
             changed += 1
         changed += close_alpha_chips(image)
+        if state in AGGRESSIVE_BODY_STATES:
+            changed += fill_final_interior_intrusions(image, preserve_points)
+        changed += draw_eye_outline(image, eye_points)
         changed += remove_disconnected_debris(image)
 
         if changed:
