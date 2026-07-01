@@ -13,6 +13,8 @@ from fix_slime_sprite_transparency import fix_frame
 ROOT = Path(__file__).resolve().parents[1]
 SLIME_DIR = ROOT / "frontend" / "public" / "anim" / "slime"
 SLIME_BASE = (73, 132, 16)
+IDLE_TARGET_BODY_HEIGHT = 78
+MAX_DEBRIS_PIXELS = 20
 
 
 def is_slime_body_color(color: tuple[int, int, int, int]) -> bool:
@@ -67,6 +69,75 @@ def largest_body_component(image: Image.Image) -> set[tuple[int, int]]:
                 largest = component
 
     return largest
+
+
+def alpha_components(image: Image.Image) -> list[set[tuple[int, int]]]:
+    pixels = image.load()
+    width, height = image.size
+    seen: set[tuple[int, int]] = set()
+    components: list[set[tuple[int, int]]] = []
+
+    for y in range(height):
+        for x in range(width):
+            if (x, y) in seen or pixels[x, y][3] == 0:
+                continue
+
+            queue = deque([(x, y)])
+            seen.add((x, y))
+            component: set[tuple[int, int]] = set()
+
+            while queue:
+                px, py = queue.popleft()
+                component.add((px, py))
+                for nx, ny in ((px - 1, py), (px + 1, py), (px, py - 1), (px, py + 1)):
+                    if nx < 0 or ny < 0 or nx >= width or ny >= height:
+                        continue
+                    if (nx, ny) in seen or pixels[nx, ny][3] == 0:
+                        continue
+                    seen.add((nx, ny))
+                    queue.append((nx, ny))
+
+            components.append(component)
+
+    return sorted(components, key=len, reverse=True)
+
+
+def remove_disconnected_debris(image: Image.Image, max_pixels: int = MAX_DEBRIS_PIXELS) -> int:
+    pixels = image.load()
+    removed = 0
+    for component in alpha_components(image)[1:]:
+        if len(component) > max_pixels:
+            continue
+        for x, y in component:
+            pixels[x, y] = (0, 0, 0, 0)
+            removed += 1
+    return removed
+
+
+def normalize_idle_pose_height(path: Path, target_height: int = IDLE_TARGET_BODY_HEIGHT) -> int:
+    image = Image.open(path).convert("RGBA")
+    body_points = largest_body_component(image)
+    if not body_points:
+        return 0
+
+    _left, top, _right, bottom = body_bounds(body_points)
+    body_height = bottom - top + 1
+    if body_height <= target_height:
+        return 0
+
+    alpha_bbox = image.getchannel("A").getbbox()
+    if not alpha_bbox:
+        return 0
+
+    left, crop_top, right, crop_bottom = alpha_bbox
+    crop = image.crop(alpha_bbox)
+    scale_y = target_height / body_height
+    scaled_height = max(1, round(crop.height * scale_y))
+    scaled = crop.resize((crop.width, scaled_height), Image.Resampling.NEAREST)
+    out = Image.new("RGBA", image.size, (0, 0, 0, 0))
+    out.alpha_composite(scaled, (left, crop_bottom - scaled_height))
+    out.save(path, optimize=True)
+    return body_height - target_height
 
 
 def clamp_channel(value: float) -> int:
@@ -335,14 +406,18 @@ def repair_sleep_pose() -> int:
 
 
 def smooth_frame(path: Path) -> int:
-    total_changed = 0
+    total_changed = normalize_idle_pose_height(path) if path.name.startswith("idle_") else 0
 
     for _iteration in range(2):
         fix_frame(path)
         image = Image.open(path).convert("RGBA")
         pixels = image.load()
+        changed = remove_disconnected_debris(image)
         body_points = sleep_pose_body_points(image) if path.name == "emote_d_0.png" else largest_body_component(image)
         if not body_points:
+            if changed:
+                image.save(path, optimize=True)
+                total_changed += changed
             continue
 
         for _pass in range(8):
@@ -352,7 +427,6 @@ def smooth_frame(path: Path) -> int:
                 break
         body_points.update(removable_dark_specks(image, body_points))
 
-        changed = 0
         bounds = body_bounds(body_points)
         base = SLIME_BASE
 
@@ -363,9 +437,10 @@ def smooth_frame(path: Path) -> int:
                 target_g,
                 target_b,
                 255,
-            )
+        )
             changed += 1
         changed += close_alpha_chips(image)
+        changed += remove_disconnected_debris(image)
 
         if changed:
             image.save(path, optimize=True)

@@ -212,6 +212,19 @@ function bodyBrightnessMedian(decoded) {
     return values.length ? values[Math.floor(values.length / 2)] : 0;
 }
 
+function pointsBounds(points) {
+    const xs = points.map(({ x }) => x);
+    const ys = points.map(({ y }) => y);
+    return {
+        left: Math.min(...xs),
+        top: Math.min(...ys),
+        right: Math.max(...xs),
+        bottom: Math.max(...ys),
+        width: Math.max(...xs) - Math.min(...xs) + 1,
+        height: Math.max(...ys) - Math.min(...ys) + 1,
+    };
+}
+
 function largestSlimeBodyPoints(decoded) {
     const seen = Array.from({ length: decoded.height }, () => new Uint8Array(decoded.width));
     const components = [];
@@ -240,6 +253,36 @@ function largestSlimeBodyPoints(decoded) {
 
     components.sort((a, b) => b.length - a.length);
     return components[0] || [];
+}
+
+function alphaComponents(decoded) {
+    const seen = Array.from({ length: decoded.height }, () => new Uint8Array(decoded.width));
+    const components = [];
+
+    for (let y = 0; y < decoded.height; y += 1) {
+        for (let x = 0; x < decoded.width; x += 1) {
+            if (seen[y][x] || decoded.alpha[y][x] === 0) continue;
+            const queue = [{ x, y }];
+            seen[y][x] = 1;
+            const points = [];
+
+            while (queue.length) {
+                const point = queue.shift();
+                points.push(point);
+                [[point.x - 1, point.y], [point.x + 1, point.y], [point.x, point.y - 1], [point.x, point.y + 1]].forEach(([nx, ny]) => {
+                    if (nx < 0 || ny < 0 || nx >= decoded.width || ny >= decoded.height) return;
+                    if (seen[ny][nx] || decoded.alpha[ny][nx] === 0) return;
+                    seen[ny][nx] = 1;
+                    queue.push({ x: nx, y: ny });
+                });
+            }
+
+            components.push(points);
+        }
+    }
+
+    components.sort((a, b) => b.length - a.length);
+    return components;
 }
 
 function transparentRowInteriorLeaks(decoded) {
@@ -398,6 +441,47 @@ describe("animated sprite asset alpha", () => {
 
         expect({ medians, spread: Number(spread.toFixed(2)) }).toMatchObject({ spread: expect.any(Number) });
         expect(spread).toBeLessThanOrEqual(3);
+    });
+
+    test("slime idle body height stays close to hop travel height", () => {
+        const idleHeights = ["idle_0.png", "idle_1.png", "idle_2.png"].map((name) => ({
+            name,
+            height: pointsBounds(largestSlimeBodyPoints(decodePngAlpha(path.join(SLIME_DIR, name)))).height,
+        }));
+        const hopHeights = ["hop_0.png", "hop_1.png", "hop_2.png", "hop_3.png"].map((name) => ({
+            name,
+            height: pointsBounds(largestSlimeBodyPoints(decodePngAlpha(path.join(SLIME_DIR, name)))).height,
+        }));
+        const sortedHopHeights = hopHeights.map(({ height }) => height).sort((a, b) => a - b);
+        const hopMedian = sortedHopHeights[Math.floor(sortedHopHeights.length / 2)];
+        const maxIdleHeight = Math.max(...idleHeights.map(({ height }) => height));
+
+        expect({ idleHeights, hopHeights, hopMedian, maxIdleHeight }).toMatchObject({
+            hopMedian: expect.any(Number),
+            maxIdleHeight: expect.any(Number),
+        });
+        expect(maxIdleHeight).toBeLessThanOrEqual(hopMedian + 5);
+    });
+
+    test("slime frames do not keep disconnected rotoscope debris", () => {
+        const debrisFrames = fs.readdirSync(SLIME_DIR)
+            .filter((name) => name.endsWith(".png"))
+            .map((name) => {
+                const components = alphaComponents(decodePngAlpha(path.join(SLIME_DIR, name)));
+                const debris = components.slice(1).filter((component) => component.length <= 20);
+                return debris.length
+                    ? {
+                        name,
+                        debris: debris.map((component) => ({
+                            pixels: component.length,
+                            bounds: pointsBounds(component),
+                        })),
+                    }
+                    : null;
+            })
+            .filter(Boolean);
+
+        expect(debrisFrames).toEqual([]);
     });
 
     test("slime sleep frame keeps the sleeping pose instead of the standing idle pose", () => {
