@@ -46,7 +46,7 @@ services:
         destination: /index.html
     envVars:
       - key: NODE_VERSION
-        value: 22
+        value: "22"
       - key: VITE_BACKEND_URL
         value: https://api.g00dweird.com
       - key: VITE_PREVIEW_MOCK
