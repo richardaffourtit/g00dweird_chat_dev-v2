@@ -23,7 +23,7 @@ services:
       - key: DB_NAME
         value: g00dweird
       - key: CORS_ORIGINS
-        value: https://g00dweird.com,https://www.g00dweird.com,https://chat.g00dweird.com
+        value: https://g00dweird.com,https://www.g00dweird.com,https://chat.g00dweird.com,https://g00dweird-chat.onrender.com
       - key: REALTIME_MODE
         value: single-instance
       - key: OBJECT_STORAGE_PROVIDER
@@ -48,7 +48,7 @@ services:
       - key: NODE_VERSION
         value: "22"
       - key: VITE_BACKEND_URL
-        value: https://api.g00dweird.com
+        value: https://g00dweird-api.onrender.com
       - key: VITE_PREVIEW_MOCK
         value: "0"
       - key: VITE_USE_CLEANED_SPRITES

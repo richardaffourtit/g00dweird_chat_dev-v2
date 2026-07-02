@@ -33,6 +33,8 @@ backend_env = backend.fetch("envVars").map { |item| [item.fetch("key"), item] }.
 end
 raise "MONGO_URL must stay secret/sync:false" unless backend_env.fetch("MONGO_URL")["sync"] == false
 raise "REALTIME_MODE must be single-instance for launch" unless backend_env.fetch("REALTIME_MODE")["value"] == "single-instance"
+cors_origins = backend_env.fetch("CORS_ORIGINS")["value"].to_s.split(",")
+raise "backend CORS must allow Render staging frontend" unless cors_origins.include?("https://g00dweird-chat.onrender.com")
 
 raise "frontend must be a static web service" unless frontend["type"] == "web" && frontend["runtime"] == "static"
 raise "frontend rootDir changed" unless frontend["rootDir"] == "g00dweird_chat-main/frontend"
@@ -43,7 +45,7 @@ frontend_env = frontend.fetch("envVars").map { |item| [item.fetch("key"), item] 
 %w[NODE_VERSION VITE_BACKEND_URL VITE_PREVIEW_MOCK VITE_USE_CLEANED_SPRITES].each do |key|
   raise "frontend missing env var #{key}" unless frontend_env.key?(key)
 end
-raise "frontend backend URL mismatch" unless frontend_env.fetch("VITE_BACKEND_URL")["value"] == "https://api.g00dweird.com"
+raise "frontend backend URL mismatch" unless frontend_env.fetch("VITE_BACKEND_URL")["value"] == "https://g00dweird-api.onrender.com"
 
 puts "render.yaml launch config ok"
 RUBY
