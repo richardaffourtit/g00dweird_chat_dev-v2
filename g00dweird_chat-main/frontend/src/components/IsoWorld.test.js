@@ -243,6 +243,14 @@ describe("iso world avatar rendering styles", () => {
         expect(css).not.toMatch(/@keyframes\s+marsRoverPatrol/);
     });
 
+    test("idle inspiration theatre screen offers a direct YouTube paste form", () => {
+        const source = fs.readFileSync(path.join(__dirname, "IsoWorld.jsx"), "utf8");
+
+        expect(source).toMatch(/data-testid="theatre-youtube-form"/);
+        expect(source).toMatch(/parseYouTubeId\(youtubeInput\)/);
+        expect(source).toMatch(/sendWS\(\{ type: "youtube_play", video_id: vid, title: vid \}\)/);
+    });
+
     test("mars rover frames share one uncropped platform anchor", () => {
         for (const fileName of MARS_ROVER_FILES) {
             const metrics = marsRoverFrameMetrics(fileName);

@@ -7,7 +7,7 @@ import AnimSprite, {
     spriteFrameBox,
 } from "./AnimSprite";
 import { isPresetTag, tagImageUrl, jetFrameUrl, canUrl, JET_FRAMES } from "../lib/tags";
-import { youtubeEmbedUrl, THEATRE_SCREEN_BBOX, elapsedSinceStart } from "../lib/youtube";
+import { youtubeEmbedUrl, THEATRE_SCREEN_BBOX, elapsedSinceStart, parseYouTubeId } from "../lib/youtube";
 import EmojiBurst from "./EmojiBurst";
 import HelloLivingScene from "./HelloLivingScene";
 import SpiderwebPhase2Scene from "./SpiderwebPhase2Scene";
@@ -3063,11 +3063,25 @@ function PixelPuff({ size, driftX = 1, driftY = -1, delay = 0 }) {
 
 function TheatreScreen({ track, accent, sendWS }) {
     const { leftPct, topPct, widthPct, heightPct } = THEATRE_SCREEN_BBOX;
+    const [youtubeInput, setYoutubeInput] = useState("");
+    const [youtubeError, setYoutubeError] = useState("");
     const startSeconds = useMemo(() => {
         if (!track?.video_id || !track?.started_ts) return 0;
         return Math.floor(elapsedSinceStart(track.started_ts));
     }, [track?.video_id, track?.started_ts]);
     const iframeRef = useRef(null);
+
+    const submitYoutube = (e) => {
+        e.preventDefault();
+        const vid = parseYouTubeId(youtubeInput);
+        if (!vid || !sendWS) {
+            setYoutubeError("Paste a valid YouTube link or video ID.");
+            return;
+        }
+        sendWS({ type: "youtube_play", video_id: vid, title: vid });
+        setYoutubeInput("");
+        setYoutubeError("");
+    };
 
     // YouTube IFrame API requires a "listening" handshake before it sends events back.
     // After the iframe loads, postMessage `event=listening`; the player then emits
@@ -3151,17 +3165,48 @@ function TheatreScreen({ track, accent, sendWS }) {
                     allowFullScreen
                 />
             ) : (
-                <div
-                    className="font-pixel blink"
+                <form
+                    className="font-pixel"
+                    data-testid="theatre-youtube-form"
+                    onSubmit={submitYoutube}
                     style={{
                         width: "100%", height: "100%",
-                        display: "flex", alignItems: "center", justifyContent: "center",
+                        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                        gap: 6, padding: 10, boxSizing: "border-box",
                         color: accent, fontSize: 14, textAlign: "center",
                         background: "#001100",
                     }}
                 >
-                    ◉ NO SIGNAL — PASTE A YOUTUBE LINK ◉
-                </div>
+                    <div className="blink">NO SIGNAL</div>
+                    <input
+                        className="w95-input"
+                        value={youtubeInput}
+                        onChange={(e) => {
+                            setYoutubeInput(e.target.value);
+                            if (youtubeError) setYoutubeError("");
+                        }}
+                        placeholder="Paste YouTube link"
+                        data-testid="theatre-youtube-input"
+                        style={{ width: "92%", fontSize: 12 }}
+                    />
+                    {youtubeError && (
+                        <div
+                            className="font-mono-retro"
+                            data-testid="theatre-youtube-error"
+                            style={{ color: "#ffaaaa", fontSize: 12 }}
+                        >
+                            {youtubeError}
+                        </div>
+                    )}
+                    <button
+                        type="submit"
+                        className="w95-button"
+                        data-testid="theatre-youtube-play"
+                        style={{ fontSize: 12 }}
+                    >
+                        Play for Room
+                    </button>
+                </form>
             )}
         </div>
     );

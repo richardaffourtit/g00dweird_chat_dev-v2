@@ -18,28 +18,34 @@ export default function YouTubeWindow({
 }) {
     const [input, setInput] = useState("");
     const [titleHint, setTitleHint] = useState("");
+    const [error, setError] = useState("");
+
+    const submitLink = (type) => {
+        const vid = parseYouTubeId(input);
+        if (!vid) {
+            setError("Paste a YouTube link, Shorts link, or 11-character video ID.");
+            return false;
+        }
+        sendWS({ type, video_id: vid, title: titleHint.trim() || vid });
+        setInput("");
+        setTitleHint("");
+        setError("");
+        return true;
+    };
 
     const enqueue = (e) => {
         e?.preventDefault?.();
-        const vid = parseYouTubeId(input);
-        if (!vid) {
-            setTitleHint("not a youtube link or id");
-            return;
-        }
-        sendWS({ type: "youtube_enqueue", video_id: vid, title: titleHint || vid });
-        setInput("");
-        setTitleHint("");
+        submitLink("youtube_enqueue");
     };
 
-    const playNow = () => {
-        const vid = parseYouTubeId(input);
-        if (!vid) {
-            setTitleHint("not a youtube link or id");
-            return;
-        }
-        sendWS({ type: "youtube_play", video_id: vid, title: titleHint || vid });
-        setInput("");
-        setTitleHint("");
+    const playNow = (e) => {
+        e?.preventDefault?.();
+        submitLink("youtube_play");
+    };
+
+    const submitDefault = (e) => {
+        e.preventDefault();
+        submitLink(currentYoutube ? "youtube_enqueue" : "youtube_play");
     };
 
     const skip = () => sendWS({ type: "youtube_next" });
@@ -81,15 +87,18 @@ export default function YouTubeWindow({
                 </div>
 
                 <form
-                    onSubmit={enqueue}
+                    onSubmit={submitDefault}
                     className="flex flex-col gap-1 w95-bevel-inset p-2"
                     data-testid="yt-form"
                 >
                     <input
                         className="w95-input"
-                        placeholder="paste youtube link or id (e.g. dQw4w9WgXcQ)"
+                        placeholder="Paste YouTube URL, Shorts link, or video ID"
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                        onChange={(e) => {
+                            setInput(e.target.value);
+                            if (error) setError("");
+                        }}
                         data-testid="yt-input"
                     />
                     <input
@@ -99,21 +108,31 @@ export default function YouTubeWindow({
                         onChange={(e) => setTitleHint(e.target.value)}
                         data-testid="yt-title-input"
                     />
-                    <div className="flex gap-1">
-                        <button
-                            className="w95-button"
-                            type="submit"
-                            data-testid="yt-enqueue"
+                    {error && (
+                        <div
+                            className="font-mono-retro"
+                            style={{ color: "#b00020", fontSize: 14 }}
+                            data-testid="yt-error"
                         >
-                            + Queue
-                        </button>
+                            {error}
+                        </div>
+                    )}
+                    <div className="flex gap-1">
                         <button
                             className="w95-button"
                             type="button"
                             onClick={playNow}
                             data-testid="yt-play-now"
                         >
-                            ▶ Play Now
+                            ▶ Play for Room
+                        </button>
+                        <button
+                            className="w95-button"
+                            type="button"
+                            onClick={enqueue}
+                            data-testid="yt-enqueue"
+                        >
+                            + Queue
                         </button>
                         <button
                             className="w95-button"
@@ -152,7 +171,7 @@ export default function YouTubeWindow({
                     </div>
                     {youtubeQueue.length === 0 ? (
                         <div className="px-2 py-1 font-mono-retro" style={{ fontSize: 14, color: "#666" }}>
-                            empty. paste a link above & + Queue.
+                            empty. paste a link above, then press Enter or Play for Room.
                         </div>
                     ) : (
                         <ul>

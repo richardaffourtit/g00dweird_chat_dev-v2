@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Win95Window from "./Win95Window";
 import { getRecentMedia, fileUrl } from "../lib/api";
+import { mediaUrlForElement, seekElementToTrackTime } from "../lib/mediaSync";
 
 export default function JukeboxWindow({
     kind, // "audio" | "video"
@@ -8,6 +9,11 @@ export default function JukeboxWindow({
     currentTrack,
     queue = [],
     sendWS,
+    volume,
+    muted,
+    onVolumeChange,
+    onMutedChange,
+    activePlayback = true,
     refreshNonce = 0,
     onClose,
     initialX = 120,
@@ -16,9 +22,13 @@ export default function JukeboxWindow({
 }) {
     const [library, setLibrary] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [volume, setVolume] = useState(0.6);
-    const [muted, setMuted] = useState(false);
+    const [localVolume, setLocalVolume] = useState(0.6);
+    const [localMuted, setLocalMuted] = useState(false);
     const mediaRef = useRef(null);
+    const resolvedVolume = volume ?? localVolume;
+    const resolvedMuted = muted ?? localMuted;
+    const setResolvedVolume = onVolumeChange || setLocalVolume;
+    const setResolvedMuted = onMutedChange || setLocalMuted;
     const title = kind === "audio" ? "Jukebox.exe" : "VideoWall.exe";
     const icon =
         kind === "audio" ? (
@@ -42,15 +52,26 @@ export default function JukeboxWindow({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [kind, refreshNonce]);
 
-    // Auto play/update when currentTrack changes
+    // Auto play/update when this window owns playback. The audio jukebox delegates
+    // actual sound to RoomMediaPlayers so it keeps playing even when the window is closed.
     useEffect(() => {
         const el = mediaRef.current;
         if (!el) return;
+        if (!activePlayback) {
+            try {
+                el.pause();
+                el.removeAttribute("src");
+                el.load();
+            } catch { /* ignore */ }
+            return;
+        }
         if (currentTrack && currentTrack.url) {
             try {
-                if (el.src !== currentTrack.url) {
+                if (el.src !== mediaUrlForElement(currentTrack.url)) {
                     el.src = currentTrack.url;
+                    el.load();
                 }
+                seekElementToTrackTime(el, currentTrack);
                 const p = el.play();
                 if (p && p.catch) p.catch(() => {});
             } catch { /* ignore */ }
@@ -61,16 +82,31 @@ export default function JukeboxWindow({
                 el.load();
             } catch { /* ignore */ }
         }
-    }, [currentTrack]);
+    }, [activePlayback, currentTrack]);
+
+    useEffect(() => {
+        if (!activePlayback || !currentTrack?.url) return undefined;
+        const el = mediaRef.current;
+        if (!el) return undefined;
+        const onLoadedMetadata = () => seekElementToTrackTime(el, currentTrack);
+        el.addEventListener("loadedmetadata", onLoadedMetadata);
+        const timer = window.setInterval(() => {
+            seekElementToTrackTime(el, currentTrack);
+        }, 15000);
+        return () => {
+            window.clearInterval(timer);
+            el.removeEventListener("loadedmetadata", onLoadedMetadata);
+        };
+    }, [activePlayback, currentTrack]);
 
     // Volume / mute apply to local element only
     useEffect(() => {
         const el = mediaRef.current;
         if (el) {
-            el.volume = volume;
-            el.muted = muted;
+            el.volume = resolvedVolume;
+            el.muted = resolvedMuted;
         }
-    }, [volume, muted]);
+    }, [resolvedVolume, resolvedMuted]);
 
     const play = (f) => {
         sendWS({
@@ -146,13 +182,28 @@ export default function JukeboxWindow({
                 </div>
 
                 {kind === "audio" ? (
-                    <audio
-                        ref={mediaRef}
-                        controls
-                        className="w-full"
-                        onEnded={onMediaEnded}
-                        data-testid="jukebox-audio"
-                    />
+                    activePlayback ? (
+                        <audio
+                            ref={mediaRef}
+                            controls
+                            className="w-full"
+                            onEnded={onMediaEnded}
+                            data-testid="jukebox-audio"
+                        />
+                    ) : (
+                        <div
+                            className="w95-bevel-inset font-mono-retro"
+                            data-testid="jukebox-shared-player-note"
+                            style={{
+                                background: "#000",
+                                color: "#7fff7f",
+                                fontSize: 15,
+                                padding: "8px",
+                            }}
+                        >
+                            room audio is live for everyone. use the controls below for your local volume.
+                        </div>
+                    )
                 ) : (
                     <video
                         ref={mediaRef}
@@ -169,25 +220,25 @@ export default function JukeboxWindow({
                 <div className="w95-bevel-inset p-2 flex items-center gap-2" style={{ background: "var(--w95-bg)" }}>
                     <button
                         className="w95-button"
-                        onClick={() => setMuted((m) => !m)}
+                        onClick={() => setResolvedMuted((m) => !m)}
                         data-testid="jukebox-mute"
                         title="local mute"
                     >
-                        {muted ? "🔇" : "🔊"}
+                        {resolvedMuted ? "🔇" : "🔊"}
                     </button>
                     <input
                         type="range"
                         min="0"
                         max="1"
                         step="0.05"
-                        value={volume}
-                        onChange={(e) => setVolume(parseFloat(e.target.value))}
+                        value={resolvedVolume}
+                        onChange={(e) => setResolvedVolume(parseFloat(e.target.value))}
                         data-testid="jukebox-volume"
                         style={{ flex: 1 }}
                         aria-label="Volume"
                     />
                     <span className="font-mono-retro" style={{ fontSize: 14, width: 36, textAlign: "right" }}>
-                        {Math.round(volume * 100)}%
+                        {Math.round(resolvedVolume * 100)}%
                     </span>
                     <button className="w95-button" onClick={stop} data-testid="jukebox-stop">
                         Stop

@@ -17,6 +17,7 @@ import MultitaireWindow from "./MultitaireWindow";
 import { sanitizeAnimCreature } from "./AnimSprite";
 import AdminConsoleWindow from "./AdminConsoleWindow";
 import { isAdminUser } from "../lib/admin";
+import RoomMediaPlayers from "./RoomMediaPlayers";
 
 function useIsMobile(bp = 640) {
     const [m, setM] = useState(typeof window !== "undefined" && window.innerWidth < bp);
@@ -113,6 +114,10 @@ export default function Desktop({ user, onLogout }) {
 
     // Auto-refresh hint for JukeboxWindow when a new audio/video uploads
     const [mediaRefreshNonce, setMediaRefreshNonce] = useState(0);
+    const [audioVolume, setAudioVolume] = useState(0.6);
+    const [audioMuted, setAudioMuted] = useState(false);
+    const [videoVolume, setVideoVolume] = useState(0.8);
+    const [videoMuted, setVideoMuted] = useState(false);
 
     // Bump every time user requests SprayWindow open — forces a fresh mount
     // even when the window state is already true (so the window pops to front).
@@ -362,6 +367,21 @@ export default function Desktop({ user, onLogout }) {
         >
             <div className="scanlines crt-flicker" aria-hidden="true" />
 
+            {activeRoom && (
+                <RoomMediaPlayers
+                    user={user}
+                    currentAudio={socket.currentAudio}
+                    currentVideo={socket.currentVideo}
+                    sendWS={socket.send}
+                    audioVolume={audioVolume}
+                    audioMuted={audioMuted}
+                    videoVolume={videoVolume}
+                    videoMuted={videoMuted}
+                    showVideoMonitor={!openWindows.video}
+                    onOpenVideo={() => toggle("video", true)}
+                />
+            )}
+
             <div
                 className="absolute top-2 left-2 flex flex-col gap-2"
                 style={{ width: 96, display: mobile ? "none" : "flex" }}
@@ -439,6 +459,9 @@ export default function Desktop({ user, onLogout }) {
             {openWindows.jukebox && activeRoom && (
                 <JukeboxWindow kind="audio" user={user} currentTrack={socket.currentAudio}
                     queue={socket.audioQueue} sendWS={socket.send}
+                    volume={audioVolume} muted={audioMuted}
+                    onVolumeChange={setAudioVolume} onMutedChange={setAudioMuted}
+                    activePlayback={false}
                     refreshNonce={mediaRefreshNonce}
                     onClose={() => toggle("jukebox", false)} initialX={480} initialY={80}
                     requestFocus={focusNonces.jukebox || 0} />
@@ -447,6 +470,9 @@ export default function Desktop({ user, onLogout }) {
             {openWindows.video && activeRoom && (
                 <JukeboxWindow kind="video" user={user} currentTrack={socket.currentVideo}
                     queue={socket.videoQueue} sendWS={socket.send}
+                    volume={videoVolume} muted={videoMuted}
+                    onVolumeChange={setVideoVolume} onMutedChange={setVideoMuted}
+                    activePlayback={true}
                     refreshNonce={mediaRefreshNonce}
                     onClose={() => toggle("video", false)} initialX={520} initialY={140}
                     requestFocus={focusNonces.video || 0} />
@@ -592,6 +618,7 @@ export default function Desktop({ user, onLogout }) {
                         <StartItem label="MULTITAIRE" onClick={() => { toggle("multitaire", true); setStartOpen(false); }} testId="start-multitaire" />
                         <StartItem label="Jukebox" onClick={() => { toggle("jukebox", true); setStartOpen(false); }} testId="start-jukebox" />
                         <StartItem label="Video Wall" onClick={() => { toggle("video", true); setStartOpen(false); }} testId="start-video" />
+                        <StartItem label="Theatre" onClick={() => { toggle("youtube", true); setStartOpen(false); }} testId="start-youtube" />
                         <StartItem label="Upload Zone" onClick={() => { toggle("upload", true); setStartOpen(false); }} testId="start-upload" />
                         <StartItem label="My Profile" onClick={() => { toggle("profile", true); setStartOpen(false); }} testId="start-profile" />
                         <StartItem label="Guestbook" onClick={() => { toggle("guestbook", true); setStartOpen(false); }} testId="start-guestbook" />
