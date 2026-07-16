@@ -3,6 +3,14 @@ import Win95Window from "./Win95Window";
 import { Sprite, SPRITES, SPRITE_IDS } from "../lib/sprites";
 import AnimSprite, { ANIM_CREATURES, getAvailableStates, EMOTE_LABELS } from "./AnimSprite";
 
+export const ANIM_DISPLAY_NAMES = {
+    teekae: "Tee Kae",
+};
+
+export function animDisplayName(id) {
+    return ANIM_DISPLAY_NAMES[id] || id;
+}
+
 const STATE_LABELS = {
     // user-chosen "emote" stances
     action: "action",
@@ -138,7 +146,7 @@ export default function SpritePicker({
                             className="font-pixel mb-1 flex items-center justify-between"
                             style={{ fontSize: 10, color: "#000080" }}
                         >
-                            <span>POSES FOR <b>{animId.toUpperCase()}</b></span>
+                            <span>POSES FOR <b>{animDisplayName(animId).toUpperCase()}</b></span>
                             <span style={{ color: "#999" }}>movement → walk/run auto</span>
                         </div>
                         <div
@@ -199,6 +207,7 @@ export default function SpritePicker({
                         {ANIM_CREATURES.map((id) => {
                             const active = animId === id;
                             const previewState = previewStateFor(id, active, animStance);
+                            const displayName = animDisplayName(id);
                             return (
                                 <button
                                     key={id}
@@ -210,7 +219,7 @@ export default function SpritePicker({
                                     }}
                                     onClick={() => onPickAnim(id)}
                                     data-testid={`anim-pick-${id}`}
-                                    title={id}
+                                    title={displayName}
                                 >
                                     <div style={ANIM_PREVIEW_FRAME}>
                                         <AnimSprite
@@ -220,14 +229,14 @@ export default function SpritePicker({
                                             frameWidth={72}
                                             frameHeight={56}
                                             fps={active && animStance !== "idle" ? 4 : 6}
-                                            alt={`${id}-${previewState}`}
+                                            alt={`${displayName}-${previewState}`}
                                         />
                                     </div>
                                     <span
                                         className="font-pixel mt-1"
                                         style={{ fontSize: 10, color: "#000" }}
                                     >
-                                        {id}
+                                        {displayName}
                                     </span>
                                 </button>
                             );

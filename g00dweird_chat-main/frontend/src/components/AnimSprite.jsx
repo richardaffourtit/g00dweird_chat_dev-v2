@@ -18,7 +18,7 @@ import React, { useEffect, useRef } from "react";
  * STATE_ALIASES maps requested-but-missing states onto sensible existing frames.
  */
 
-export const ANIM_VERSION = 31;
+export const ANIM_VERSION = 34;
 
 // Frame counts per creature/state — mirrors slicer v3 / unified output.
 export const FRAMES = {
@@ -41,6 +41,8 @@ export const FRAMES = {
     slime:    { idle: 3, wiggle: 4, hop: 4, split: 5, attack: 4, hurt: 2, die: 2,
                 emote_a: 1, emote_b: 1, emote_c: 1, emote_d: 1 },
     tvhead:   { idle: 3, walk: 4, run: 4, jump: 3, attack: 5, hurt: 2, die: 2,
+                emote_a: 1, emote_b: 1, emote_c: 1, emote_d: 1 },
+    teekae:   { idle: 3, walk: 6, attack: 4, hurt: 1, die: 4,
                 emote_a: 1, emote_b: 1, emote_c: 1, emote_d: 1 },
     weirdbot: { idle: 4, talk: 4, think: 4, walk: 6, glitch: 4, react: 4 },
 };
@@ -187,6 +189,19 @@ export function spriteVisualEffect(creature) {
     return {};
 }
 
+// Most animation sheets are authored facing right, so `faceLeft` normally
+// maps directly to a horizontal mirror. Tee Kae's standing/walking poses were
+// authored facing left; his attack row is already right-facing and must keep
+// the normal rule so its microphone blast still points toward the target.
+const NATIVE_LEFT_STATES = {
+    teekae: new Set(["idle", "walk", "emote_a", "emote_b", "emote_c", "emote_d"]),
+};
+
+export function spriteMirrorForFacing(creature, state, faceLeft = false) {
+    const nativeFacesLeft = NATIVE_LEFT_STATES[creature]?.has(state) || false;
+    return Boolean(faceLeft) !== nativeFacesLeft;
+}
+
 // ---- Locomotion mapping (per spec) ----
 // SLOW: walk | float | hop | wiggle
 // FAST: run | dash | hop | walk (fallback)
@@ -233,6 +248,7 @@ export const EMOTE_LABELS = {
     skeleton: { emote_a: "?", emote_b: "♥", emote_c: "!", emote_d: "x_x" },
     slime:    { emote_a: "?", emote_b: "♥", emote_c: "!", emote_d: "z" },
     tvhead:   { emote_a: "?", emote_b: "♥", emote_c: "!", emote_d: "><" },
+    teekae:   { emote_a: "♥", emote_b: "?", emote_c: "✨", emote_d: "♫" },
 };
 
 export default function AnimSprite({
@@ -305,6 +321,7 @@ export default function AnimSprite({
         : undefined;
     const visualEffect = spriteVisualEffect(renderCreature);
     const filter = [ghostGlow, visualEffect.filter].filter(Boolean).join(" ") || undefined;
+    const renderFlip = spriteMirrorForFacing(renderCreature, resolved, flip);
     const fixedFrame = Number.isFinite(frameWidth) && Number.isFinite(frameHeight);
     const frameBox = fixedFrame
         ? { width: frameWidth, height: frameHeight }
@@ -328,7 +345,7 @@ export default function AnimSprite({
                 zIndex: 1,
                 filter,
                 animation: visualEffect.animation,
-                transform: flip ? "scaleX(-1)" : "none",
+                transform: renderFlip ? "scaleX(-1)" : "none",
                 willChange: visualEffect.willChange || (isGhost ? "filter, transform" : "transform"),
             }}
         />

@@ -4,6 +4,7 @@ import zlib from "zlib";
 
 const CAT_DIR = path.resolve(process.cwd(), "public/anim/cat");
 const SLIME_DIR = path.resolve(process.cwd(), "public/anim/slime");
+const TEE_KAE_DIR = path.resolve(process.cwd(), "public/anim/teekae");
 
 function paeth(left, up, upLeft) {
     const p = left + up - upLeft;
@@ -141,6 +142,32 @@ function opaqueBounds({ width, height, alpha }) {
     }
 
     return right >= left ? { left, top, right, bottom } : null;
+}
+
+function opaqueWidthBelow({ width, height, alpha }, startY) {
+    let left = width;
+    let right = -1;
+    for (let y = Math.max(0, startY); y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+            if (alpha[y][x] === 0) continue;
+            left = Math.min(left, x);
+            right = Math.max(right, x);
+        }
+    }
+    return right >= left ? right - left + 1 : 0;
+}
+
+function opaqueWidthBetween({ width, height, alpha }, startY, endY) {
+    let left = width;
+    let right = -1;
+    for (let y = Math.max(0, startY); y < Math.min(height, endY); y += 1) {
+        for (let x = 0; x < width; x += 1) {
+            if (alpha[y][x] === 0) continue;
+            left = Math.min(left, x);
+            right = Math.max(right, x);
+        }
+    }
+    return right >= left ? right - left + 1 : 0;
 }
 
 function isSlimeBodyPixel([r, g, b, a]) {
@@ -397,6 +424,74 @@ function whiteEyeEdgeGaps(decoded) {
 }
 
 describe("animated sprite asset alpha", () => {
+    test("Tee Kae ships a complete transparent, bottom-anchored frame family", () => {
+        const expectedFiles = [
+            "idle_0.png", "idle_1.png", "idle_2.png",
+            "walk_0.png", "walk_1.png", "walk_2.png",
+            "walk_3.png", "walk_4.png", "walk_5.png",
+            "attack_0.png", "attack_1.png", "attack_2.png", "attack_3.png",
+            "hurt_0.png",
+            "die_0.png", "die_1.png", "die_2.png", "die_3.png",
+            "emote_a_0.png", "emote_b_0.png", "emote_c_0.png", "emote_d_0.png",
+        ].sort();
+        const actualFiles = fs.readdirSync(TEE_KAE_DIR)
+            .filter((name) => name.endsWith(".png"))
+            .sort();
+
+        expect(actualFiles).toEqual(expectedFiles);
+
+        actualFiles.forEach((name) => {
+            const decoded = decodePngAlpha(path.join(TEE_KAE_DIR, name));
+            const state = animationStateName(name);
+            const expectedWidth = state === "attack" ? 520 : (["die", "hurt"].includes(state) ? 280 : 180);
+            const corners = [
+                decoded.alpha[0][0],
+                decoded.alpha[0][decoded.width - 1],
+                decoded.alpha[decoded.height - 1][0],
+                decoded.alpha[decoded.height - 1][decoded.width - 1],
+            ];
+            const bounds = opaqueBounds(decoded);
+            const opaque = opaquePixelCount(decoded);
+
+            expect(decoded.width).toBe(expectedWidth);
+            expect(decoded.height).toBe(224);
+            expect(corners).toEqual([0, 0, 0, 0]);
+            expect(bounds?.bottom).toBe(219);
+            expect(opaque).toBeGreaterThan(8000);
+            expect(opaque / (decoded.width * decoded.height)).toBeLessThan(0.5);
+        });
+    });
+
+    test("Tee Kae uses the upright dizzy pose for hurt", () => {
+        const hurt = fs.readFileSync(path.join(TEE_KAE_DIR, "hurt_0.png"));
+        const firstDie = fs.readFileSync(path.join(TEE_KAE_DIR, "die_0.png"));
+        expect(hurt.equals(firstDie)).toBe(true);
+    });
+
+    test("Tee Kae walk alternates between contact and passing silhouettes", () => {
+        const lowerBodyWidths = Array.from({ length: 6 }, (_, frame) => (
+            opaqueWidthBelow(
+                decodePngAlpha(path.join(TEE_KAE_DIR, `walk_${frame}.png`)),
+                160
+            )
+        ));
+
+        expect(Math.max(...lowerBodyWidths) - Math.min(...lowerBodyWidths)).toBeGreaterThan(30);
+    });
+
+    test("Tee Kae keeps the same head scale between idle and walk", () => {
+        const headWidth = (name) => {
+            const decoded = decodePngAlpha(path.join(TEE_KAE_DIR, name));
+            const bounds = opaqueBounds(decoded);
+            return opaqueWidthBetween(decoded, bounds.top, bounds.top + 24);
+        };
+        const average = (values) => values.reduce((sum, value) => sum + value, 0) / values.length;
+        const idleAverage = average(["idle_0.png", "idle_1.png", "idle_2.png"].map(headWidth));
+        const walkAverage = average(Array.from({ length: 6 }, (_, frame) => headWidth(`walk_${frame}.png`)));
+
+        expect(Math.abs(idleAverage - walkAverage)).toBeLessThanOrEqual(2);
+    });
+
     test("cat frames have no enclosed transparent pinholes", () => {
         const badFrames = fs.readdirSync(CAT_DIR)
             .filter((name) => name.endsWith(".png"))

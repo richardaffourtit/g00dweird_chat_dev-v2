@@ -5,16 +5,18 @@ import {
     resolveState,
     sanitizeAnimCreature,
     shouldUseCleanedSprites,
+    spriteMirrorForFacing,
     spriteVisualEffect,
     spriteFrameBox,
 } from "./AnimSprite";
 
 describe("animated sprite registry", () => {
     test("only exposes production-ready animated creatures", () => {
-        expect(ANIM_CREATURES).toEqual(expect.arrayContaining(["alien", "cat", "ghost", "slime"]));
+        expect(ANIM_CREATURES).toEqual(expect.arrayContaining(["alien", "cat", "ghost", "slime", "teekae"]));
         expect(ANIM_CREATURES).not.toEqual(expect.arrayContaining(["bat", "boo", "plant"]));
         expect(sanitizeAnimCreature("cat")).toBe("cat");
         expect(sanitizeAnimCreature("slime")).toBe("slime");
+        expect(sanitizeAnimCreature("teekae")).toBe("teekae");
         expect(sanitizeAnimCreature("bat")).toBeNull();
         expect(sanitizeAnimCreature("boo")).toBeNull();
         expect(sanitizeAnimCreature("plant")).toBeNull();
@@ -24,7 +26,12 @@ describe("animated sprite registry", () => {
         expect(pickTravelStance("slime", 120, 0)).toBe("hop");
         expect(pickTravelStance("ghost", 120, 0)).toBe("float");
         expect(pickTravelStance("alien", 320, 0)).toBe("run");
+        expect(pickTravelStance("teekae", 320, 0)).toBe("walk");
         expect(resolveState("slime", "idle")).toBe("idle");
+        expect(getAvailableStates("teekae")).toEqual([
+            "idle", "walk", "attack", "hurt", "die",
+            "emote_a", "emote_b", "emote_c", "emote_d",
+        ]);
     });
 
     test("uses cleaned sprite frames by default and allows an explicit opt-out", () => {
@@ -48,5 +55,17 @@ describe("animated sprite registry", () => {
         expect(slimeEffect.animation).toContain("linear");
         expect(slimeEffect.animation).not.toContain("steps");
         expect(spriteVisualEffect("cat")).toEqual({});
+    });
+
+    test("accounts for Tee Kae walk art being authored facing left", () => {
+        expect(spriteMirrorForFacing("teekae", "walk", false)).toBe(true);
+        expect(spriteMirrorForFacing("teekae", "walk", true)).toBe(false);
+        expect(spriteMirrorForFacing("teekae", "idle", false)).toBe(true);
+
+        // His attack row and the rest of the family are authored facing right.
+        expect(spriteMirrorForFacing("teekae", "attack", false)).toBe(false);
+        expect(spriteMirrorForFacing("teekae", "attack", true)).toBe(true);
+        expect(spriteMirrorForFacing("cat", "walk", false)).toBe(false);
+        expect(spriteMirrorForFacing("cat", "walk", true)).toBe(true);
     });
 });

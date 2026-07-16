@@ -48,7 +48,7 @@ class WSContext:
 ALLOWED_ANIM = {
     "fairy", "ape", "ghost", "robot", "frog", "cat",
     "alien", "skeleton", "slime", "tvhead", "plant", "bat", "boo",
-    "weirdbot",
+    "teekae", "weirdbot",
     "",
 }
 

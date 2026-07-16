@@ -155,5 +155,16 @@
     "glitch": 4,
     "react": 4
   },
-  "__version": 21
+  "teekae": {
+    "idle": 3,
+    "walk": 6,
+    "attack": 4,
+    "hurt": 1,
+    "die": 4,
+    "emote_a": 1,
+    "emote_b": 1,
+    "emote_c": 1,
+    "emote_d": 1
+  },
+  "__version": 24
 }
