@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Awaitable, Any
+from worlds.halloween import enter_halloween
 
 AsyncHook = Callable[[Any, Any, Any], Awaitable[None]]
 
@@ -12,6 +13,7 @@ class WorldBehavior:
     media_policy: dict | None = None
 
 WORLD_BEHAVIORS = {
+    "halloween": WorldBehavior(on_join=enter_halloween),
     "basketball-court": WorldBehavior(interaction_rules={"shots_enabled": True}),
     "inspiration-theatre": WorldBehavior(media_policy={"youtube_priority": True}),
 }

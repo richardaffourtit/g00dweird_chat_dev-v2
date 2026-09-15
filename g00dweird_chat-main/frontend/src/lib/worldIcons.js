@@ -1,0 +1,17 @@
+export const WORLD_ICON_URLS = {
+    heaven: "/assets/world-icons/heaven.png",
+    mars: "/assets/world-icons/mars.png",
+    "inspiration-theatre": "/assets/world-icons/inspiration-theatre.png",
+    wwworld: "/assets/world-icons/wwworld.png",
+    "neoclassick-world": "/assets/world-icons/neoclassick-world.png",
+    "basketball-court": "/assets/world-icons/basketball-court.png",
+    "toxic-void": "/assets/world-icons/toxic-void.png",
+    jello: "/assets/world-icons/jello.png",
+    "regular-cafe": "/assets/world-icons/regular-cafe.png",
+    hello: "/assets/world-icons/hello.png",
+    "food-court": "/assets/world-icons/food-court.png",
+    spiderweb: "/assets/world-icons/spiderweb.png",
+    jungle: "/assets/world-icons/jungle.png",
+    "liminal-backroom": "/assets/world-icons/liminal-backroom.png",
+    halloween: "/assets/world-icons/halloween.png",
+};

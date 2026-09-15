@@ -14,6 +14,7 @@ import SpiderwebPhase2Scene from "./SpiderwebPhase2Scene";
 import LiminalPhase4Scene from "./LiminalPhase4Scene";
 import NeoclassickPhase2Scene from "./NeoclassickPhase2Scene";
 import WWWorldScene from "./WWWorldScene";
+import HalloweenScene from "./HalloweenScene";
 import { isLiminalRoom, liminalAvatarDrift, liminalCornerShadow, liminalDisplayName } from "../lib/liminal";
 import { clearThoughtBubbleMatte } from "../lib/thoughtBubbleMatte";
 import thoughtBubbleManifest from "../data/thoughtBubbles.json";
@@ -24,6 +25,7 @@ const MemoSpiderwebPhase2Scene = React.memo(SpiderwebPhase2Scene);
 const MemoLiminalPhase4Scene = React.memo(LiminalPhase4Scene);
 const MemoNeoclassickPhase2Scene = React.memo(NeoclassickPhase2Scene);
 const MemoWWWorldScene = React.memo(WWWorldScene);
+const MemoHalloweenScene = React.memo(HalloweenScene);
 
 function frameNow() {
     if (typeof window !== "undefined" && typeof window.performance?.now === "function") {
@@ -176,6 +178,7 @@ const THEME_ACCENT = {
     "food-court": "#ff00a0",
     jungle: "#4ae053",
     spiderweb: "#b86cff",
+    halloween: "#ffad4a",
     "liminal-backroom": "#ffd47b",
     "inspiration-theatre": "#ff0033",
     wwworld: "#38ff4b",
@@ -1780,6 +1783,7 @@ export default function IsoWorld({
                 <div className="iso-floor" style={{ opacity: room?.bg_url ? 0 : 0.2 }} />
                 {room?.theme === "hello" && <MemoHelloLivingScene />}
                 {room?.theme === "spiderweb" && <MemoSpiderwebPhase2Scene />}
+                {room?.theme === "halloween" && <MemoHalloweenScene />}
                 {room?.theme === "neoclassick-world" && <MemoNeoclassickPhase2Scene />}
                 {room?.theme === "wwworld" && (
                     <MemoWWWorldScene

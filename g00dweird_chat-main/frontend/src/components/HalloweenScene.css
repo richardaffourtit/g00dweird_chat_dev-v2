@@ -1,0 +1,93 @@
+.halloween-scene,
+.halloween-atmosphere,
+.halloween-whisper-region {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.halloween-scene { z-index: 4; }
+.halloween-atmosphere { overflow: hidden; }
+
+.halloween-lantern-glow {
+    position: absolute;
+    width: 5%;
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, #ffd37988 0%, #ff9b3729 35%, transparent 70%);
+    mix-blend-mode: screen;
+    animation: halloween-candle 3.7s steps(5, end) infinite;
+}
+
+.halloween-scene[data-awake="true"] .halloween-lantern-glow {
+    background: radial-gradient(circle, #ffdc9acc 0%, #ff9b3755 35%, transparent 70%);
+}
+
+.halloween-ember {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #ffca78;
+    box-shadow: 0 0 4px #ff913c;
+    opacity: 0;
+    animation: halloween-ember-rise 9s steps(28, end) infinite;
+}
+
+.halloween-ember:nth-of-type(3n) {
+    background: #d6c9f0;
+    box-shadow: 0 0 4px #a17bcc;
+}
+
+.halloween-secret {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    pointer-events: auto;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.halloween-secret:hover {
+    background: radial-gradient(ellipse, #ffbf5f33, transparent 70%);
+}
+
+.halloween-secret:focus-visible {
+    outline: 2px dashed #ffcf82;
+    outline-offset: 3px;
+    background: #ffbf5f22;
+}
+
+.halloween-whisper {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    width: max-content;
+    max-width: 44%;
+    padding: 8px 10px;
+    color: #ffe0a0;
+    background: #21132eee;
+    border: 1px solid #ca9052;
+    box-shadow: 3px 3px 0 #100c1e;
+    font-size: clamp(7px, 1vw, 10px);
+    line-height: 1.8;
+    text-align: center;
+}
+
+@keyframes halloween-candle {
+    0%, 100% { opacity: 0.5; }
+    20%, 65% { opacity: 0.9; }
+    35%, 80% { opacity: 0.65; }
+}
+
+@keyframes halloween-ember-rise {
+    0% { opacity: 0; transform: translate(0, 0); }
+    20% { opacity: 0.7; }
+    65% { opacity: 0.4; }
+    100% { opacity: 0; transform: translate(12px, -36px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .halloween-lantern-glow { animation: none; opacity: 0.65; }
+    .halloween-ember { animation: none; opacity: 0.35; }
+}

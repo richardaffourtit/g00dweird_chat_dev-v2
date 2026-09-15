@@ -11,6 +11,7 @@
   {"id":"food-court","name":"Food Court","theme":"food-court","tagline":"cosmic bites, taco asteroid, zero-g fries","bg_url":"/worlds/food-court.png"},
   {"id":"jungle","name":"Jungle","theme":"jungle","tagline":"welcome to the jungle, explore chill connect","bg_url":"/worlds/jungle.png"},
   {"id":"spiderweb","name":"Spider Web","theme":"spiderweb","tagline":"web weave chill, stick together","bg_url":"/worlds/spiderweb.png"},
+  {"id":"halloween","name":"Halloween Town","theme":"halloween","tagline":"crooked rooftops, pumpkin grins, midnight mischief","bg_url":"/worlds/halloween.png"},
   {"id":"liminal-backroom","name":"Liminal Room","theme":"liminal-backroom","tagline":"final form: the room remembers wrong","bg_url":"/worlds/liminal-backroom.png"},
   {"id":"inspiration-theatre","name":"Inspiration Theatre","theme":"inspiration-theatre","tagline":"g00dweird theatre — communal youtube groupwatch","bg_url":"/worlds/inspiration-theatre.png"}
 ]

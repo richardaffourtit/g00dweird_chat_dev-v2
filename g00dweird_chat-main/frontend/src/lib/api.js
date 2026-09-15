@@ -21,9 +21,10 @@ const PREVIEW_ROOMS = [
     { id: "toxic-void", name: "TOXIC VOID", tagline: "hazardous signal is alive", theme: "toxic-void", bg_url: "/worlds/toxic-void.png", icon_url: "/world_icons/toxic-void.png" },
     { id: "basketball-court", name: "BASKETBALL COURT", tagline: "court of strange rebounds", theme: "basketball-court", bg_url: "/worlds/basketball-court.png", icon_url: "/world_icons/basketball-court.png" },
     { id: "food-court", name: "FOOD COURT", tagline: "mall snacks, shared static", theme: "food-court", bg_url: "/worlds/food-court.png", icon_url: "/world_icons/food-court.png" },
-    { id: "jungle", name: "JUNGLE", tagline: "green signal overgrowth", theme: "jungle", bg_url: "/worlds/jungle.png", icon_url: "/world_icons/jungle.png" },
+    { id: "jungle", name: "JUNGLE", tagline: "green signal overgrowth", theme: "jungle", bg_url: "/worlds/jungle.png", icon_url: "/assets/world-icons/jungle.png" },
     { id: "spiderweb", name: "SPIDERWEB", tagline: "sticky hallway of whispers", theme: "spiderweb", bg_url: "/worlds/spiderweb.png", icon_url: "/world_icons/spiderweb.png" },
-    { id: "liminal-backroom", name: "LIMINAL BACKROOM", tagline: "final form: the room remembers wrong", theme: "liminal-backroom", bg_url: "/worlds/liminal-backroom.png", icon_url: "/world_icons/liminal-backroom.png" },
+    { id: "halloween", name: "Halloween Town", tagline: "crooked rooftops, pumpkin grins, midnight mischief", theme: "halloween", bg_url: "/worlds/halloween.png", icon_url: "/assets/world-icons/halloween.png" },
+    { id: "liminal-backroom", name: "LIMINAL BACKROOM", tagline: "final form: the room remembers wrong", theme: "liminal-backroom", bg_url: "/worlds/liminal-backroom.png", icon_url: "/assets/world-icons/liminal-backroom.png" },
     { id: "inspiration-theatre", name: "INSPIRATION THEATRE", tagline: "groupwatch weird together", theme: "inspiration-theatre", bg_url: "/worlds/inspiration-theatre.png", icon_url: "/world_icons/inspiration-theatre.png" },
 ];
 

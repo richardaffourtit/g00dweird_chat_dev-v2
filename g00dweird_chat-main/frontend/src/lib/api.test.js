@@ -32,4 +32,25 @@ describe("frontend API environment config", () => {
 
         expect(API).toBe("https://legacy-api.g00dweird.com/api");
     });
+
+    test("Halloween Town is available in the local preview room picker", async () => {
+        process.env = {
+            ...originalEnv,
+            VITE_PREVIEW_MOCK: "1",
+        };
+
+        const { listRooms } = require("./api");
+        const rooms = await listRooms();
+
+        expect(rooms.filter((room) => room.id === "halloween")).toEqual([
+            {
+                id: "halloween",
+                name: "Halloween Town",
+                tagline: "crooked rooftops, pumpkin grins, midnight mischief",
+                theme: "halloween",
+                bg_url: "/worlds/halloween.png",
+                icon_url: "/assets/world-icons/halloween.png",
+            },
+        ]);
+    });
 });
