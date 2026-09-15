@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PRESENT. — sprite review</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --scale: 1;
+      --ink: #eef0e8;
+      --muted: #a1aaa2;
+      --accent: #ff994e;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111512;
+      color: var(--ink);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: clamp(18px, 3vw, 42px); }
+    main { max-width: 1220px; margin: 0 auto; }
+    header { margin-bottom: 28px; }
+    .eyebrow { color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 8px 0; font-size: clamp(26px, 4vw, 40px); line-height: 1.1; letter-spacing: -.04em; }
+    p { color: var(--muted); line-height: 1.6; margin: 0; }
+    a { color: var(--accent); text-underline-offset: 4px; }
+    .downloads { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 16px; font-size: 14px; }
+    .controls { padding: 18px; background: #1a211c; border: 1px solid #333c34; border-radius: 14px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 7px; }
+    button, select { font: inherit; }
+    button {
+      border: 1px solid #4b574d; border-radius: 7px; padding: 9px 13px;
+      background: #242e27; color: var(--ink); cursor: pointer;
+    }
+    button:hover { background: #354237; }
+    button[aria-pressed="true"] { border-color: var(--accent); background: #473223; color: #ffc794; }
+    button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    .playback { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 28px; margin-top: 18px; }
+    .fps, .scale-control { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+    input { accent-color: var(--accent); }
+    .fps input { width: 110px; }
+    .fps output { min-width: 36px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .scale-control > span { color: var(--muted); }
+    .scale-control button { padding: 6px 10px; }
+    #toggle { min-width: 96px; }
+    .review-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin: 26px 0 12px; }
+    .review-meta h2 { font-size: 18px; margin: 0; }
+    #frame-status { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+    .comparison-scroll { overflow-x: auto; border: 1px solid #354037; border-radius: 14px; background: #171e19; }
+    .comparison { display: grid; grid-template-columns: repeat(2, minmax(calc(520px * var(--scale) + 32px), 1fr)); width: max-content; min-width: 100%; }
+    .avatar { padding: 20px 16px 0; margin: 0; min-width: 0; }
+    .avatar + .avatar { border-left: 1px solid #354037; }
+    figcaption { margin: 0 0 20px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    figcaption strong { font-size: 17px; }
+    figcaption span { font-size: 12px; color: var(--muted); }
+    .stage {
+      position: relative; height: calc(224px * var(--scale) + 32px); width: 100%;
+      background-image: linear-gradient(to right, #29322b66 1px, transparent 1px), linear-gradient(to bottom, #29322b66 1px, transparent 1px);
+      background-size: calc(16px * var(--scale)) calc(16px * var(--scale));
+    }
+    .stage::before {
+      content: ""; position: absolute; top: calc(220px * var(--scale)); left: -16px; right: -16px;
+      border-top: 1px solid #92a489; z-index: 2; pointer-events: none;
+    }
+    .stage::after {
+      content: ""; position: absolute; top: 0; bottom: 32px; left: 50%;
+      border-left: 1px dashed #576a5a80; pointer-events: none;
+    }
+    .sprite {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      height: calc(224px * var(--scale)); width: auto; max-width: none;
+      image-rendering: pixelated; z-index: 1;
+    }
+    .action-size-review { margin-top: 28px; }
+    .action-size-review h2 { font-size: 18px; margin: 0 0 6px; }
+    .action-size-review > p { font-size: 13px; margin-bottom: 12px; }
+    .action-size-row { display: flex; width: max-content; min-width: 100%; }
+    .action-size-card { flex: 1 0 184px; width: 184px; margin: 0; padding: 16px 12px 0; }
+    .action-size-card + .action-size-card { border-left: 1px solid #354037; }
+    .action-size-card--wide { flex-basis: 244px; width: 244px; overflow: hidden; }
+    .action-size-card figcaption { display: block; margin-bottom: 12px; }
+    .action-size-card figcaption strong { display: block; font-size: 14px; }
+    .action-size-card figcaption span { display: block; margin-top: 3px; }
+    .action-size-card .stage { --scale: 1; }
+    .action-size-card .stage::before { left: -12px; right: -12px; }
+    .load-error { position: absolute; top: 40%; left: 0; right: 0; text-align: center; color: #ffba93; z-index: 3; padding: 10px; }
+    .load-error[hidden] { display: none; }
+    .notes { margin-top: 14px; font-size: 13px; }
+    .notes code { color: #d9e2d5; }
+    footer { margin-top: 26px; padding-top: 16px; border-top: 1px solid #303931; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Avatar action review</div>
+    <h1>PRESENT.</h1>
+    <p>Compare every action with Tee Kae at the same scale and ground line.</p>
+    <nav class="downloads" aria-label="Sprite downloads">
+      <a href="/assets/avatars/present/present-actions.png?v=present-model-5">Open sprite sheet</a>
+      <a href="/assets/avatars/present/present-actions.json?v=present-model-5">Open frame manifest</a>
+    </nav>
+  </header>
+
+  <section class="controls" aria-label="Animation controls">
+    <div class="actions" role="group" aria-label="Action">
+      <button type="button" data-action="idle" aria-pressed="true">Idle</button>
+      <button type="button" data-action="walk" aria-pressed="false">Walk</button>
+      <button type="button" data-action="attack" aria-pressed="false">Attack</button>
+      <button type="button" data-action="hurt" aria-pressed="false">Hurt</button>
+      <button type="button" data-action="die" aria-pressed="false">Die</button>
+      <button type="button" data-action="emote_a" aria-pressed="false">Emote A</button>
+      <button type="button" data-action="emote_b" aria-pressed="false">Emote B</button>
+      <button type="button" data-action="emote_c" aria-pressed="false">Emote C</button>
+      <button type="button" data-action="emote_d" aria-pressed="false">Emote D</button>
+    </div>
+    <div class="playback">
+      <button type="button" id="toggle" aria-pressed="false">Pause</button>
+      <button type="button" id="previous-frame">Previous frame</button>
+      <button type="button" id="next-frame">Next frame</button>
+      <label class="fps" for="fps">Speed <input id="fps" type="range" min="1" max="16" value="8"><output id="fps-value" for="fps">8 fps</output></label>
+      <div class="scale-control" role="group" aria-label="Display scale">
+        <span>Scale</span>
+        <button type="button" data-scale="1" aria-pressed="true">1×</button>
+        <button type="button" data-scale="2" aria-pressed="false">2×</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="review-meta">
+    <h2 id="action-label">Idle</h2>
+    <span id="frame-status">Frame 1 / 3 · 180 × 224 px</span>
+  </div>
+  <div class="comparison-scroll" tabindex="0" role="region" aria-label="Side-by-side sprite comparison; scroll horizontally to view both avatars">
+    <div class="comparison">
+      <figure class="avatar">
+        <figcaption><strong>PRESENT.</strong><span>New avatar</span></figcaption>
+        <div class="stage">
+          <img class="sprite" id="present" src="/anim/present/idle_0.png?v=present-model-5" alt="PRESENT., idle, frame 1" width="180" height="224">
+          <p class="load-error" id="present-error" role="status" hidden>PRESENT. frame is unavailable.</p>
+        </div>
+      </figure>
+      <figure class="avatar">
+        <figcaption><strong>Tee Kae</strong><span>Scale reference</span></figcaption>
+        <div class="stage">
+          <img class="sprite" id="teekae" src="/anim/teekae/idle_0.png" alt="Tee Kae, idle, frame 1" width="180" height="224">
+          <p class="load-error" id="teekae-error" role="status" hidden>Tee Kae frame is unavailable.</p>
+        </div>
+      </figure>
+    </div>
+  </div>
+  <p class="notes">Both frames are <code>224 px</code> tall at 1×. The floor marks <code>y = 220</code>; the dashed center line marks each actor's pivot. Scroll horizontally at 2× to see both avatars.</p>
+  <section class="action-size-review" aria-labelledby="action-size-heading">
+    <h2 id="action-size-heading">Compare PRESENT.’s action sizes</h2>
+    <p>Idle, walk, attack, hurt, and emotes share one floor line. This strip stays at 1× so you can compare the head, hoodie, and logo across actions.</p>
+    <div class="comparison-scroll" tabindex="0" role="region" aria-label="PRESENT. action-size comparison; scroll horizontally to view all eight poses">
+      <div class="action-size-row">
+        <figure class="action-size-card">
+          <figcaption><strong>Idle</strong><span>Frame 1</span></figcaption>
+          <div class="stage">
+            <img class="sprite" src="/anim/present/idle_0.png?v=present-model-5" alt="PRESENT., idle, size comparison" width="180" height="224">
+          </div>
+        </figure>
+        <figure class="action-size-card">
+          <figcaption><strong>Walk</strong><span>Frame 2</span></figcaption>
+          <div class="stage">
+            <img class="sprite" src="/anim/present/walk_1.png?v=present-model-5" alt="PRESENT., walk, size comparison" width="180" height="224">
+          </div>
+        </figure>
+        <figure class="action-size-card action-size-card--wide">
+          <figcaption><strong>Attack</strong><span>One-shot · frame 1</span></figcaption>
+          <div class="stage">
+            <img class="sprite" src="/anim/present/attack_0.png?v=present-model-5" alt="PRESENT., attack, size comparison" width="520" height="224">
+          </div>
+        </figure>
+        <figure class="action-size-card action-size-card--wide">
+          <figcaption><strong>Hurt</strong><span>Single reaction</span></figcaption>
+          <div class="stage">
+            <img class="sprite" src="/anim/present/hurt_0.png?v=present-model-5" alt="PRESENT., hurt, size comparison" width="280" height="224">
+          </div>
+        </figure>
+        <figure class="action-size-card">
+          <figcaption><strong>Emote A</strong><span>Single pose</span></figcaption>
+          <div class="stage">
+            <img class="sprite" src="/anim/present/emote_a_0.png?v=present-model-5" alt="PRESENT., emote a, size comparison" width="180" height="224">
+          </div>
+        </figure>
+        <figure class="action-size-card">
+          <figcaption><strong>Emote B</strong><span>Single pose</span></figcaption>
+          <div class="stage">
+            <img class="sprite" src="/anim/present/emote_b_0.png?v=present-model-5" alt="PRESENT., emote b, size comparison" width="180" height="224">
+          </div>
+        </figure>
+        <figure class="action-size-card">
+          <figcaption><strong>Emote C</strong><span>Single pose</span></figcaption>
+          <div class="stage">
+            <img class="sprite" src="/anim/present/emote_c_0.png?v=present-model-5" alt="PRESENT., emote c, size comparison" width="180" height="224">
+          </div>
+        </figure>
+        <figure class="action-size-card">
+          <figcaption><strong>Emote D</strong><span>Single pose</span></figcaption>
+          <div class="stage">
+            <img class="sprite" src="/anim/present/emote_d_0.png?v=present-model-5" alt="PRESENT., emote d, size comparison" width="180" height="224">
+          </div>
+        </figure>
+      </div>
+    </div>
+  </section>
+  <footer>22 frames per avatar · Idle 3 · Walk 6 · Attack 4 · Hurt 1 · Die 4 · Four emotes<br>Poses loop for review. In-game facing and one-shot playback are controlled by the app.</footer>
+</main>
+<script>
+(() => {
+  "use strict";
+  const counts = { idle: 3, walk: 6, attack: 4, hurt: 1, die: 4, emote_a: 1, emote_b: 1, emote_c: 1, emote_d: 1 };
+  const images = ["present", "teekae"].map(id => document.getElementById(id));
+  const toggle = document.getElementById("toggle");
+  const fpsInput = document.getElementById("fps");
+  const actionLabel = document.getElementById("action-label");
+  const frameStatus = document.getElementById("frame-status");
+  let state = "idle";
+  let frame = 0;
+  let fps = 8;
+  let paused = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let elapsed = 0;
+  let lastTime = null;
+
+  function frameSource(avatar, action, index) {
+    return "/anim/" + avatar + "/" + action + "_" + index + ".png" +
+      (avatar === "present" ? "?v=present-model-5" : "");
+  }
+
+  const preloadedFrames = images.flatMap(img =>
+    Object.entries(counts).flatMap(([action, count]) =>
+      Array.from({ length: count }, (_, index) => {
+        const preload = new Image();
+        preload.src = frameSource(img.id, action, index);
+        return preload;
+      })
+    )
+  );
+
+  function dimensions() {
+    return state === "attack" ? 520 : (state === "hurt" || state === "die" ? 280 : 180);
+  }
+
+  function render() {
+    const width = dimensions();
+    images.forEach(img => {
+      img.src = frameSource(img.id, state, frame);
+      img.width = width;
+      img.alt = (img.id === "present" ? "PRESENT." : "Tee Kae") + ", " + actionLabel.textContent + ", frame " + (frame + 1);
+    });
+    frameStatus.textContent = "Frame " + (frame + 1) + " / " + counts[state] + " · " + width + " × 224 px";
+  }
+
+  function renderPlayback() {
+    toggle.textContent = paused ? "Play" : "Pause";
+    toggle.setAttribute("aria-pressed", String(paused));
+    toggle.setAttribute("aria-label", paused ? "Play animation" : "Pause animation");
+  }
+
+  images.forEach(img => {
+    const error = document.getElementById(img.id + "-error");
+    img.addEventListener("error", () => { error.hidden = false; img.style.visibility = "hidden"; });
+    img.addEventListener("load", () => { error.hidden = true; img.style.visibility = "visible"; });
+  });
+
+  document.querySelectorAll("[data-action]").forEach(button => {
+    button.addEventListener("click", () => {
+      state = button.dataset.action;
+      frame = 0;
+      elapsed = 0;
+      actionLabel.textContent = button.textContent;
+      document.querySelectorAll("[data-action]").forEach(other => other.setAttribute("aria-pressed", String(other === button)));
+      render();
+    });
+  });
+
+  toggle.addEventListener("click", () => {
+    paused = !paused;
+    elapsed = 0;
+    renderPlayback();
+  });
+
+  function stepFrame(direction) {
+    paused = true;
+    frame = (frame + direction + counts[state]) % counts[state];
+    elapsed = 0;
+    lastTime = null;
+    renderPlayback();
+    render();
+  }
+
+  document.getElementById("previous-frame").addEventListener("click", () => stepFrame(-1));
+  document.getElementById("next-frame").addEventListener("click", () => stepFrame(1));
+
+  fpsInput.addEventListener("input", () => {
+    fps = Number(fpsInput.value);
+    elapsed = 0;
+    document.getElementById("fps-value").textContent = fps + " fps";
+  });
+
+  document.querySelectorAll("[data-scale]").forEach(button => {
+    button.addEventListener("click", () => {
+      document.documentElement.style.setProperty("--scale", button.dataset.scale);
+      document.querySelectorAll("[data-scale]").forEach(other => other.setAttribute("aria-pressed", String(other === button)));
+    });
+  });
+
+  function tick(now) {
+    if (lastTime !== null && !paused && !document.hidden && counts[state] > 1) {
+      elapsed += Math.min(now - lastTime, 250);
+      const duration = 1000 / fps;
+      if (elapsed >= duration) {
+        const steps = Math.floor(elapsed / duration);
+        frame = (frame + steps) % counts[state];
+        elapsed %= duration;
+        render();
+      }
+    }
+    lastTime = now;
+    requestAnimationFrame(tick);
+  }
+
+  document.addEventListener("visibilitychange", () => { lastTime = null; elapsed = 0; });
+  renderPlayback();
+  render();
+  Promise.allSettled(preloadedFrames.map(img => img.decode())).then(() => {
+    requestAnimationFrame(tick);
+  });
+})();
+</script>
+</body>
+</html>

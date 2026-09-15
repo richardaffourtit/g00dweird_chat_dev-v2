@@ -1,5 +1,8 @@
 import {
     ANIM_CREATURES,
+    ANIM_VERSION,
+    FRAMES,
+    frameSrc,
     getAvailableStates,
     pickTravelStance,
     resolveState,
@@ -12,7 +15,7 @@ import {
 
 describe("animated sprite registry", () => {
     test("only exposes production-ready animated creatures", () => {
-        expect(ANIM_CREATURES).toEqual(expect.arrayContaining(["alien", "cat", "ghost", "slime", "teekae"]));
+        expect(ANIM_CREATURES).toEqual(expect.arrayContaining(["alien", "cat", "ghost", "slime", "teekae", "present"]));
         expect(ANIM_CREATURES).not.toEqual(expect.arrayContaining(["bat", "boo", "plant"]));
         expect(sanitizeAnimCreature("cat")).toBe("cat");
         expect(sanitizeAnimCreature("slime")).toBe("slime");
@@ -67,5 +70,34 @@ describe("animated sprite registry", () => {
         expect(spriteMirrorForFacing("teekae", "attack", true)).toBe(true);
         expect(spriteMirrorForFacing("cat", "walk", false)).toBe(false);
         expect(spriteMirrorForFacing("cat", "walk", true)).toBe(true);
+    });
+});
+
+describe("PRESENT. runtime integration", () => {
+    test("preserves the approved action frames and movement fallbacks", () => {
+        expect(sanitizeAnimCreature("present")).toBe("present");
+        expect(pickTravelStance("present", 120)).toBe("walk");
+        expect(pickTravelStance("present", 400)).toBe("walk");
+        const manifest = require("../../public/anim/manifest.json");
+        expect(FRAMES.present).toEqual(manifest.present);
+        expect(Object.values(FRAMES.present).reduce((sum, n) => sum + n, 0)).toBe(22);
+        const fs = require("fs");
+        const path = require("path");
+        Object.entries(FRAMES.present).forEach(([state, count]) => {
+            expect(resolveState("present", state)).toBe(state);
+            for (let frame = 0; frame < count; frame += 1) {
+                expect(fs.existsSync(path.resolve(process.cwd(), `public/anim/present/${state}_${frame}.png`))).toBe(true);
+                expect(frameSrc("present", state, frame)).toBe(`/anim/present/${state}_${frame}.png?v=${ANIM_VERSION}`);
+            }
+        });
+    });
+
+    test("faces the movement and attack toward their requested direction", () => {
+        ["idle", "walk", "hurt", "die", "emote_a", "emote_b", "emote_c", "emote_d"].forEach(state => {
+            expect(spriteMirrorForFacing("present", state, false)).toBe(true);
+            expect(spriteMirrorForFacing("present", state, true)).toBe(false);
+        });
+        expect(spriteMirrorForFacing("present", "attack", false)).toBe(false);
+        expect(spriteMirrorForFacing("present", "attack", true)).toBe(true);
     });
 });

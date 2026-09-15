@@ -18,7 +18,7 @@ import React, { useEffect, useRef } from "react";
  * STATE_ALIASES maps requested-but-missing states onto sensible existing frames.
  */
 
-export const ANIM_VERSION = 34;
+export const ANIM_VERSION = 35;
 
 // Frame counts per creature/state — mirrors slicer v3 / unified output.
 export const FRAMES = {
@@ -44,6 +44,8 @@ export const FRAMES = {
                 emote_a: 1, emote_b: 1, emote_c: 1, emote_d: 1 },
     teekae:   { idle: 3, walk: 6, attack: 4, hurt: 1, die: 4,
                 emote_a: 1, emote_b: 1, emote_c: 1, emote_d: 1 },
+    present: { idle: 3, walk: 6, attack: 4, hurt: 1, die: 4,
+               emote_a: 1, emote_b: 1, emote_c: 1, emote_d: 1 },
     weirdbot: { idle: 4, talk: 4, think: 4, walk: 6, glitch: 4, react: 4 },
 };
 
@@ -108,7 +110,9 @@ function ensureCleanedSpriteManifest() {
         });
 }
 
-function frameSrc(creature, state, frame) {
+export function frameSrc(creature, state, frame) {
+    // PRESENT. ships finished, pivot-aligned frames; recropping changes his scale.
+    if (creature === "present") return `/anim/present/${state}_${frame}.png?v=${ANIM_VERSION}`;
     const cleaned = USE_CLEANED_SPRITES ? cleanedFrameSrc(creature, state, frame) : null;
     if (cleaned) return cleaned;
     return `/anim/${creature}/${state}_${frame}.png?v=${ANIM_VERSION}`;
@@ -190,11 +194,12 @@ export function spriteVisualEffect(creature) {
 }
 
 // Most animation sheets are authored facing right, so `faceLeft` normally
-// maps directly to a horizontal mirror. Tee Kae's standing/walking poses were
-// authored facing left; his attack row is already right-facing and must keep
-// the normal rule so its microphone blast still points toward the target.
+// maps directly to a horizontal mirror. Tee Kae and PRESENT. have left-facing
+// movement poses but right-facing attacks; preserve each action's native facing
+// so both movement and attack effects point toward the target.
 const NATIVE_LEFT_STATES = {
     teekae: new Set(["idle", "walk", "emote_a", "emote_b", "emote_c", "emote_d"]),
+    present: new Set(["idle", "walk", "hurt", "die", "emote_a", "emote_b", "emote_c", "emote_d"]),
 };
 
 export function spriteMirrorForFacing(creature, state, faceLeft = false) {
@@ -249,6 +254,7 @@ export const EMOTE_LABELS = {
     slime:    { emote_a: "?", emote_b: "♥", emote_c: "!", emote_d: "z" },
     tvhead:   { emote_a: "?", emote_b: "♥", emote_c: "!", emote_d: "><" },
     teekae:   { emote_a: "♥", emote_b: "?", emote_c: "✨", emote_d: "♫" },
+    present:  { emote_a: "♥", emote_b: "?", emote_c: "✨", emote_d: "♫" },
 };
 
 export default function AnimSprite({

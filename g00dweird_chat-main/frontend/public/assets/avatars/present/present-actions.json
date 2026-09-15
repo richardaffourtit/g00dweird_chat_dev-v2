@@ -1,0 +1,520 @@
+{
+  "id": "present",
+  "displayName": "PRESENT.",
+  "image": "present-actions.png",
+  "size": {
+    "width": 2080,
+    "height": 1344
+  },
+  "frameCounts": {
+    "idle": 3,
+    "walk": 6,
+    "attack": 4,
+    "hurt": 1,
+    "die": 4,
+    "emote_a": 1,
+    "emote_b": 1,
+    "emote_c": 1,
+    "emote_d": 1
+  },
+  "defaultFps": 8,
+  "baselineY": 220,
+  "standingHeight": 201,
+  "walkRevision": 5,
+  "attackRevision": 5,
+  "sharedHead": {
+    "reference": "idle_0",
+    "scale": 1,
+    "walk": "left",
+    "attack": "mirrored-right"
+  },
+  "walkPhases": [
+    "near-contact",
+    "near-support",
+    "far-reach",
+    "far-contact",
+    "far-support",
+    "near-reach"
+  ],
+  "nativeFacing": {
+    "idle": "left",
+    "walk": "left",
+    "emote_a": "left",
+    "emote_b": "left",
+    "emote_c": "left",
+    "emote_d": "left",
+    "hurt": "left",
+    "die": "left",
+    "attack": "right"
+  },
+  "alphaCutoff": 128,
+  "resampling": "nearest",
+  "sourceScales": {
+    "base": 0.8626609442060086,
+    "attack": 0.35638297872340424,
+    "walk": 0.32211538461538464
+  },
+  "reactionScaleMultiplier": 1.15,
+  "frames": {
+    "idle_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/idle_0.png",
+      "opaqueBounds": [
+        47,
+        19,
+        132,
+        220
+      ]
+    },
+    "idle_1": {
+      "frame": {
+        "x": 180,
+        "y": 0,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/idle_1.png",
+      "opaqueBounds": [
+        48,
+        20,
+        132,
+        220
+      ]
+    },
+    "idle_2": {
+      "frame": {
+        "x": 360,
+        "y": 0,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/idle_2.png",
+      "opaqueBounds": [
+        46,
+        20,
+        131,
+        220
+      ]
+    },
+    "walk_0": {
+      "frame": {
+        "x": 0,
+        "y": 224,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/walk_0.png",
+      "opaqueBounds": [
+        39,
+        19,
+        139,
+        220
+      ]
+    },
+    "walk_1": {
+      "frame": {
+        "x": 180,
+        "y": 224,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/walk_1.png",
+      "opaqueBounds": [
+        58,
+        19,
+        131,
+        220
+      ]
+    },
+    "walk_2": {
+      "frame": {
+        "x": 360,
+        "y": 224,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/walk_2.png",
+      "opaqueBounds": [
+        36,
+        19,
+        139,
+        220
+      ]
+    },
+    "walk_3": {
+      "frame": {
+        "x": 540,
+        "y": 224,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/walk_3.png",
+      "opaqueBounds": [
+        35,
+        19,
+        143,
+        220
+      ]
+    },
+    "walk_4": {
+      "frame": {
+        "x": 720,
+        "y": 224,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/walk_4.png",
+      "opaqueBounds": [
+        58,
+        19,
+        127,
+        220
+      ]
+    },
+    "walk_5": {
+      "frame": {
+        "x": 900,
+        "y": 224,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/walk_5.png",
+      "opaqueBounds": [
+        37,
+        19,
+        139,
+        220
+      ]
+    },
+    "emote_a_0": {
+      "frame": {
+        "x": 0,
+        "y": 448,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/emote_a_0.png",
+      "opaqueBounds": [
+        21,
+        20,
+        132,
+        220
+      ]
+    },
+    "emote_b_0": {
+      "frame": {
+        "x": 180,
+        "y": 448,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/emote_b_0.png",
+      "opaqueBounds": [
+        23,
+        22,
+        163,
+        220
+      ]
+    },
+    "emote_c_0": {
+      "frame": {
+        "x": 360,
+        "y": 448,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/emote_c_0.png",
+      "opaqueBounds": [
+        21,
+        21,
+        148,
+        220
+      ]
+    },
+    "emote_d_0": {
+      "frame": {
+        "x": 540,
+        "y": 448,
+        "w": 180,
+        "h": 224
+      },
+      "pivot": {
+        "x": 90,
+        "y": 220
+      },
+      "source": "/anim/present/emote_d_0.png",
+      "opaqueBounds": [
+        24,
+        22,
+        157,
+        220
+      ]
+    },
+    "attack_0": {
+      "frame": {
+        "x": 0,
+        "y": 672,
+        "w": 520,
+        "h": 224
+      },
+      "pivot": {
+        "x": 260,
+        "y": 220
+      },
+      "source": "/anim/present/attack_0.png",
+      "opaqueBounds": [
+        201,
+        19,
+        324,
+        220
+      ]
+    },
+    "attack_1": {
+      "frame": {
+        "x": 520,
+        "y": 672,
+        "w": 520,
+        "h": 224
+      },
+      "pivot": {
+        "x": 260,
+        "y": 220
+      },
+      "source": "/anim/present/attack_1.png",
+      "opaqueBounds": [
+        202,
+        19,
+        368,
+        220
+      ]
+    },
+    "attack_2": {
+      "frame": {
+        "x": 1040,
+        "y": 672,
+        "w": 520,
+        "h": 224
+      },
+      "pivot": {
+        "x": 260,
+        "y": 220
+      },
+      "source": "/anim/present/attack_2.png",
+      "opaqueBounds": [
+        200,
+        19,
+        385,
+        220
+      ]
+    },
+    "attack_3": {
+      "frame": {
+        "x": 1560,
+        "y": 672,
+        "w": 520,
+        "h": 224
+      },
+      "pivot": {
+        "x": 260,
+        "y": 220
+      },
+      "source": "/anim/present/attack_3.png",
+      "opaqueBounds": [
+        202,
+        19,
+        358,
+        220
+      ]
+    },
+    "hurt_0": {
+      "frame": {
+        "x": 0,
+        "y": 896,
+        "w": 280,
+        "h": 224
+      },
+      "pivot": {
+        "x": 140,
+        "y": 220
+      },
+      "source": "/anim/present/hurt_0.png",
+      "opaqueBounds": [
+        71,
+        33,
+        221,
+        220
+      ]
+    },
+    "die_0": {
+      "frame": {
+        "x": 0,
+        "y": 1120,
+        "w": 280,
+        "h": 224
+      },
+      "pivot": {
+        "x": 140,
+        "y": 220
+      },
+      "source": "/anim/present/die_0.png",
+      "opaqueBounds": [
+        71,
+        33,
+        221,
+        220
+      ]
+    },
+    "die_1": {
+      "frame": {
+        "x": 280,
+        "y": 1120,
+        "w": 280,
+        "h": 224
+      },
+      "pivot": {
+        "x": 140,
+        "y": 220
+      },
+      "source": "/anim/present/die_1.png",
+      "opaqueBounds": [
+        52,
+        34,
+        234,
+        220
+      ]
+    },
+    "die_2": {
+      "frame": {
+        "x": 560,
+        "y": 1120,
+        "w": 280,
+        "h": 224
+      },
+      "pivot": {
+        "x": 140,
+        "y": 220
+      },
+      "source": "/anim/present/die_2.png",
+      "opaqueBounds": [
+        48,
+        138,
+        242,
+        220
+      ]
+    },
+    "die_3": {
+      "frame": {
+        "x": 840,
+        "y": 1120,
+        "w": 280,
+        "h": 224
+      },
+      "pivot": {
+        "x": 140,
+        "y": 220
+      },
+      "source": "/anim/present/die_3.png",
+      "opaqueBounds": [
+        49,
+        141,
+        236,
+        220
+      ]
+    }
+  },
+  "animations": {
+    "idle": [
+      "idle_0",
+      "idle_1",
+      "idle_2"
+    ],
+    "walk": [
+      "walk_0",
+      "walk_1",
+      "walk_2",
+      "walk_3",
+      "walk_4",
+      "walk_5"
+    ],
+    "emote_a": [
+      "emote_a_0"
+    ],
+    "emote_b": [
+      "emote_b_0"
+    ],
+    "emote_c": [
+      "emote_c_0"
+    ],
+    "emote_d": [
+      "emote_d_0"
+    ],
+    "attack": [
+      "attack_0",
+      "attack_1",
+      "attack_2",
+      "attack_3"
+    ],
+    "hurt": [
+      "hurt_0"
+    ],
+    "die": [
+      "die_0",
+      "die_1",
+      "die_2",
+      "die_3"
+    ]
+  }
+}

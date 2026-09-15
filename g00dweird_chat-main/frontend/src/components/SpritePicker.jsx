@@ -5,6 +5,7 @@ import AnimSprite, { ANIM_CREATURES, getAvailableStates, EMOTE_LABELS } from "./
 
 export const ANIM_DISPLAY_NAMES = {
     teekae: "Tee Kae",
+    present: "PRESENT.",
 };
 
 export function animDisplayName(id) {
