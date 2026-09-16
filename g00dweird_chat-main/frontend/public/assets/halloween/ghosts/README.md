@@ -60,8 +60,8 @@ These are ambient scene assets, separate from the selectable `ghost` avatar.
 
 ## Scene appearance
 
-`appearance.css` gives the cropped sprites a spectral green tint and soft green
-halo. Apply `halloween-ghost-glow` to an outer wrapper around the clipped frame;
+`appearance.css` gives the cropped sprites a soft green outer halo while preserving
+their original colors. Apply `halloween-ghost-glow` to an outer wrapper around the clipped frame;
 this keeps neighboring atlas cells out of the glow. The original artwork remains
 available for future palette changes. Preview and chat share this stylesheet.
 The approved scene size is 0.75 × the preview's base size.

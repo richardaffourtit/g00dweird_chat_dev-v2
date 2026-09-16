@@ -1,7 +1,6 @@
 /* Apply to a wrapper around the cropped frame so the halo follows one pose. */
 .halloween-ghost-glow {
     filter:
-        grayscale(1) sepia(1) saturate(3) hue-rotate(65deg) brightness(1.15)
         drop-shadow(0 0 2px #b7ff96)
         drop-shadow(0 0 7px #5fff6288);
     pointer-events: none;

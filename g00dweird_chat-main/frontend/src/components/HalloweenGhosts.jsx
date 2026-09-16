@@ -134,7 +134,7 @@ export default function HalloweenGhosts() {
 
     return (
         <div ref={layerRef} className="halloween-ghosts" data-testid="halloween-ghosts" aria-hidden="true">
-            <link rel="stylesheet" href="/assets/halloween/ghosts/appearance.css" />
+            <link rel="stylesheet" href="/assets/halloween/ghosts/appearance.css?v=2" />
             {ghosts.map((ghost) => (
                 <React.Fragment key={ghost.id}>
                     <span className="halloween-ghost-ground" data-ghost-ground={ghost.id} />
