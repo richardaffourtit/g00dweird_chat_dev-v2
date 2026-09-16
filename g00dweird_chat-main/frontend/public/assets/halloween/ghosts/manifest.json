@@ -1,0 +1,677 @@
+{
+  "version": 1,
+  "ghosts": [
+    {
+      "id": "ghost1",
+      "name": "Crooked Grin",
+      "sheet": "/assets/halloween/ghosts/ghost1/sheet.png",
+      "frameWidth": 354,
+      "frameHeight": 314,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.96
+      },
+      "preview": "/assets/halloween/ghosts/ghost1/float.webp",
+      "animations": {
+        "rise": {
+          "row": 0,
+          "frames": 4,
+          "fps": 7,
+          "loop": false,
+          "next": "float",
+          "files": [
+            "/assets/halloween/ghosts/ghost1/rise_0.png",
+            "/assets/halloween/ghosts/ghost1/rise_1.png",
+            "/assets/halloween/ghosts/ghost1/rise_2.png",
+            "/assets/halloween/ghosts/ghost1/rise_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        },
+        "float": {
+          "row": 1,
+          "frames": 4,
+          "fps": 6,
+          "loop": true,
+          "files": [
+            "/assets/halloween/ghosts/ghost1/float_0.png",
+            "/assets/halloween/ghosts/ghost1/float_1.png",
+            "/assets/halloween/ghosts/ghost1/float_2.png",
+            "/assets/halloween/ghosts/ghost1/float_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        },
+        "haunt": {
+          "row": 2,
+          "frames": 4,
+          "fps": 7,
+          "loop": false,
+          "next": "float",
+          "files": [
+            "/assets/halloween/ghosts/ghost1/haunt_0.png",
+            "/assets/halloween/ghosts/ghost1/haunt_1.png",
+            "/assets/halloween/ghosts/ghost1/haunt_2.png",
+            "/assets/halloween/ghosts/ghost1/haunt_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        },
+        "vanish": {
+          "row": 3,
+          "frames": 4,
+          "fps": 7,
+          "loop": false,
+          "files": [
+            "/assets/halloween/ghosts/ghost1/vanish_0.png",
+            "/assets/halloween/ghosts/ghost1/vanish_1.png",
+            "/assets/halloween/ghosts/ghost1/vanish_2.png",
+            "/assets/halloween/ghosts/ghost1/vanish_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ghost2",
+      "name": "Velvet Eyes",
+      "sheet": "/assets/halloween/ghosts/ghost2/sheet.png",
+      "frameWidth": 354,
+      "frameHeight": 314,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.96
+      },
+      "preview": "/assets/halloween/ghosts/ghost2/float.webp",
+      "animations": {
+        "rise": {
+          "row": 0,
+          "frames": 4,
+          "fps": 7,
+          "loop": false,
+          "next": "float",
+          "files": [
+            "/assets/halloween/ghosts/ghost2/rise_0.png",
+            "/assets/halloween/ghosts/ghost2/rise_1.png",
+            "/assets/halloween/ghosts/ghost2/rise_2.png",
+            "/assets/halloween/ghosts/ghost2/rise_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        },
+        "float": {
+          "row": 1,
+          "frames": 4,
+          "fps": 6,
+          "loop": true,
+          "files": [
+            "/assets/halloween/ghosts/ghost2/float_0.png",
+            "/assets/halloween/ghosts/ghost2/float_1.png",
+            "/assets/halloween/ghosts/ghost2/float_2.png",
+            "/assets/halloween/ghosts/ghost2/float_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        },
+        "haunt": {
+          "row": 2,
+          "frames": 4,
+          "fps": 7,
+          "loop": false,
+          "next": "float",
+          "files": [
+            "/assets/halloween/ghosts/ghost2/haunt_0.png",
+            "/assets/halloween/ghosts/ghost2/haunt_1.png",
+            "/assets/halloween/ghosts/ghost2/haunt_2.png",
+            "/assets/halloween/ghosts/ghost2/haunt_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        },
+        "vanish": {
+          "row": 3,
+          "frames": 4,
+          "fps": 7,
+          "loop": false,
+          "files": [
+            "/assets/halloween/ghosts/ghost2/vanish_0.png",
+            "/assets/halloween/ghosts/ghost2/vanish_1.png",
+            "/assets/halloween/ghosts/ghost2/vanish_2.png",
+            "/assets/halloween/ghosts/ghost2/vanish_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ghost3",
+      "name": "Little Wisp",
+      "sheet": "/assets/halloween/ghosts/ghost3/sheet.png",
+      "frameWidth": 354,
+      "frameHeight": 314,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.96
+      },
+      "preview": "/assets/halloween/ghosts/ghost3/float.webp",
+      "animations": {
+        "rise": {
+          "row": 0,
+          "frames": 4,
+          "fps": 7,
+          "loop": false,
+          "next": "float",
+          "files": [
+            "/assets/halloween/ghosts/ghost3/rise_0.png",
+            "/assets/halloween/ghosts/ghost3/rise_1.png",
+            "/assets/halloween/ghosts/ghost3/rise_2.png",
+            "/assets/halloween/ghosts/ghost3/rise_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        },
+        "float": {
+          "row": 1,
+          "frames": 4,
+          "fps": 6,
+          "loop": true,
+          "files": [
+            "/assets/halloween/ghosts/ghost3/float_0.png",
+            "/assets/halloween/ghosts/ghost3/float_1.png",
+            "/assets/halloween/ghosts/ghost3/float_2.png",
+            "/assets/halloween/ghosts/ghost3/float_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        },
+        "haunt": {
+          "row": 2,
+          "frames": 4,
+          "fps": 7,
+          "loop": false,
+          "next": "float",
+          "files": [
+            "/assets/halloween/ghosts/ghost3/haunt_0.png",
+            "/assets/halloween/ghosts/ghost3/haunt_1.png",
+            "/assets/halloween/ghosts/ghost3/haunt_2.png",
+            "/assets/halloween/ghosts/ghost3/haunt_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        },
+        "vanish": {
+          "row": 3,
+          "frames": 4,
+          "fps": 7,
+          "loop": false,
+          "files": [
+            "/assets/halloween/ghosts/ghost3/vanish_0.png",
+            "/assets/halloween/ghosts/ghost3/vanish_1.png",
+            "/assets/halloween/ghosts/ghost3/vanish_2.png",
+            "/assets/halloween/ghosts/ghost3/vanish_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ghost4",
+      "name": "Skull Veil",
+      "sheet": "/assets/halloween/ghosts/ghost4/sheet.png",
+      "frameWidth": 354,
+      "frameHeight": 314,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.96
+      },
+      "preview": "/assets/halloween/ghosts/ghost4/float.webp",
+      "animations": {
+        "rise": {
+          "row": 0,
+          "frames": 4,
+          "fps": 7,
+          "loop": false,
+          "next": "float",
+          "files": [
+            "/assets/halloween/ghosts/ghost4/rise_0.png",
+            "/assets/halloween/ghosts/ghost4/rise_1.png",
+            "/assets/halloween/ghosts/ghost4/rise_2.png",
+            "/assets/halloween/ghosts/ghost4/rise_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 0,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        },
+        "float": {
+          "row": 1,
+          "frames": 4,
+          "fps": 6,
+          "loop": true,
+          "files": [
+            "/assets/halloween/ghosts/ghost4/float_0.png",
+            "/assets/halloween/ghosts/ghost4/float_1.png",
+            "/assets/halloween/ghosts/ghost4/float_2.png",
+            "/assets/halloween/ghosts/ghost4/float_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 314,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        },
+        "haunt": {
+          "row": 2,
+          "frames": 4,
+          "fps": 7,
+          "loop": false,
+          "next": "float",
+          "files": [
+            "/assets/halloween/ghosts/ghost4/haunt_0.png",
+            "/assets/halloween/ghosts/ghost4/haunt_1.png",
+            "/assets/halloween/ghosts/ghost4/haunt_2.png",
+            "/assets/halloween/ghosts/ghost4/haunt_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 628,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        },
+        "vanish": {
+          "row": 3,
+          "frames": 4,
+          "fps": 7,
+          "loop": false,
+          "files": [
+            "/assets/halloween/ghosts/ghost4/vanish_0.png",
+            "/assets/halloween/ghosts/ghost4/vanish_1.png",
+            "/assets/halloween/ghosts/ghost4/vanish_2.png",
+            "/assets/halloween/ghosts/ghost4/vanish_3.png"
+          ],
+          "atlasFrames": [
+            {
+              "x": 0,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 354,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 708,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            },
+            {
+              "x": 1062,
+              "y": 942,
+              "w": 354,
+              "h": 314
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

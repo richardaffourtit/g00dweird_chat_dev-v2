@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import HalloweenGhosts from "./HalloweenGhosts";
 import "./HalloweenScene.css";
 
 // Coordinates are percentages of the square artwork, independent of stage size.
@@ -72,6 +73,7 @@ export default function HalloweenScene() {
                     />
                 ))}
             </div>
+            <HalloweenGhosts />
             {SECRETS.map((secret) => (
                 <button
                     key={secret.id}

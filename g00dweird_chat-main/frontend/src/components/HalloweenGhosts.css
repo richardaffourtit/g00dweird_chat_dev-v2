@@ -1,0 +1,46 @@
+.halloween-ghosts {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.halloween-ghost-actor,
+.halloween-ghost-ground {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.halloween-ghost-actor { user-select: none; }
+
+.halloween-ghost-actor > .halloween-ghost-glow,
+.halloween-ghost-crop {
+    width: 100%;
+    height: 100%;
+}
+
+.halloween-ghost-crop {
+    position: relative;
+    overflow: hidden;
+}
+
+.halloween-ghost-sheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 400%;
+    height: 400%;
+    max-width: none;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.halloween-ghost-ground {
+    height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, #d3ffba99 0%, #83ff624d 35%, #54ed6122 58%, transparent 75%);
+    mix-blend-mode: screen;
+}
