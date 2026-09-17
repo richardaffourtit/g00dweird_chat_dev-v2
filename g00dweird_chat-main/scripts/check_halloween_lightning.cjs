@@ -24,6 +24,22 @@ const reportDir = path.resolve(__dirname, "../reports/halloween-lightning");
     await page.waitForFunction(() => document.querySelector('[data-testid="halloween-lighting"]')?.dataset.ready === "true");
     const states = [];
     const capture = async (name, expectedPhase) => {
+        // Visibility assertions alone miss opaque scenery covering a message.
+        // Include the normally click-through art in a hit-test to check paint
+        // order, then restore its event behavior before continuing.
+        const chatOnTop = await page.getByTestId("chat-messages").evaluate((panel) => {
+            const art = document.querySelector(".halloween-lighting");
+            const previous = art.style.pointerEvents;
+            try {
+                art.style.pointerEvents = "auto";
+                const bounds = panel.getBoundingClientRect();
+                const front = document.elementFromPoint(bounds.left + 16, bounds.top + 20);
+                return panel.contains(front);
+            } finally {
+                art.style.pointerEvents = previous;
+            }
+        });
+        assert.equal(chatOnTop, true, `${name}: chat must paint above the room artwork`);
         const state = await lighting.evaluate((node) => ({
             phase: node.dataset.phase,
             strike: node.dataset.strike,

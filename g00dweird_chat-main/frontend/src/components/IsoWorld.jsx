@@ -1664,6 +1664,8 @@ export default function IsoWorld({
             }}
             data-testid="iso-world"
             style={{
+                // Keep every scene layer below the sibling chat overlays.
+                isolation: "isolate",
                 backgroundColor: "#111",
                 imageRendering: "pixelated",
                 cursor: isBasketballCourt && hoopsMode ? "crosshair" : hoveringWorldReaction ? "help" : undefined,
