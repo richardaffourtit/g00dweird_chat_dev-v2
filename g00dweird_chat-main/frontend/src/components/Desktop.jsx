@@ -136,12 +136,9 @@ export default function Desktop({ user, onLogout }) {
             .then((rs) => {
                 setRooms(rs);
                 if (!activeRoom && rs.length) {
-                    if (urlRoomId) {
-                        const match = rs.find((r) => r.id === urlRoomId);
-                        setActiveRoom(match || rs[0]);
-                    } else {
-                        setActiveRoom(rs[0]);
-                    }
+                    const requestedRoom = rs.find((room) => room.id === urlRoomId);
+                    const defaultRoom = rs.find((room) => room.id === "halloween") || rs[0];
+                    setActiveRoom(requestedRoom || defaultRoom);
                 }
             })
             .catch((error) => {
