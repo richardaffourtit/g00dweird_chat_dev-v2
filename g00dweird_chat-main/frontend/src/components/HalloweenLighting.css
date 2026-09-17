@@ -1,0 +1,68 @@
+.halloween-lighting,
+.halloween-art,
+.halloween-sky-flash,
+.halloween-bolts,
+.halloween-cast-shadows {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.halloween-lighting {
+    overflow: hidden;
+    opacity: 0;
+    background: #0d0818;
+}
+
+.halloween-lighting[data-ready="true"] { opacity: 1; }
+.halloween-art { max-width: none; image-rendering: pixelated; user-select: none; }
+.halloween-background {
+    filter: brightness(calc(1 - var(--halloween-darkness, 0) * 0.95));
+}
+
+.halloween-sky-flash {
+    background: radial-gradient(ellipse at 56% 8%, #fff 0%, #ced1ff 34%, #9184c0 65%, transparent 95%);
+    opacity: calc(var(--halloween-flash, 0) * 0.88);
+}
+
+.halloween-bolts {
+    fill: none;
+    stroke: #fffef6;
+    stroke-linejoin: miter;
+    opacity: var(--halloween-bolt, 0);
+    filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 9px #bca4ff);
+    shape-rendering: crispEdges;
+}
+
+.halloween-foreground {
+    filter: brightness(calc(1 - var(--halloween-darkness, 0) * 0.96 + var(--halloween-flash, 0) * 1.9))
+        saturate(calc(1 - var(--halloween-darkness, 0) * 0.35))
+        contrast(calc(1 + var(--halloween-flash, 0) * 0.25));
+}
+
+.halloween-cast-shadows {
+    fill: #090714;
+    opacity: calc(var(--halloween-shadow, 0) * 0.82);
+}
+
+.halloween-lighting [data-strike-shape] { display: none; }
+.halloween-lighting[data-strike="0"] [data-strike-shape="0"],
+.halloween-lighting[data-strike="1"] [data-strike-shape="1"] { display: initial; }
+
+.halloween-lantern-light { opacity: var(--halloween-darkness, 0); }
+
+.halloween-scene .halloween-ghosts {
+    filter: brightness(calc(1 - var(--halloween-darkness, 0) * 0.75 + var(--halloween-flash, 0) * 0.5));
+}
+
+[data-world-theme="halloween"] [data-world-actor-art] {
+    filter: brightness(var(--halloween-actor-brightness, 1));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .halloween-sky-flash, .halloween-bolts, .halloween-cast-shadows { display: none; }
+    .halloween-background, .halloween-foreground, .halloween-scene .halloween-ghosts,
+    [data-world-theme="halloween"] [data-world-actor-art] { filter: none; }
+}

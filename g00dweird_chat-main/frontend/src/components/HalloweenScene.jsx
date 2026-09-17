@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import HalloweenGhosts from "./HalloweenGhosts";
+import HalloweenLighting from "./HalloweenLighting";
 import "./HalloweenScene.css";
 
 // Coordinates are percentages of the square artwork, independent of stage size.
@@ -7,6 +8,7 @@ const LANTERNS = [
     { x: 7.5, y: 49 },
     { x: 27.3, y: 30 },
     { x: 38.5, y: 29 },
+    { x: 47, y: 26.2 },
     { x: 60.1, y: 30 },
     { x: 76, y: 35.7 },
     { x: 40.8, y: 65.2 },
@@ -57,6 +59,7 @@ export default function HalloweenScene() {
 
     return (
         <div className="halloween-scene" data-testid="halloween-scene" data-awake={Boolean(reaction)}>
+            <HalloweenLighting />
             <div aria-hidden="true" className="halloween-atmosphere">
                 {LANTERNS.map((lantern, index) => (
                     <span

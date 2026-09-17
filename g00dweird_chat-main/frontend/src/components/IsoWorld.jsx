@@ -1767,6 +1767,7 @@ export default function IsoWorld({
             <div
                 className="absolute overflow-visible"
                 data-testid="iso-world-plane"
+                data-world-theme={room?.theme}
                 style={{
                     left: worldRect.left,
                     top: worldRect.top,
@@ -2035,7 +2036,7 @@ export default function IsoWorld({
                             {isMe ? " ◄" : ""}
                         </div>
 
-                        <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "flex-end" }}>
+                        <div data-world-actor-art="" style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "flex-end" }}>
                             {u.anim_stance === "hurt" && (
                                 <div
                                     aria-hidden
